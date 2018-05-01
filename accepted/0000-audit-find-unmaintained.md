@@ -105,3 +105,4 @@ As far as I know, no dependency managers/cli tools offer a report which specific
  fixes, pull requests, and other features, but the primary package is still what's shown at the top of npmjs's repository. 
    * In another RFC I intend to submit, I will suggest the ability to find forks and other packages, for use in place of packages flagged by audit unmaintained. 
 
+ * My search for Prior art and alternatives was rather limited.
