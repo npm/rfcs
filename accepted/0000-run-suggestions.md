@@ -43,9 +43,10 @@ It could be useful to also check reverses of the scripts and consider them in th
 
 ## Rationale and Alternatives
 
-> This is required, even if it seems like a stretch
+It could keep the same behavior, which I think doesn't help users with script typos.
 
-I'm sorry, but I can't come up with alternatives to help with this problem.
+It could show all scripts as per `npm run` without arguments.
+This doesn't seem like it would help with confused users; not explicitly calling out probable typos won't suggest a typo to the user.
 
 ## Implementation
 
