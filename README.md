@@ -24,6 +24,7 @@ feature requests made there will be redirected to the RFCs repository.
 * Copy `accepted/0000-template.md` into `accepted/0000-your-rfc-name.md`.
 * Fill in and edit the template with your own proposal.
 * Submit a PR to the `npm/rfcs` repo.
+* Link to the PR in [the RFCs forum on npm.community](https://npm.community/c/ideas/rfcs)
 * Tell all your friends! (don't ping npm folks -- we already get notified RFCs)
 
 ## How does review work?
@@ -34,18 +35,15 @@ discussion and ask questions and provide (constructive) feedback. Keep in mind
 that only npm collaborators are able to ratify the RFC itself, even if other
 users can comment.
 
-Side discussion can happen externally, in public or private, and it's
-recommended that anyone submitting an RFC join [the `#js-npm` channel in the
-package.community Discord](https://package.community), where npm collaborators
-are available for more immediate back-and-forth discussions about RFCs and
-details.
+Side discussion can happen externally, in public or private, with general non-review
+discussion happening in [the RFC category in npm.community](https://npm.community/c/ideas/rfcs),
+where npm collaborators are available for more immediate back-and-forth discussions
+about RFCs and details.
 
 All discussions surrounding an RFC are covered by the [npm Code of
-Conduct](https://www.npmjs.com/policies/conduct). Discussions on the
-[package.community](https://package.community) are *additionally* covered by
-[its own Code of Conduct](https://package.community/code-of-conduct). Please
-keep conversations constructive, civil, and low-temperature. If tensions flare
-during discussion, the npm team may, at its own discretion, moderate, remove, or
+Conduct](https://www.npmjs.com/policies/conduct). Please keep conversations
+constructive, civil, and low-temperature. If tensions flare during discussion,
+the npm team may, at its own discretion, moderate, remove, or
 edit posts, as well as locking the discussion on that PR or the entire RFCs
 repository.
 
