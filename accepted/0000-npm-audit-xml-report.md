@@ -19,7 +19,7 @@ This should be done by executing `npm audit --owasp`.
 
 Instead of implementing an OWASP Dependency Check XML generation it should be possbile to add support for custom audit reporters. So third party reporters can do this job.
 
-A tool that can process the json format report from `npm audit --json`.
+A tool that can process the json format report from `npm audit --json`. That's a valid alternative but why has `npm audit` a json representation and not owasp report for a direct use in a security plugin?
 
 ## Implementation
 
