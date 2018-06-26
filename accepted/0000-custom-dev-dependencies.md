@@ -44,11 +44,11 @@ package.json can have multiple dependencies:
 
 There can be an argument in the npm install command to install different sets of devDependencies, where devDependencies itself would be default:
 
-`npm install` will install default and dev dependencies
-`npm install --prod` will install default packages only
-`npm install --dependencies=cypress` would install default, dev and Cypress packages
-`npm install --prod --dependencies would install default and Cypress packages
-`npm install --dependencies=karma` would install default, dev and karma packages (so not the wonderful but bulky Cypress packages)
+- `npm install` will install default and dev dependencies
+- `npm install --prod` will install default packages only
+- `npm install --dependencies=cypress` would install default, dev and Cypress packages
+- `npm install --prod --dependencies would install default and Cypress packages
+- `npm install --dependencies=karma` would install default, dev and karma packages (so not the wonderful but bulky Cypress packages)
 
 ## Rationale and Alternatives
 
