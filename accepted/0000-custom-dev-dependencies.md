@@ -56,6 +56,7 @@ There can be an argument in the npm install command to install different sets of
 file or the developer would have to do this manually. Also, there has to be an argument for `npm install` in which you can define which package.json you would like to use, or the developer can manually rename files. 
 - Just accept those build times.
 - Use another testing tool that's not bulky. (I tried the normal way to test Angular. It's hell on earth)
+- Using an external tool (maybe grunt?) to manage package.json variants.
 
 ## Implementation
 
@@ -71,6 +72,8 @@ file or the developer would have to do this manually. Also, there has to be an a
 
 ## Unresolved Questions and Bikeshedding
 
-{{Write about any arbitrary decisions that need to be made (syntax, colors, formatting, minor UX decisions), and any questions for the proposal that have not been answered.}}
+- What should the default be?
+- What should the option be called?
+- Should other things have namespaces, like scripts?
 
 {{THIS SECTION SHOULD BE REMOVED BEFORE RATIFICATION}}
