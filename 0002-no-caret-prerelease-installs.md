@@ -20,13 +20,13 @@ results in
 
 ## Motivation
 
-{{Why are we doing this? What pain points does this resolve? What use cases does it support? What is the expected outcome? Use real, concrete examples to make your case!}}
-
 As mentioned in the `node-semver` [readme](https://github.com/npm/node-semver#prerelease-tags), package authors may intentionally use prerelease tags to signify instability and breaking changes (`-alpha`, `-beta`).
 
 However, when a user tries to install a package like `@babel/core` from the cli with `npm install`, the default behavior of `--save` or `--save-dev` to `package.json` applies the `^` in front of the version which will install the latest prerelease in subsequent installs.
 
 This may be an unexpected experience for end users, as they may not realize they have installed the prerelease version initially, or don't understand that a package author maybe in the midst of other breaking changes that a user would not want to automatically have to deal with on CI or locally.
+
+*Example issue*: https://github.com/babel/babel/issues/7786#issuecomment-383586020
 
 By changing the default behavior to pin to the latest version, a user won't be automatically opted into the latest version and will have to explicitly do it themselves. This way an end-user can decide when to upgrade.
 
