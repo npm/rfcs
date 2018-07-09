@@ -2,7 +2,7 @@
 
 ## Summary
 
-`package.json` should not be edit by `npm update` unneccesarily. When updating a package to a newer version that still satisfies the original range, package.json should not change. Only when updating to a range that does not satisfy the range specified in `package.json` should it be changed and saved to `package.json`.
+`package.json` should not be edited by `npm update` unneccesarily. When updating a package to a newer version that still satisfies the original range, package.json should not change. Only when updating to a range that does not satisfy the range specified in `package.json` should it be changed and saved to `package.json`.
 
 ## Motivation
 
@@ -36,7 +36,7 @@ and the following available versions for all packages:
 ## Rationale and Alternatives
 
 1.  No longer defaulting `npm update` to `--save`. This is not a great idea, since it only hides the problem, it will still result in unexpected behaviour when using `--save`.
-2.  Make sure that npm keeps the range when updating. For example, updating `~1.0.0` when `1.1.0` is available will yield `~1.1.0`. This also solves some of the problems, but I don't think there is a good reason to update `package.json` when we are updating to a version that is compatible with our current range.
+2.  Make sure that npm keeps the range when updating. For example, updating `~1.0.0` when `1.0.1` is available will yield `~1.0.1`. This also solves some of the problems, but I don't think there is a good reason to update `package.json` when we are updating to a version that is compatible with our current range.
 
 ## Implementation
 
