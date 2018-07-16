@@ -63,5 +63,6 @@ It should inpact:
 - the `npm publish` command: instead of uploading the source code directly on the NPM registry, it should fetch it from Github
 
 ## Prior Art
+Cargo does something like SNPM: https://doc.rust-lang.org/cargo/reference/publishing.html#github-permissions
 
 ## Unresolved Questions and Bikeshedding
