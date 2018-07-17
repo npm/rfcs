@@ -80,7 +80,23 @@ processes for various Teams, they have no special privileges granted within the
 organization, and they cannot participate in Roadmap Proposal discussions.
 
 Please note that in order to have work accepted when it takes more than 4 hours
-per week, the labor must be compensated somehow. See above for details.
+per week, the labor must be compensated somehow. See below for details.
+
+#### Memberships and Multiple Roles
+
+Membership status operates on two levels: if a collaborator gains Full Member
+status on _any_ Role, they are treated as Full Members in any cross-organization
+situation. Within a Role, though, they are only considered Full Members if they
+put at least 4 hours of compensated work _into that specific Role_.
+
+Thus, collaborators can be Guest Members of as many Roles as will accept them,
+but only Full Members of a limited number of Roles.
+
+Additionally, there's a hard cap of 4 Full Memberships for any Member. Any other
+Roles will be treated as Guest Memberships in the case of additional Roles, and
+Full Memberships that the collaborator picks must be declared beforehand. Roles
+should reject significant, over-4-hours worth of labor from these "Full Time"
+members if they are a Guest Member of that Role.
 
 #### Labor and Compensation Limits
 
@@ -131,6 +147,7 @@ the Team who they allow into the Team, or whether to remove someone. For this
 process, they should work with their Group's Role coordinator both to document
 it and ensure that everything goes smoothly.
 
+
 ### Proposed Groups and Teams
 
 #### Role: Project Coordination
@@ -141,8 +158,8 @@ it and ensure that everything goes smoothly.
   * Draft quarterly Roadmap Proposals based on RFCs and input from Groups/Roles.
   * Track and document Roadmap progress and check in with Groups/Roles.
   * Facilitate Roadmap Proposal discussions/meetings to reach a final decision on each Roadmap, making sure all Roles with something to say get heard.
-  * Determine appropriate decision-making systems, with input from Groups/Roles.
-  * Work with the rest of the project to draft or modify general project bylaws.
+  * Work with the rest of the project to draft or modify general project bylaws, with the exception of those overlapping with Community Health and Facilitation, which is responsible for conduct-related bylaws.
+  * Hear petitions for cross-project decision requests and organize the events accordingly.
 
 * Note: This Role is **not** a decision-making role. It is a facilitation role that acts as glue between the different groups and their roles. Ultimately, project decisions come directly from those Roles, except which group decision-making system is used for Roadmap Proposals.
 
@@ -229,33 +246,6 @@ its associated spaces.
   * Maintain [#how-do-i](https://npm.community/c/support/how-do-i) and [#troubleshooting](https://npm.community/c/support/troubleshooting).
   * Encourage folks to file full, well-formed bug reports for things that might be bugs instead of usage questions, and [#ideas](https://npm.community/c/ideas) and RFCs for things that should be new features.
 
-##### Role: Documentation
-
-* Purpose: Ensure the project has high-quality, accessible, useful documentation for its functions and various usecases, both at the user and the developer levels.
-
-* Responsibilities:
-  * Fix issues in existing documentation.
-  * Make sure undocumented things get documented.
-  * Maintain [#docs-needed](https://npm.community/c/docs-needed)
-  * Plan out documentation reorgs.
-  * Work with the npm Liaison to work with its own documentation team to keep website docs up to date and working good.
-
-##### Role: Outreach and Management
-
-* Purpose: Reach out to the wider npm community and manage communications.
-
-* Responsibilities:
-  * Manage overall official comms for the project.
-  * Work with Liaisons and get in touch with Marketing stakeholders to coordinate cross-project marketing comms.
-  * Make the wider community aware of the project's work.
-  * Help reach out to new collaborators and generate interest in contribution.
-  * Give talks and presentations about the project, the roadmap, and other stuff
-
-#### Development Group
-
-The Development Group is responsible for the codebases for npm Core, developing
-the actual tools that the project produces.
-
 ##### Role: Bug Champion
 
 * Purpose: Ensure the overall quality of npm Core tools, particularly as it affects the wider community.
@@ -266,6 +256,46 @@ the actual tools that the project produces.
   * Make bugs more visible to community collaborators and seek out bugfix contributions.
   * Look for overall bug patterns, areas of concern, or potential risks and communicate those with the Core Developer team and community.
   * Look for and communicate any blockers that might prevent `next` from becoming `latest`.
+  * Block releases from going out if they're not up to quality standards.
+
+##### Role: Outreach and Marketing
+
+* Purpose: Reach out to the wider npm community and manage communications.
+
+* Responsibilities:
+  * Manage overall official comms for the project.
+  * Work with Liaisons and get in touch with Marketing stakeholders to coordinate cross-project marketing comms.
+  * Make the wider community aware of the project's work.
+  * Help reach out to new collaborators and generate interest in contribution.
+  * Give talks and presentations about the project, the roadmap, and other stuff
+
+##### Role: Community Health and Facilitation
+
+* Purpose: Preserve the overall health and well-being of the people in the community and help all collaborators focus on their contributions.
+
+* Responsibilities:
+  * Help create a harassment-free experience for everyone.
+  * Facilitate difficult technical conversations for the rest of the project on request.
+  * Provide a facilitator for cross-project votes and work with Project Coordination to smooth out the process.
+  * Follow the guidelines in the Code of Conduct for addressing interpersonal conflict within the project.
+  * Follow the guidelines in the CoC for enforcement actions against members, including temporary and full removals from the project, exclusion from certain Roles, etc, so long as these decisions follow processes outlined in the CoC.
+  * Lead discussions with the rest of the community to define/maintain the Code of Conduct and related community health guidelines. No one with a guest or full membership in the Health and Facilitation committee is able to vote on CoC changes, but they may be heard, and they may propose changes.
+
+#### Development Group
+
+The Development Group is responsible for the codebases for npm Core, developing
+the actual tools that the project produces.
+
+##### Role: Documentation
+
+* Purpose: Ensure the project has high-quality, accessible, useful documentation for its functions and various usecases, both at the user and the developer levels.
+
+* Responsibilities:
+  * Fix issues in existing documentation.
+  * Make sure undocumented things get documented.
+  * Maintain [#docs-needed](https://npm.community/c/docs-needed)
+  * Plan out documentation reorgs.
+  * Work with the npm Liaison to work with its own documentation team to keep website docs up to date and working good.
 
 ##### Role: Core Development
 
@@ -278,19 +308,73 @@ the actual tools that the project produces.
   * Implement new features in concordance with the Roadmap and other RFCs.
   * Recategorize triaged bugs and talk with community members about them.
   * Be available for the Support Team to answer questions about support issues.
-  * Maintain technical aspects of ancillary systems like CI, websites, etc.
 
 * Note: As with all other Roles, Core Development can spin off new Roles that it will defer some responsibilities to. It can no longer lay claim to those responsibilities once they've been handed to the other Role.
 
+##### Role: Release Coordination
+
+* Purpose: Manage releases of project products.
+
+* Responsibilities:
+  * Decide what patches and other changes will be included in a released version.
+  * Manage release cadence.
+  * Move `next` releases into `latest` based on input from Bug Champions.
+  * Develop and maintain release-related ancillary systems for the project, such as CI, build processes, and release automation for the project.
+
+### Checks and Balances
+
+* Cap of 4 roles as "Full Member" -- no limit on guest memberships
+* 4hr minimum for "Full Member" status puts a limit on overall influence
+* Organization-wide decisions, such as votes, made for important situations are handled at the member level, not the role level, and always facilitated.
+* Picking decision systems on a per-Role basis prevent a single governance model from preventing other Roles from having a system that works better for them, and improves the general feeling of federation/sindicalism.
+* Any Full Member can petition the Project Organizers to call for a project decision. Project Organizers are responsible for choosing the format/system used for that decision (but this can be overridden by full consensus of non-Project Organizer members).
+* Ultimately, the userbase organizing and forking acts as a passive check against project decisions.
+
 ## Rationale and Alternatives
 
-<!-- TODO: write once the above is fleshed out a bit (and document ideas that are passed up and why) -->
+Governance is intentionally very "flat", with actual authority and
+responsibility bubbling "up" from individual members in their various roles.
+"Higher" ranks act more as coordinators for the will of the larger community and
+have no more authority over their groups/areas than any other teams. This is
+intended to maximise community/collaborator control of the project, and for
+emphasising that non-developer roles are considered to have as much value to the
+project as roles whose output is strictly code-related.
 
 {{Discuss 2-3 different alternative solutions that were considered. This is required, even if it seems like a stretch. Then explain why this is the best choice out of available ones.}}
 
 ## Implementation
 
-<!-- TODO: discuss transition plan, bootstrap exceptions, and resources required -->
+### Resources and Transition
+
+Launching this process will be a significant load on the CLI team until the
+project is done bootstrapping. Other npm folks may help, but it's worth noting
+that most of the roles described here are already roles that members of the CLI
+team have already taken on as their jobs.
+
+Transitioning to this process will require final approval of the public RFC, and
+then any necessary permissions setup on `npm/cli` and npm.community. Everything
+will have to be documented... somewhere. Once the transition is over, it's
+expected that the CLI team will have much more time to focus on their work as
+codebase maintainers, project leads, and working on products and projects
+relevant to npm, Inc. itself. A lot of the "ancillary" tasks that the CLI team
+is currently responsible for will become the full responsibility of community
+members, instead, and potentially other employees of npm, Inc.
+
+### Bootstrapping
+
+At first, it'll pretty much only be npm employees taking on all available Roles.
+Any npm employees participating in a certain Role, whether they put 4 hours of
+work into that role, are considered Provisional Full Members of that Role.
+Provisional status lasts until that Role receives its first non-npm Full Member,
+at which point the npm employee loses Provisional status and will have a member
+status following the usual rules of 4h -> full member.
+
+If the Role loses all other Full Members, and no one else in the organization is
+able to take on a Full Membership in that Role, a Provisional Full Membership
+may be granted to an existing Guest Member, while still not allowing them more
+than 4h of work. If no willing Guest Members exist, the Responsibilities for
+that Role become the responsibility of other Roles with similar or overlapping
+responsibilities, until the Role can find a new Full Member.
 
 ## Prior Art
 
