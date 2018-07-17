@@ -117,11 +117,6 @@ people and they're valuable, and their labor has value. npm Core does not
 believe open source is an excuse for not paying people for their hard work, and
 the project is committed to help facilitate this compensation.
 
-Exceptions can be made on a case-by-case basis for students, who often benefit
-from early commitment to open source projects, and who can benefit in
-non-monetary ways from it, though they'll be encouraged to make sure that
-compensation happens in some way.
-
 These limits are also directly related to the distinction between the two types
 of Member: Guest Members and Full Members.
 
