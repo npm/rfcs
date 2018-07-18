@@ -1,7 +1,7 @@
 # npm RFC Process
 
 This document describes the RFC process for the [npm
-CLI](https://github.com/npm/npm), and provides a way for the CLI team and the
+CLI](https://github.com/npm/cli), and provides a way for the CLI team and the
 wider community to have discussions about the features and direction of the
 package manager! It is based on [the WeAllJS RFC process](https://wealljs.org/rfc-process) and the [Rust RFC process](https://github.com/rust-lang/rfcs), and, by extension, the [Yarn RFC process](https://github.com/yarnpkg/rfcs)
 
@@ -25,7 +25,7 @@ feature requests made there will be redirected to the RFCs repository.
 * Fill in and edit the template with your own proposal.
 * Submit a PR to the `npm/rfcs` repo.
 * Link to the PR in [the RFCs forum on npm.community](https://npm.community/c/ideas/rfcs)
-* Tell all your friends! (don't ping npm folks -- we already get notified RFCs)
+* Tell all your friends! (don't ping npm folks -- we already get immediately notified about RFCs)
 
 ## How does review work?
 
