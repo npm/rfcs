@@ -303,6 +303,7 @@ the actual tools that the project produces.
   * Implement new features in concordance with the Roadmap and other RFCs.
   * Recategorize triaged bugs and talk with community members about them.
   * Be available for the Support Team to answer questions about support issues.
+  * Review pull requests and help contributors as needed until they get accepted
 
 * Note: As with all other Roles, Core Development can spin off new Roles that it will defer some responsibilities to. It can no longer lay claim to those responsibilities once they've been handed to the other Role.
 
@@ -311,7 +312,7 @@ the actual tools that the project produces.
 * Purpose: Manage releases of project products.
 
 * Responsibilities:
-  * Decide what patches and other changes will be included in a released version.
+  * Decide which Developer-accepted pull requests will go into the next release, in accordance with the roadmap, and merge them into integration branches as needed.
   * Manage release cadence.
   * Move `next` releases into `latest` based on input from Bug Champions.
   * Develop and maintain release-related ancillary systems for the project, such as CI, build processes, and release automation for the project.
