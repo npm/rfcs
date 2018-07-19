@@ -372,6 +372,15 @@ than 4h of work. If no willing Guest Members exist, the Responsibilities for
 that Role become the responsibility of other Roles with similar or overlapping
 responsibilities, until the Role can find a new Full Member.
 
+## NEXT STEPS (post-meeting)
+
+* Extract the multiple job descriptions the CLI itself is already doing (for framing as a team within npm)
+* Work on goals from the perspective of npm itself too
+* Write down what this structure looks like day 0, 3mo in, 1yr in, etc
+* Make a new private repo that splits into multiple documents
+* Sit down and write down scenarios of what this looks like with different types of disruptive participants.
+* Write a "short" spec version of this. (presumably what day 0 would look like)
+
 ## Prior Art
 
 <!-- TODO: plenty of FOSS out there. It's worth studying how some of them are structured -->
