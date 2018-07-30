@@ -27,6 +27,118 @@ A tool that can process the json format report from `npm audit --json`. That's a
 
 A new file named owasp.js should be created in https://github.com/npm/npm-audit-report/blob/latest/reporters/ and this could use a xml builder like `var builder = require('xmlbuilder');`
 
+### How to map npm audit information to OWASP Dependency Check XML?
+
+I used `npm audit --json` to generate information and use pseudo code for illustration. Everything in round brackets have to be implemented additionally.
+
+#### json from `npm audit --json`
+
+```
+actions
+    action
+    module
+    target
+    isMajor
+    resolves
+        id
+        path
+        dev
+        optional
+        bundled
+advisories
+    ID_VALUE
+        findings
+            version
+            paths
+            dev
+            optional
+            bundled
+        id
+        created
+        updated
+        deleted
+        title
+        found_by
+            name
+        reported_by
+            name
+        module_name
+        cves
+        vulnerable_versions
+        patched_versions
+        overview
+        recommendation
+        references
+        access
+        severity
+        cwe
+        metadata
+            module_type
+            exploitability
+            affected_components
+        url
+muted
+metadata
+    vulnerabilities
+        info
+        low
+        moderate
+        high
+        critical
+    dependencies
+    devDependencies
+    optionalDependencies
+    totalDependencies
+runId
+```
+
+#### JSON to OWASP XML Mapping
+
+```
+analysis
+    scanInfo
+        engineVersion: NPM_VERSION
+    projectInfo
+        name: (name attribute from package.json)
+        version: (version attribute from package.json)
+        reportDate: (CURRENT_DATE)
+        credits: (nsp or npm)
+    dependencies
+        dependency
+            fileName: actions[i].module + '@' + actions[i].target,
+            filePath: (LOCAL_FILE_PATH_TO_MAIN_JS_FROM_actions[i]-module) OR actions[i].module + '@' + actions[i].target,
+            md5: (NEED ADDITIONAL INFORMATION)
+            sha1: (NEED ADDITIONAL INFORMATION)
+            description: (description attribute from actions[i].module package.json)
+            license: (license attribute from actions[i].module package.json)
+            identifiers
+                identifier
+                    name: actions[i].module
+                    type (attribute): (nsp or npm)
+            vulnerabilities
+                vulnerability
+                    name: actions[i].resolves[j].id => advisories[actions[i].resolves[j].id].cves[k]
+                    cvssScore: (NEED ADDITIONAL INFORMATION)
+                    cvssAccessVector: (NEED ADDITIONAL INFORMATION)
+                    cvssAccessComplexity: LOW
+                    cvssAuthenticationr: NONE
+                    cvssConfidentialImpact: NONE
+                    cvssIntegrityImpact: NONE
+                    cvssAvailabilityImpact: PARTIAL
+                    severity: actions[i].resolves[j].id => advisories[actions[i].resolves[j].id].severity
+                    cwe: actions[i].resolves[j].id => advisories[actions[i].resolves[j].id].cwe
+                    description: (description attribute from actions[i].resolves[j].id => advisories[actions[i].resolves[j].id] package.json) or actions[i].resolves[j].id => advisories[actions[i].resolves[j].id].overview + '||' + actions[i].resolves[j].id => advisories[actions[i].resolves[j].id].recommendation + ' vulnerable versions:'  + actions[i].resolves[j].id => advisories[actions[i].resolves[j].id].vulnerable_versions + ' patched_versions: ' + actions[i].resolves[j].id => advisories[actions[i].resolves[j].id].patched_versions
+                    source (attribute): (nsp or npm)
+                    references (optional)
+                        reference
+                            source: (NEED ADDITIONAL INFORMATION)
+                            url: actions[i].resolves[j].id => advisories[actions[i].resolves[j].id].references[k].url
+                            name: actions[i].resolves[j].id => advisories[actions[i].resolves[j].id].references[k].name
+                    vulnerableSoftware
+                        software: actions[i].resolves[j].id => advisories[actions[i].resolves[j].id].module_name '@' +  actions[i].resolves[j].id => advisories[actions[i].resolves[j].id].findings.version
+            isVirtual (attribute): false
+```
+
 ## Unresolved Questions and Bikeshedding
 
 none
