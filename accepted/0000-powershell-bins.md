@@ -49,6 +49,7 @@ The path to the bin script will have to be substituted into the right place.
 ## Prior Art
 
 - [cmd-shim](https://www.npmjs.com/package/cmd-shim)
+- [yarn PR](https://github.com/yarnpkg/yarn/pull/6093)
 
 ## Unresolved Questions and Bikeshedding
 
