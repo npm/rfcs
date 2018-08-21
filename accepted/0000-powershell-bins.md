@@ -32,8 +32,8 @@ Here's an example of a functionally identical powershell wrapper:
 
 ```powershell
 $myPath = Split-Path $myInvocation.MyCommand.Path -Parent
-$node = Join-Path $myPath "node.exe"
-$binPath = Join-Path $myPath "[ path to node_module bin script, e.g. node_modules\typescript\bin\tsc]"
+$node = Join-Path $myPath 'node.exe'
+$binPath = Join-Path $myPath '[ path to node_module bin script, e.g. node_modules\typescript\bin\tsc]'
 if (Test-Path $node)
 {
     & $node $binPath $args
