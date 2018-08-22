@@ -54,3 +54,4 @@ The path to the bin script will have to be substituted into the right place.
 ## Unresolved Questions and Bikeshedding
 
 - impact of additional scripts on install times, node_modules size, etc.
+- default powershell permissions: will powershell users need to toggle some settings so this works without permissions errors? Can the errors be worked around? (This PR will need testing on a fresh Windows install)
