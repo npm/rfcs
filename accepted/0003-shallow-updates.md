@@ -45,14 +45,33 @@ dependencies of `package-name` are still satisfied. If they are not for a
 package, run the same steps recursively for that package (do shallow update,
 check sub-dependencies).
 
-If and only if a conflict occurs, duplicate the package as npm does today. This
-means that if a package was deduped before (i.e. depended on directly by the
-root, _and_ an indirect dependency, but now needs to be updated because of a
-changed constraint) and still satisfies the root range, the deduping is
-maintained and the deduped package is updated for the root too. I believe this
-is the expected behavior, because it is inline with npm's dedupe-by-default
-behavior for `install`. If this is undesirable in a case, the user can pin the
-version in the root package.json.
+If and only if a conflict occurs, duplicate the package as npm does today.  
+This means that given dependency constraints like this:
+
+```
+|- A@^1.0.0
+| `- B@^1.0.0
+`- B@^1.2.0
+```
+
+where both constraints for `B` are compatible and therefor `B` was deduped:
+
+```
+|- A@1.0.0
+`- B@1.2.0
+```
+
+If `A` is being updated and bumped its constraint to `B@^1.3.0`, the deduping is
+maintained and the deduped package is updated for the root too:
+
+```
+|- A@1.0.0
+`- B@1.3.0
+```
+
+I believe this is the expected behavior, because it is inline with npm's
+dedupe-by-default behavior for `install`. If this is undesirable in a case, the
+user can pin the version in the root package.json.
 
 It would be good if at the end the command printed out the list of packages that
 were updated and their version to highlight transitive updates that happened
