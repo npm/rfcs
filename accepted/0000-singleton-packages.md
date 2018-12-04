@@ -2,7 +2,7 @@
 
 ## Summary
 
-Add a step to the graph analysis phase of `npm install` that causes it to fail when unable to resolve certain packages to a single instance/version due to semver constraints.  Would be best if this could happen prior to package downloads, if there's an index-fetch only
+Add a step to the graph analysis phase of `npm install` that causes it to fail when unable to resolve certain packages to a single instance/version due to semver constraints.  Would be best if this could happen prior to actual package downloads.
 
 ## Motivation
 
