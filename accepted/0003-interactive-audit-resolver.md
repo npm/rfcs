@@ -35,7 +35,7 @@ All decisions are stored in `audit-resolve.json` file as key-value, where key is
 
 (this RFC can't define the full scope of investigate)
 - **investigate** when fix is not available, investigate option shows instead. It goes up through the dependencies chain and finds the one that needs their package.json updated with new version specification to enable a fix. 
-The result can be a call to action to create a PR (patch could be automatically generated)
+The result can be a call to action to create a PR (patch to package.json could be automatically generated)
 Patch could also be applied locally or a specific change to package-lock.json could be proposed. 
 
 **skip** and **abort** options should also be provided.
@@ -65,7 +65,8 @@ While shipping with a known vulnerability is a bad practice, NPM's mission with 
 
 Remove is only useful as a convenience. Imagine a developer introducing `npm audit` and having to go through tens of issues. If they notice one of the first issues is caused by a dependency they no longer use, instead of remembering to clean it up later, they can choose this option.
 
-Investigate option has a lot of potential for the future where NPM could do things ranging from linking to resources on mitigation to generating local fixes or providing a marketplace of companies offering services fixing the issue for customers (business potential for NPM).
+Investigate option is there to aid the user and direct them towards fixing the issue upstream.
+This RFC doesn't cover potential future usecases where NPM could do things ranging from linking to resources on mitigation to generating local fixes or providing a marketplace of companies offering services fixing the issue for customers (business potential for NPM).
 
 ### Alternatives
 
