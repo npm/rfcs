@@ -23,12 +23,12 @@ For that, the user needs a new tool which makes addressing issues one by one con
 `npm audit resolve` runs audit and iterates over all actions from the output with a prompt for a decision on each. 
 If fix is available, it's offered as one of the options to proceed. Other options include: ignore, remind later and delete.
 
-All decisions are stored in `audit-resolv.json` file as key-value, where key is `${dependency path}|${advisory id}` and value is a structure specific to the resolution.
+All decisions are stored in `audit-resolve.json` file as key-value, where key is `${advisory id}|${dependency path}` and value is a structure specific to the resolution.
 
-`npm audit` reads `audit-resolv.json` and respects the resolution (ignores ignored issues, ignores issues postponed to a date in the future)
+`npm audit` reads `audit-resolve.json` and respects the resolution (ignores ignored issues, ignores issues postponed to a date in the future)
 
 ### resolutions
-- **fix** runs the fix proposed in audit action and marks the issue as fixed in `audit-resolv.json`. On each subsequent run of `npm audit resolve` if the issue comes up again, the user is also warned that the problem was supposed to be fixed already.
+- **fix** runs the fix proposed in audit action and marks the issue as fixed in `audit-resolve.json`. On each subsequent run of `npm audit resolve` if the issue comes up again, the user is also warned that the problem was supposed to be fixed already.
 - **ignore** marks the issue as ignored and `npm audit` will no longer fail because of it (but should display a single line warning about the issue being ignored). If a new vulnerability is found in the same dependency, it does not get ignored. If another dependency is installed with the same vulnerability advisory id it is not ignored. If the same package is installed as a dependency to another dependency (different path) it is not ignored.
 - **postpone** marks the issue as postponed to a timestamp 24h in the future. Instead of ignoring an issue permanently just to make a build pass, one can postpone it when in rush, but make it show up as a CI faiure on the next working day. 
 - **remove** runs `npm rm` on the top level dependency containing the issue. It's a convenience option for the user to remove an old package which they no longer intend to use. 
@@ -47,7 +47,7 @@ Patch could also be applied locally or a specific change to package-lock.json co
 - ignoring just dev dependencies is not enough. Sometimes the developer knows a vulnerability can be ignored because a package with a DOS is used in tooling for the project (not a dev dependency but eg. a migration script), not production code. To be really secure, ignoring must be explicit. 
 - Editing a file to specify what to ignore will not suffice any more at that level of detail, so automation is necessary.
 
-**Why audit-resolv.json?**
+**Why audit-resolve.json?**
 Resolutions must be recorded in a file and committed to git(or alternative) for edit history and full audit on who decided what.
 Resolution format must be readable for a JavaScript developer.
 
@@ -55,7 +55,7 @@ Resolution format must be readable for a JavaScript developer.
 - `package.json` is not a good option, because it is already overloaded for so many functionalities. The output of resolutions could be lengthy and clutter the file. User will need the resolution information much less often than they look in the package.json file. ALso, resolution file is not meant to be edited by hand.
 - `.npmrc` is not a good option because it doesn't live in the repository and being a dotfile is easy to miss, so a developer could overlook it affecting the audit. Also using it for the purpose of storing resolutions to project specific issues seems counter-intuitive.
 
-A separate file referred to as `audit-resolv.json` has the benefit of being single purpose, easy to track and audit, easy to version and migrate between versions of `npm` and comfortable for the users to review in git history and pull requests.
+A separate file referred to as `audit-resolve.json` has the benefit of being single purpose, easy to track and audit, easy to version and migrate between versions of `npm` and comfortable for the users to review in git history and pull requests.
 
 **postpone, remove, investigate**
 Other options are helpers for more elaborate actions a developer would take when confronted with an issue they can't or don't want to fix. 
@@ -81,6 +81,36 @@ prototype of a working tool (in production use) https://www.npmjs.com/package/np
 
 The implementation is, and should remain, runnable standalone as a separate package with minor wrapping code - useful for testing new features without bundling unfinished work with npm cli versions and therefore node.js
 
+### audit-resolve.json
+
+Audit resolution file format:
+map key-value where key is the advisory number concatenated with package path
+
+```js
+{
+  "version": 1,
+  "ADVISORY_NUMBER|DEPENDENCY_PATH":{
+      "resolution": "RESOLUTION_TYPE",
+      "reason": "Reason provided by the person making the decision (optional)",
+      "remindTime": timestamp
+
+  }
+}
+```
+
+example
+
+```js
+{
+  "717|spawn-shell>merge-options": {
+    "resolution":"remind",
+    "remindTime": 1542440172844
+  },
+  ...
+}
+```
+
+*initially npm-audit-resolver used a different format*
 
 ## Prior Art
 
