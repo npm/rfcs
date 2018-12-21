@@ -42,4 +42,6 @@ Otherwise, each time someone reports an issue with different/incompatible versio
 
 ## Implementation
 
-Have not started on it.
+See `Detailed Explanation`. Add another conditional when writing to `package.json` on `npm install` such that it uses `semver` to check if the version passed to `npm install` is a prerelease or not.
+
+Suggestion: modify https://github.com/npm/cli/blob/ab0f0260e5b6333f98062fb2d9f4f9954d3ee6cd/lib/install/deps.js#L303-L305 and add a conditional like `semver.prerelease(version) == null`
