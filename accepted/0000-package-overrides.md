@@ -18,7 +18,7 @@ Users don't frequently need to do this sort of override because npm's nested tre
 
 ## Implementation
 
-{{In order to do this, the npm installer will need to read in an overrides section from `package.json`. This will have a simple format such as `overrides: { 'foo': '1.2.3' }`. These values will need to be used at the end of the tree-building process to select the final version. [Is there also a pruning element to this?]}}
+In order to do this, the npm installer will need to read in an overrides section from `package.json`. This will have a simple format such as `overrides: { 'foo': '1.2.3' }`. These values will need to be used at the end of the tree-building process to select the final version. (Is there also a pruning element to this?)
 
 ## Prior Art
 
