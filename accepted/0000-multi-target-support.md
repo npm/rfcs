@@ -84,14 +84,14 @@ The current, fully-merged scope is available under the environment variable `npm
 
 When performing `npm install` and `npm ci`, it does the following:
 
-- Install all development dependencies with the target scope `%current,npm-install`.
+- Install all development dependencies with the target scope `current,npm-install`.
 - Install all runtime dependencies with the union of the development target scope and the target scope specified in the config variable `target`, intersected with the union of the selected target's key if the dependency is specified in a target and applicable `target=...` scope.
 - Run the installation scripts with the runtime's scope.
 - Uninstall all installed dependencies that would've been ignored if `install` was omitted.
 
 When performing `npm install --production` or `npm ci --production`, it does the following:
 
-- Install all installation dependencies with the target scope `%current,npm-install,production`.
+- Install all installation dependencies with the target scope `current,npm-install,production`.
 - Install all runtime dependencies with the union of the target scope `production` and the target scope specified in the config variable `target`, intersected with the union of the selected target's key if the dependency is specified in a target and applicable `target=...` scope.
 - Run the installation scripts with the runtime's scope.
 - Uninstall all installed dependencies that would've been ignored if `npm-install` was omitted.
