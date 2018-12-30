@@ -10,7 +10,7 @@ In many cases, operating systems provide tools or native APIs that significantly
 
 For one concrete example, consider [Chokidar](https://github.com/paulmillr/chokidar). It currently uses `fsevents` on macOS, a thin wrapper around that operating system's `FSEvents` API, if available, but it falls back to its own slower implementation.
 
-For another, [Liftoff](https://github.com/js-cli/js-liftoff) could optimize its respawning routine to use the native `execvpe` on most *nix operating systems, to avoid retaining the overhead of the existing Node.js process.
+For another, [Liftoff](https://github.com/js-cli/js-liftoff) could optimize its respawning routine to use the native `execvpe` on most \*nix operating systems, to avoid retaining the overhead of the existing Node.js process.
 
 But in each of those cases, they would likely depend on two packages that only really work on some operating systems:
 
