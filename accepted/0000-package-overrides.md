@@ -35,5 +35,6 @@ Our goal in this RFC is to provide the simplest possible solution to a less comm
 - Will a warning be sufficient if someone installs a package that contains an override in its own package.json?
 - Do we want a `--force` option to allow publishing a package with this in place?
 - Are there other workarounds users are likely to try, or edge cases to consider?
+- Should this be applied to devDependencies, optionally or by default?
 
 {{THIS SECTION SHOULD BE REMOVED BEFORE RATIFICATION}}
