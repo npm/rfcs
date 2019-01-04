@@ -10,7 +10,7 @@ In some situations, allowing more than one version of a package to be installed 
 
 ## Detailed Explanation
 
-Users will be able to add an additional dependency section called 'overrides' where they give a list of one or more packages to be installed at a specific version. Having this section will ensure that the only version of that package that is eventually installed to the project is the one set as an override. This will not affect the name, source, path, or other aspects of the package's installation.
+Users will be able to add an additional dependency section called 'replace' where they give a list of one or more packages to be installed at a specific version. Having this section will ensure that the only version of that package that is eventually installed to the project is the one set as an replacement. This will not affect the name, source, path, or other aspects of the package's installation.
 
 ## Rationale and Alternatives
 
