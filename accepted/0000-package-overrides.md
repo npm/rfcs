@@ -2,7 +2,7 @@
 
 ## Summary
 
-Add a section to package.json that allows the user to designate packages as an 'override' at a particular version.
+Add a section to package.json that allows the user to designate packages as an 'override' or replacement at a particular version.
 
 ## Motivation
 
@@ -14,11 +14,13 @@ Users will be able to add an additional dependency section called 'overrides' wh
 
 ## Rationale and Alternatives
 
-Users don't frequently need to do this sort of override because npm's nested tree structure allows for a collection of dependencies to require incompatible semvers for the same package. In many cases, the default behavior is acceptable and nothing further is needed. In other, more problematic situations, the user may encounter conflicting binaries or other components that cannot be used simultaneously. The only current options are to attempt to get the maintainers of the dependencies to make changes that will reduce these conflicts, or to use a tool like `https://www.npmjs.com/package/replace-deep-dep` to repair the requirements.
+Users don't frequently need to do this sort of override/replacement because npm's nested tree structure allows for a collection of dependencies to require incompatible semvers for the same package. In many cases, the default behavior is acceptable and nothing further is needed. In other, more problematic situations, the user may encounter conflicting binaries or other components that cannot be used simultaneously. The only current options are to attempt to get the maintainers of the dependencies to make changes that will reduce these conflicts, or to use a tool like `https://www.npmjs.com/package/replace-deep-dep` to repair the requirements.
 
 ## Implementation
 
-In order to do this, the npm installer will need to read in an overrides section from `package.json`. This will have a simple format such as `overrides: { 'foo': '1.2.3' }`. These values will need to be used at the end of the tree-building process to select the final version. (Is there also a pruning element to this?)
+In order to do this, the npm installer will need to read in an replacement section from `package.json`. This will have a simple format such as `replace: { 'foo': '1.2.3' }`. These values will need to be used at the end of the tree-building process to select the final version. It will be applied in a 'flat' way -- the same version will be selected for all sub-dependencies that require that package.
+
+Users will not be allowed to `npm publish` a package with this kind of dependency (we may choose to revise this behavior later). If someone installs a package that does have a 'replace' section, we'll warn them that this may have unexpected results.
 
 ## Prior Art
 
@@ -30,6 +32,8 @@ Our goal in this RFC is to provide the simplest possible solution to a less comm
 
 ## Unresolved Questions and Bikeshedding
 
-Are there error situations that could occur? When should the installer exit or warn because the override will not be possible?
+- Will a warning be sufficient if someone installs a package that contains an override in its own package.json?
+- Do we want a `--force` option to allow publishing a package with this in place?
+- Are there other workarounds users are likely to try, or edge cases to consider?
 
 {{THIS SECTION SHOULD BE REMOVED BEFORE RATIFICATION}}
