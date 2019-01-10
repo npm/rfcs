@@ -30,11 +30,13 @@ Users will not be allowed to `npm publish` a package with this kind of dependenc
 
 Our goal in this RFC is to provide the simplest possible solution to a less common but impactful problem. The most important part of this feature is to define a safe fallback for package versions that conflict.
 
-## Unresolved Questions and Bikeshedding
+## Questions and Bikeshedding
 
 - Will a warning be sufficient if someone installs a package that contains an override in its own package.json?
+  - Yes, that's fine. Or no warning is fine (just a verbose log or somesuch)
 - Do we want a `--force` option to allow publishing a package with this in place?
+  - Yes.
 - Are there other workarounds users are likely to try, or edge cases to consider?
+  - Not aside from replace-deep-dep. It's fairly tricky to do without it.
 - Should this be applied to devDependencies, optionally or by default?
-
-{{THIS SECTION SHOULD BE REMOVED BEFORE RATIFICATION}}
+  - Yes. By default.
