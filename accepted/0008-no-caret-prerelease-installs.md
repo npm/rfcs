@@ -13,8 +13,8 @@ results in
 
 ```diff
 "devDependencies": {
--   "@babel/register": "^7.0.0-beta.52"
-+   "@babel/register": "7.0.0-beta.52"
+-   "@babel/core": "^7.0.0-beta.52"
++   "@babel/core": "7.0.0-beta.52"
 }
 ```
 
