@@ -17,7 +17,10 @@ There are many situations where packages have implicit requirement to be the sol
 
 Any package which needs to ensure its uniqueness in the package tree would indicate so in its `package.json`, likely  `{"singleton": true}`, informing the install command to permit installation of only one instance in the entire tree.  If unable to resolve to a solitary version, due to semver constraints, installation would fail, providing a list of version conflicts and prompt with details about options for resolving the conflict.
 
-A new feature for resolving version conflicts is neither part of this RFC nor a pre-requisite of it, but is an anticipated need.  See [Prior Art](#Prior%20Art) for more.
+While specifying a new feature for resolving version conflicts is not the intention of this RFC, nor is it a pre-requisite of it, there are precedents for package version conflict resolution in the node ecosystem.
+
+- [NPM RFC #9 "Package Overrides"](https://github.com/npm/rfcs/blob/latest/accepted/0009-package-overrides.md), if implemented, would provide a sufficient technical basis for the declaration of specific version resolutions for Singleton packages; adding a package override for a Singleton package would ensure a singular instance to satisfy the installation requirements.
+- [Yarn](https://yarnpkg.com), a node package manager, has a [resolutions](https://yarnpkg.com/lang/en/docs/package-json/#toc-resolutions) map as well, originally for addressing conflicting dependencies only in `yarn install --flat` installations.  However, it has since been extended to support [selective resolutions](https://github.com/yarnpkg/rfcs/blob/master/implemented/0000-selective-versions-resolutions.md), enabling singleton installation of *some* packages while using traditional package tree layout for other node modules. to override conflicting versions.
 
 ## Rationale and Alternatives
 
@@ -51,11 +54,9 @@ I can clearly see here that `@webcomponents/webcomponentjs` is a dependency of t
 
 Most package systems either assume everything is a singleton or nothing is.  In package systems which assume everything is singleton, there are *sometimes* override measures to support manual resolution of conflicts, but not always.  So while there is not prior art I can point to for the self-identifying singleton package, there is plenty of precedent for working around the problem of singleton conflicts and the need for supporting singletons.
 
-[Bower](https://bower.io/) is an example of a package manager that installs everything as singletons and uses a [resolutions](https://github.com/bower/spec/blob/master/json.md#resolutions) map to direct the installer.
-
-[Yarn](https://yarnpkg.com) which is a Node package manager, has a [resolutions](https://yarnpkg.com/lang/en/docs/package-json/#toc-resolutions)  map as well, originally for addressing conflicting dependencies only in `yarn install --flat` installations.  However, it has since been extended to support [selective resolutions](https://github.com/yarnpkg/rfcs/blob/master/implemented/0000-selective-versions-resolutions.md), enabling singleton installation of *some* packages while using traditional package tree layout for other node modules. to override conflicting versions.
-
-[Bundler](https://bundler.io) for Ruby has been debating an override/resolutions feature for at least 7 years. [Current RFC](https://github.com/bundler/rfcs/pull/13)
+- [Bower](https://bower.io/) is an example of a package manager that installs everything as singletons and uses a [resolutions](https://github.com/bower/spec/blob/master/json.md#resolutions) map to direct the installer.
+- [Bundler](https://bundler.io) for Ruby has been debating an override/resolutions feature for at least 7 years. [Current RFC](https://github.com/bundler/rfcs/pull/13)
+- [Yarn](https://yarnpkg.com) (as mentioned in the [Detailed Explanation](#Detailed%20Explanation) section above) has an installation mode triggered by `yarn install --flat` which attempts to install *all* packages as Singleton packages.  The `resolutions` map produced during this installation mode actually supports the expression of resolutions for a subset of all package dependencies, enabling installation of Singleton packages along-side non-singleton packages.
 
 ## Unresolved Questions and Bikeshedding
 
