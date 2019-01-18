@@ -18,7 +18,11 @@ NPM CLI would be extended with this new feature called `Missing Dependencies` th
 
 ## `TODO`: Rationale and Alternatives
 
-{{Discuss 2-3 different alternative solutions that were considered. This is required, even if it seems like a stretch. Then explain why this is the best choice out of available ones.}}
+A solution to this issue was implemented in version 2.0.0. It focuses on importing the whole folder pasted in the project as a module. Hence, each module or component that is added to the project should contain a `package.json` that centralizes all its dependencies. Therefore, it becomes easy to make a project more modular.
+
+The old answer to this issue was to create a symlink of the "module" added to the project, and basically adding it to the project's `package.json` using the path to the symlink. This method also involves implementing a `package.json` file for each "module".
+
+These solutions assume that each folder or file copy and paste from a project to another should be considered a package that appears as a dependency within the project's `package.json`. However, it causes some problems because it forces the developer to implement a `package.json` for each one of them, so potentially many extra files that could pollute the project's architecture.
 
 ## Implementation
 
