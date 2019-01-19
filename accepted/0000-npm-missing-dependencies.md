@@ -28,7 +28,7 @@ These solutions assume that each folder or file copied and paste from a project 
 
 The implementation was done already in a fork here:
 
-`https://github.com/tanohzana/cli`
+[https://github.com/tanohzana/cli](`https://github.com/tanohzana/cli`)
 
 Changes are the following:
 
@@ -37,7 +37,7 @@ Changes are the following:
 - A line should be added in `lib/config/cmd-list.js` to allow function call from cli
 - Finally, a file containing documentation shall be implemented in `doc/cli`
 
-None of these addings do interfer with any other CLI method. Although, it uses `npm install` to install missing dependencies but does not alter the way `install` works, not does it change its source code.
+None of these addings do interfer with any other CLI method. Although, it uses `npm install` to install missing dependencies but does not alter the way `install` works, nor does it change its source code.
 
 ## Prior Art
 
