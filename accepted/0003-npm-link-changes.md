@@ -2,7 +2,7 @@
 
 ## Summary
 
-Remove `npm install --link`. Change `npm link` behavior to directly create symlinks for dependencies that already exist and record this fact to the lock-file. Make `npm unlink` stop being an alias for `npm rm` and instead undo what the new `npm link` does, restoring a non-linked copy of the dependency.
+Remove `npm install --link`. Change `npm link` behavior to directly create symlinks for dependencies that already exist and record this fact into a local project file. Make `npm unlink` stop being an alias for `npm rm` and instead undo what the new `npm link` does, restoring a non-linked copy of the dependency.
 
 Note: This is a breaking change due to the all new `npm link`, the splitting of `npm unlink` from `npm rm` and the removal of `npm install --link`.
 
@@ -18,46 +18,28 @@ The result is that any run of `npm install` after creating a symlink with `npm l
 
 ### USE CASES FOR DEVELOPMENT ONLY LINKING
 
-When fixing a bug in a dependency or transitive dependency, it is often desirable to be able to test it directly in the project that consumes it.  With `npm link` you can create a symlink to the under-development dependency while continuing to otherwise work with your module normally.  By persisting this to your lock-file it allows this decision to be branch specific.
+When fixing a bug in a dependency or transitive dependency, it is often desirable to be able to test it directly in the project that consumes it. With `npm link` you can create a symlink to the under-development dependency while continuing to otherwise work with your module normally.
 
-When working with a project with a number of tightly coupled dependencies it is often desirable to work on all of them simultaneously.  `npm link` provides a facility for symlinking them and keeping them symlinked and the lock-file persistence means that new member of the project can get this configuration with little ceremony.
+When working with a project with a number of tightly coupled dependencies it is often desirable to work on all of them simultaneously.  `npm link` provides a facility for symlinking them and keeping them symlinked.
 
-### PACKAGE-LOCK
+### NEW FILE & LINK PERSISTENCE
 
-lock-file files have a new lockfile property on dependency objects: `link`
+We will introduce a new file for tracking local install specific metadata with `node_modules/.dependency-info.json`. This file is not intended to be committed.
 
-The value of `link` is a path relative to the lock-file.
+Links will be recorded in a `links` property that is an object mapping package names to link paths.
 
 ### CHANGES TO COMMANDS
 
 #### `npm link`
 
-With no subcommand, it is an alias for `npm link create`.  With an invalid subcommand the error message should note the change and behavior and point the user at `npm help link`.
-
-#### `npm link create`
-
-Create all development links referenced in the lock-file.  Failures due to missing link sources or missing package data (or invalid package data) are WARNINGs that result in no link being created.  Version mismatches in linked modules are also warnings but they still create a link.
-
-With no development links in lock-file warn with usage, but exit without error code.
-
-#### `npm link create module-name[@version-spec]`
-
-Search the lock-file for modules matching `module-name` and optionally `version-spec`, create links for those.  If no modules match, exit with an error.
-
-#### `npm link clear`
-
-Remove all development links from your `node_modules`.  This does not modify your lock-file, it just undoes what `npm link create` does.
-
-#### `npm link clear module-name[@version-spec]`
-
-Remove development links for modules matching the `module-name` and if provided the `version-spec`.
+With no subcommand or an invalid subcommand, display help for the new subcommands.
 
 #### `npm link add /path/to/module-name`
 #### `npm link add /path/to/module-name version-spec`
 
 Create a new development link in your project for the module contained in `/path/to/module-name`.  If a version specifier is included (eg `^1.0.0`) then only modules that match it are replaced with a link.  If no version specifier is included then ALL modules with the same name are replaced.
 
-Links are saved in new `link` field on the dependency record they replace in your lock-file.  The dependencies in the lock-file do not take into account any development links.  Linked dependencies have their own separate dependency tree installed inside their own `node_modules` and their own lock-file.
+Links are saved in the `links` field in the dependency-info file.  Linked dependencies have their own separate dependency tree installed inside their own `node_modules` and their own lock-file.
 
 #### `npm link remove module-name`
 #### `npm link remove /path/to/module-name`
@@ -66,11 +48,13 @@ Links are saved in new `link` field on the dependency record they replace in you
 
 Remove an existing development link from your project.  This does not remove `module-name`—it removes the `link` field from the dependency record and replaces any symlinks to `module-name` with a normally installed copy of it.
 
+If no further links remain in the dependency-info file and no other information is contained in it, it should be unlinked.
+
 #### `npm install`
 
 `npm install --link` is no longer be a valid option.
 
-`npm install` leaves any development links created by `npm link create` in place.
+`npm install` creates an links specified in the dependency-info file, along side the usual install results.
 
 `npm install module-name@latest` where `module-name` is currently a development link, will update your `package.json` and lock-file but will not do anything on disk.  It warns that the link was left in place.
 
@@ -103,6 +87,7 @@ Alternative options:
 
 1. Not do anything. This means `npm link` and `npm install --link` with a lock-file are not useful as links will immediately be erased.
 2. Leave all links alone. This would restore previous behavior around `npm link` and `npm install --link` but would make it impossible for npm to do the right thing if a `package.json` dependency changed from a `file:` specifier to a registry one as that would be indistinguishable from a link created with `npm link`.
+3. Save links to the package-lock to persist them between users.
 
 The second option is appealing for existing users, but introduces an inconsistency with how npm models it's use. npm views its job as synchronizing your `node_modules` with your `package.json` and lock-file.
 
@@ -148,34 +133,24 @@ Will scan the tree after reading it to look for any dev linked bundled items. If
 
 ### The resolver: `install/deps.js`
 
-Has three new modes of operation when selecting new dependencies to resolve (via `loadDeps` or `loadDevDeps`) and matching existing real deps to requested deps (`doesChildVersionMatch`).
+Changes the selection of  new dependencies to resolve (via `loadDeps` or `loadDevDeps`) and matching existing real deps to requested deps (`doesChildVersionMatch`):
 
-1. Ignore the `link` lock-file property and only match and install the `package.json` and `lock-file` specifiers. This is the current behavior.
-2. Match existing dependencies based on the `link` lock-file property OR the specifiers, but when installing missing dependencies use the specifier. This is the new `npm install` behavior.
-3. Match existing dependencies based on the `link` lock-file property, and when installing missing dependencies use the `link` lock-file property. This is the `npm link create` behavior.
-
-
-### `npm link create`
-
-A subclass of the `Installer` class that uses the third mode for the resolver as discussed above.
-
-### `npm link create module-name[@version-spec]`
-
-Not quite the same flow as `npm i module-name[@version-spec]`. The `install` variant removes any existing copy of `module-name` then installs a new one. By contrast `create link` needs to request that just that dependency be made available via `link` metadata, without mutating the lock-file.
-
-### `npm link clear`
-### `npm link clear module-name[@version-spec]`
-
-A subclass of the `Installer` class that uses the first mode for the resolver as discussed above.
+Match existing dependencies based on the `links` dependency-info property, and when installing missing dependencies use the `links` dependency-info property.
 
 ### `npm link add /path/to/module-name`
 ### `npm link add /path/to/module-name version-spec`
 
-As with `npm link create` but edits the lock-file prior to resolving the ideal tree.
+A subclass of the `Installer` class that edits the dependency-info links property before doing ideal tree resolution.
 
 ### `npm link remove module-name`
 
-As with `npm link clear` but edits the lock-file prior to resolving the ideal tree.
+Alias: `npm link rm`
+
+As with `npm link add`. If no links remain and no other data is in the dependency-info file then it should be removed.
+
+### `npm link clear`
+
+As with `npm link remove` but removes ALL links.
 
 ## Prior Art
 
@@ -184,9 +159,3 @@ This provides development time only linking similarly to _workspaces_. The prima
 ## Out of scope
 
 Previous discussion of this RFC discussed the needs of some users to not prune extraneous dependencies of any kind. Supporting that use case is out of scope for this RFC and should be addressed separately.
-
-## Open Discussion
-
-How to integrate this with the use case raised by @giltayar:
-
-> Ephemeral style, where you want to `npm link` elsewhere, just for trying things out. This can be to a package that resides in a totally different git repo. This is where you must _not_ persist this link in `package-lock.json` as it is relevant only for that certain developer on that certain computer, and therefore should not be commited to source control. This is also relevant for people not using `package-lock.json`.
