@@ -30,25 +30,28 @@ Links will be recorded in a `links` property that is an object mapping package n
 
 ### CHANGES TO COMMANDS
 
-#### `npm link`
+#### `npm link /path/to/module-name`
+#### `npm link /path/to/module-name [module-name@]version-spec`
 
-With no subcommand or an invalid subcommand, display help for the new subcommands.
+(Aliases: `npm ln`)
 
-#### `npm link add /path/to/module-name`
-#### `npm link add /path/to/module-name version-spec`
+With no arguments or `.`, display usage.
 
 Create a new development link in your project for the module contained in `/path/to/module-name`.  If a version specifier is included (eg `^1.0.0`) then only modules that match it are replaced with a link.  If no version specifier is included then ALL modules with the same name are replaced.
 
 Links are saved in the `links` field in the dependency-info file.  Linked dependencies have their own separate dependency tree installed inside their own `node_modules` and their own lock-file.
 
-#### `npm link remove module-name`
-#### `npm link remove /path/to/module-name`
+#### `npm unlink`
+#### `npm unlink module-name[@verson-spec]`
+#### `npm unlink /path/to/module-name`
 
-(Aliases: `npm link rm`, `npm unlink`)
+Without arguments, removes all links.
 
 Remove an existing development link from your project.  This does not remove `module-name`—it removes the `link` field from the dependency record and replaces any symlinks to `module-name` with a normally installed copy of it.
 
 If no further links remain in the dependency-info file and no other information is contained in it, it should be unlinked.
+
+Removal should indicate how to recreate the link should the user wish to do so.
 
 #### `npm install`
 
