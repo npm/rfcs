@@ -1,4 +1,4 @@
-# Running npm as root redesign
+
 
 ## Summary
 
@@ -32,29 +32,29 @@ The remainder of this document does not apply to Windows.
 
 ### Summary of Changes
 
-Remove all special behavior around root and sudo.  When `npm` is run as root, either as the actual user or via sudo it will write its files and run its scripts as root.  It will use the config and cache in root's home directory.
+Remove MOST special behavior around root and sudo.  When `npm` is run as root, either as the actual user or via sudo it will write its files and run its scripts as root.  It will use the config and cache in root's home directory.
 
 ## Implementation
 
 ### Configuration
 
-The `.npmrc` in root's home directory is used.
+We use the `.npmrc` in the configured home directory.
 
-When running under sudo, configuration from the user's `.npmrc` is used, but the values from root's is preferred.
+Under `sudo`, the user's home directory is not changed to the user they are running as. As such, the user's `.npmrc` will be used and their existing cache directory will be used.
 
-### Cache Directory
-
-Unless configured otherwise, the cache directory is one in root's home directory.
+Otherwise running as root, root's own home directory and thus `.npmrc` and cachea re used.
 
 ### Cache Permissions
 
 Files created in the cache will use the same user and group as the top level cache folder, or, if that does not exist, the folder that contains it.
 
+It is important that we maintain this behavior as `npm` running under sudo will be working from the user's `.npmrc`.
+
 ### Installation
 
 #### Local Installation
 
-Local installation with `sudo` into a directory not owned by root requires `--force` to complete.
+Local installation with `sudo` into a directory not owned by root, warn noting that you may need to chown the files.
 
 Installed files and directories are owned by root.
 
@@ -69,8 +69,3 @@ Lifecycle scripts will be run as root.
 ## Prior Art
 
 All of the standard Unix userland writes files as root when running as root.
-
-## Unresolved Questions
-
-Should npm running as root make any attempt to read the user's auth information?  Not doing this means you'd have to separately `sudo npm login` if you wanted to install private packages as root.  On the other hand, KISS principles suggest that we should not try to be magic here.  In particular, we _don't_ want other user-level config, like cache directories.
-
