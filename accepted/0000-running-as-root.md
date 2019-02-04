@@ -25,7 +25,7 @@ they are out of scope for this discussion.
 Modern best practices are that access to the `root` user is achieved through
 a command called `sudo` which authenticates the current user and can limit
 which commands may be run. It also provides logging. When running commands
-with `sudo`, information about who the real user running the command is.
+with `sudo`, information about who the real user running the command is preserved.
 
 You can also access `root` by logging in as the user or by using the `su`
 command.  `su` differs from `sudo` in that you authenticate for it using
@@ -45,7 +45,7 @@ separate administrator account.  Like `su`, ordinary practice with the
 terminal is to open up a new terminal window with elevated permissions and
 run commands from there.
 
-Currently, there the only way for a Node.js program to determine it is
+Currently the only way for a Node.js program to determine it is
 running with Administrator privileges is to run a Windows command that
 requires them and see if it fails.  This is too slow to do on every
 installation and as such npm does not change its behavior per install.
