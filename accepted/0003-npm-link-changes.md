@@ -140,20 +140,17 @@ Changes the selection of  new dependencies to resolve (via `loadDeps` or `loadDe
 
 Match existing dependencies based on the `links` dependency-info property, and when installing missing dependencies use the `links` dependency-info property.
 
-### `npm link add /path/to/module-name`
-### `npm link add /path/to/module-name version-spec`
+### `npm link /path/to/module-name`
+### `npm link /path/to/module-name [name@]version-spec`
 
 A subclass of the `Installer` class that edits the dependency-info links property before doing ideal tree resolution.
 
-### `npm link remove module-name`
+### `npm unlink [module-name[@version-spec]]`
 
-Alias: `npm link rm`
+As with `npm link`. If no links remain and no other data is in the dependency-info file then it should be removed.
 
-As with `npm link add`. If no links remain and no other data is in the dependency-info file then it should be removed.
+With no arguments removes ALL the links.
 
-### `npm link clear`
-
-As with `npm link remove` but removes ALL links.
 
 ## Prior Art
 
