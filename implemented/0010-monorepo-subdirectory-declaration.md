@@ -1,5 +1,7 @@
 # Monorepo subdirectory declaration
 
+**IMLPLEMENTED** by [#140](https://github.com/npm/cli/pull/140) and included in `npm@6.8.0`.
+
 ## Summary
 
 Add an optional `directory` field to the `repository` declaration a package makes in its `package.json`. If populated, use this directory to construct a more accurate link to the package's source code from its www.npmjs.com show page, and include it in the API response from registry.npmjs.org.
