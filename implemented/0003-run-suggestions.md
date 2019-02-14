@@ -1,5 +1,7 @@
 # Run Suggestions
 
+**IMPLEMENTED** by [npm/npm#20879](https://github.com/npm/npm/pull/20879).
+
 ## Summary
 
 This proposal is for adding additional "help" text when a command name provided to `npm run` is not found.
