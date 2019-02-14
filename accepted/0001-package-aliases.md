@@ -1,5 +1,7 @@
 # Package Aliases
 
+**IMPLEMENTED** in [npm/cli#3](https://github.com/npm/cli/pull/3).
+
 ## Summary
 
 This proposal introduces a new package alias system that allows installation of
