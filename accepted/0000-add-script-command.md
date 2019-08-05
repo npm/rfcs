@@ -66,8 +66,10 @@ I don't know, probably something like this:
 1. Write code to accept the argument, parse it into the script name and value
 1. Parse the `package.json` as an object
 1. If there is no `"scripts"` section, create it
+1. If the script name is already in use, store it for a warning message
 1. `manifest.scripts[scriptName] = value`
 1. Convert back to a happy string and save over the `package.json`
+1. If there was an existing script with a different value, output a warning message
 
 
 ## Prior Art
@@ -97,7 +99,11 @@ The proposal of `--add-script` is similar to the existing `--save` and `--save-d
 * **Run:** `npm --add-script start "nw ."`
 * **In `package.json`:** `"start": "nw ."`
 
-**Resolution:** Seeking expert opinion
+**Resolution:** Will automatically replace the value, but show a warning:
+
+```
+Warning: Existing "start" script has been overwritten. Replaced "express" with "nw .".
+```
 
 * * *
 
@@ -109,7 +115,7 @@ The proposal of `--add-script` is similar to the existing `--save` and `--save-d
 
 If **Bike A** results in us overriding existing scripts with a new value then `--create-script` would not make sense.
 
-**Resolution:** Seeking expert opinion
+**Resolution:** `npm add-script <name> <cmd>`
 
 * * *
 
@@ -124,7 +130,7 @@ But if accepting two arguments (`start` and `"some value"`) is beyond convention
 * `npm install --save-dev nw@latest`
 * `npm --save-script start@"nw ."`
 
-**Resolution:** Seeking expert opinion
+**Resolution:** `npm add-script <name> <cmd>`
 
 * * *
 
@@ -146,4 +152,4 @@ But this would have a whole host of other problems to solve like:
 
 Also adding in `--add-script` does not prevent us from also eventually creating `--add-field`. As there is already a `--save` and `--save-dev` which target the modification of specific fields in `package.json`.
 
-**Resolution:** Seeking expert opinion
+**Resolution:** Generic approach to be considered in separate RFC (if desired).
