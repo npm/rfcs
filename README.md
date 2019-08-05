@@ -88,8 +88,8 @@ is communicate the team's consensus to accept a change.
 When the changes described in an RFC have been implemented and merged into the
 relevant repository (and thus, due to be released), the corresponding RFC will
 be moved from `accepted/` to `implemented/`. If you'd like to implement an
-accepted RFC, please make a PR in the appropriate and mention the RFC and the
-RFC PR. Feel free to do this even for work-in-progress code!
+accepted RFC, please make a PR in the appropriate repo and mention the RFC in
+the PR. Feel free to do this even for work-in-progress code!
 
 ## How do I change an RFC after ratification?
 
