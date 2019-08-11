@@ -62,7 +62,7 @@ examining the environment.
 
 #### Administrator on Windows
 
-On Windows systems the equivelant is to run things as `Administrator`.
+On Windows systems the equivalent is to run things as `Administrator`.
 Like `sudo`, you allow this using your credentials, not the credentials of
 a separate administrator account.  Like `su`, ordinary practice with the
 terminal is to open up a new terminal window with elevated permissions and

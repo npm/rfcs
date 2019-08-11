@@ -2,7 +2,7 @@
 
 ## Summary
 
-`package.json` should not be edited by `npm update` unneccesarily. When updating a package to a newer version that still satisfies the original range, package.json should not change. Only when updating to a range that does not satisfy the range specified in `package.json` should it be changed and saved to `package.json`.
+`package.json` should not be edited by `npm update` unnecessarily. When updating a package to a newer version that still satisfies the original range, package.json should not change. Only when updating to a range that does not satisfy the range specified in `package.json` should it be changed and saved to `package.json`.
 
 ## Motivation
 
@@ -43,7 +43,7 @@ and the following available versions for all packages:
 I have not looked into the code yet, and would appreciate help or guidance with this.
 
 <!--
-Give a high-level overview of implementaion requirements and concerns. Be specific about areas of code that need to change, and what their potential effects are. Discuss which repositories and sub-components will be affected, and what its overall code effect might be.
+Give a high-level overview of implementation requirements and concerns. Be specific about areas of code that need to change, and what their potential effects are. Discuss which repositories and sub-components will be affected, and what its overall code effect might be.
 
 THIS SECTION IS REQUIRED FOR RATIFICATION -- you can skip it if you don't know the technical details when first submitting the proposal, but it must be there before it's accepted
 -->
