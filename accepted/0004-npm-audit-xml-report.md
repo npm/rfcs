@@ -2,7 +2,7 @@
 
 ## Summary
 
-It should be possibile to execute `npm audit --owasp` and getting an OWASP Dependency Check XML.
+It should be possible to execute `npm audit --owasp` and getting an OWASP Dependency Check XML.
 
 ## Motivation
 

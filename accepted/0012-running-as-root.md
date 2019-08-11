@@ -24,7 +24,7 @@ From Node.js, we can determine if the user is running as `root` by examining the
 
 #### Administrator on Windows
 
-On Windows systems the equivelant is to run things as `Administrator`.  Like `sudo`, you allow this using your credentials, not the credentials of a separate administrator account.  Like `su`, ordinary practice with the terminal is to open up a new terminal window with elevated permissions and run commands from there.
+On Windows systems the equivalent is to run things as `Administrator`.  Like `sudo`, you allow this using your credentials, not the credentials of a separate administrator account.  Like `su`, ordinary practice with the terminal is to open up a new terminal window with elevated permissions and run commands from there.
 
 Currently the only way for a Node.js program to determine it is running with Administrator privileges is to run a Windows command that requires them and see if it fails.  This is too slow to do on every installation and as such npm does not change its behavior per install.
 
