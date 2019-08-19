@@ -6,7 +6,7 @@ Provide a means for a registry to indicate that some or all versions of a
 package are restricted by a security policy.
 
 Introduce a new 403 error in the case that a forbidden package was
-requested and blocked by the security proxy.
+requested and blocked by a server-side policy.
 
 If no manifest was found under the versions object of the packument, then
 verify if the package is forbidden under the new restrictedVersions object.
@@ -38,7 +38,7 @@ provide a better DX and give more informative messages to its users.
 ## Detailed Explanation
 
 1. Introduce a new E403 (forbidden) error code in the case that a forbidden
-   package was requested and blocked by the security proxy on the CLI
+   package was requested and blocked by a policy on the server.
 2. Add this check on `npm-pick-manifest` where we currently check if a
    version package exists or not. This extra check verifies that a version
    isn't under the `restrictedVersions` object and if it is, it will throw
