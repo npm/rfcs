@@ -1,4 +1,4 @@
-# Add script to manifest from command
+# Set script in package.json from command line
 
 
 ## Summary
@@ -7,7 +7,7 @@ An `npm` command that lets you create a task in the scripts section of the `pack
 
 **Example:**
 
-* `npm add-script start "http-server ."`
+* `npm set-script start "http-server ."`
 
 
 ```
@@ -27,7 +27,7 @@ Outside of personal daily use (which I think is worth it just for that), it woul
 
 When giving instructions in a classroom setting (like in workshops) or just in tutorials, I'd prefer to say this:
 
-> "Run **`npm install --save-dev nw`** and then run **`npm add-script start "nw ."`** then run **`npm start`**."
+> "Run **`npm install --save-dev nw`** and then run **`npm set-script start "nw ."`** then run **`npm start`**."
 
 The current way has more steps and is proned to error:
 
@@ -41,13 +41,13 @@ Especially since the `npm install` portion could take a long time, so if they mo
 I want to be able to do this, walk away, and come back and it be done and running:
 
 ```
-npm init -y && npm install --save-dev http-server && npm add-script start "http-server ." && npm start
+npm init -y && npm install --save-dev http-server && npm set-script start "http-server ." && npm start
 ```
 
 Colons and hyphens are common in script names. they would look like this:
 
-* `npm add-script test:e2e "nightwatch"`
-* `npm add-script test-unit "jest --config jest.config.js --coverage"`
+* `npm set-script test:e2e "nightwatch"`
+* `npm set-script test-unit "jest --config jest.config.js --coverage"`
 
 
 ## Rationale and Alternatives
@@ -59,7 +59,7 @@ Colons and hyphens are common in script names. they would look like this:
 
 ## Implementation
 
-1. Add new top-level command at `lib/add-script.js`
+1. Add new top-level command at `lib/set-script.js`
 1. Require 2 arguments.  First is the script name, second is command.
 1. Parse the `package.json` as an object
 1. If there is no `"scripts"` section, create it
@@ -71,7 +71,7 @@ Colons and hyphens are common in script names. they would look like this:
 
 ## Prior Art
 
-The proposal of `add-script` is similar to the existing `--save` and `--save-dev` in the sense that it is a command followed by arguments that result in the modification of `package.json`.
+The proposal of `set-script` is similar to the existing `--save` and `--save-dev` in the sense that it is a command followed by arguments that result in the modification of `package.json`.
 
 * `npm install --save-dev http-server`
 
