@@ -203,7 +203,10 @@ This information will _not_ be tracked for `bundleDependencies`, as they
 are never fetched directly.
 
 If the `node_modules/.arborist-resolutions.json` file is not present, then
-attempt to get the reso
+attempt to get the resolution from `package-lock.json` or `package.json` if
+possible.  (Potentially also look in `yarn.lock`.)
+
+Failing that, look up based on the requested package specifier.
 
 ## Rationale and Alternatives
 
