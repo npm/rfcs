@@ -2,7 +2,7 @@
 
 ## Summary
 
-This RFC identifies an initial means of tooling to describe & notify consumers of a package's monetary support information.
+This RFC identifies an initial means of tooling to describe & notify consumers of a package's monetary support information. `npm` has been [vocal about our commitment](https://blog.npmjs.org/post/187382017885/supporting-open-source-maintainers) to providing a means for package maintainers to more sustainably support their work & this reflects an initial step toward that goal. 
 
 ## Motivation
 
