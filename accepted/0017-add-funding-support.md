@@ -32,8 +32,12 @@ Package maintainers want to clearly indentify how their software is currently, o
 * Add notification at the end of output of package installation that references the number of packages with `funding` defined 
   * ex. `23 packages are looking for funding. Run "npm fund" to find out more.`
 * Add `--no-fund` flag to opt-out of the funding notification when installing
-* Add `npm fund` subcommand which will: open the URL (string) **OR** list the funding references defined (object)
+* Add `npm fund <pkg>` subcommand: 
+  * if a singular URL is defined for the specified package's `funding` field, it will try to open it using the `--browser` config param (similar to `npm repo <pkg>`)
+  * if an object is defined for the specified package's `funding` field, it will print out the tree of values
+  * if no package is specified, `npm` will try to print out a tree of all the funding references defined in the current project's installed dependencies
 * Add a visual representation for the funding field/value on package pages on `npmjs.com`
+
 
 **Examples of `funding` usage in `package.json`:**
 ```
@@ -83,6 +87,22 @@ Package maintainers want to clearly indentify how their software is currently, o
   }
   ...
 }
+```
+
+**Example of `npm fund <pkg>`:**
+```
+$ npm fund example-package 
+└─ example-package
+   ├─ sponsor
+   │  ├─ 0: https://github.com/users/my-account/sponsorship
+   │  ├─ 1: https://opencollective.com/my-account
+   │  └─ 2: https://www.patreon.com/my-account
+   ├─ sponsors: https://github.com/users/my-account/sponsorship#sponsors
+   ├─ contributors: https://opencollective.com/my-account#section-contributors
+   └─ patrons
+      ├─ 0: https://patrons-site-one.com/
+      ├─ 1: https://patrons-site-two.com/
+      └─ 2: https://patrons-site-three.com/
 ```
 
 ## Prior Art
