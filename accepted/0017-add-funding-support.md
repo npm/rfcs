@@ -19,7 +19,8 @@ Package maintainers want to clearly indentify how their software is currently, o
 
 ##  Rationale & Alternatives
 * Rationale: This is a straightforward and easily implemented solution to take the first step toward supporting Open Source Package Maintainence sustainability
-* Alternative: Do nothing
+* Rationale: Building this functionality into the package management layer is the only reliable way to push funding notifications to the vast majority of developers who already use npm
+* Alternative: Continue to rely on third-party, opt-in, tools & platforms that only support a fraction of the desired audience
 * Alternative: Continue debating a larger, more complex schema /w correspondingly more complex tooling
 
 ## Implementation
