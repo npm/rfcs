@@ -126,6 +126,3 @@ $ npm fund
 8. <i id="r8"></i>[`thanks`: "Read URL from `package.json`" Issue](https://github.com/feross/thanks/issues/2)
 9. <i id="r9"></i>[`funding`: "Collaborate with the PM WG" Issue](https://github.com/feross/funding/issues/15)
 10. <i id="r10"></i>[Differences between: "author", "contributors", "maintainers" & "owner"](https://github.com/npm/www/issues/133#issuecomment-284906561)
-
-## Unresolved Questions and Bikeshedding
-* [ ] Highlight this proposal to the [Package Maintaince WG](https://github.com/nodejs/package-maintenance/)
