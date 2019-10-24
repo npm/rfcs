@@ -118,7 +118,7 @@ $ npm fund example-package
 * [microformats: `rel-payment`](http://microformats.org/wiki/rel-payment)
 * [Shields.io: Funding](https://shields.io/category/funding)
 * [ThanksApp: Donate Spec](https://github.com/ThanksApp/donate-spec)
-*  [Bevry: `sponsored`](https://github.com/bevry-archive/sponsored)
+* [Bevry: `sponsored`](https://github.com/bevry-archive/sponsored)
 * [OGAG: `civic.json`](http://open.dc.gov/civic.json/)
 
 #### Other Work & Conversations
