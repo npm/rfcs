@@ -26,7 +26,11 @@ Package maintainers want to clearly indentify how their software is currently, o
 ## Implementation
 
 * Add a `funding` field to `package.json`
-  * supports an object with a specified `type` & `url` field
+  * supports a string or an object with a specified `type` & `url` field
+  * `url` is required for `npm fund` to execute
+  * `type` is an optional field that can be inferred by the `url`
+  * Note: if `funding` is defined as a string, that value will be mapped to `url` & a `type` may be inferred
+  * Note: it is not advicsed to add arbitrary key/values to `funding` as additional fields may be added in the future 
 * Add notification at the end of output of package installation that references the number of packages with `funding` defined 
   * ex. `23 packages are looking for funding. Run "npm fund" to find out more.`
 * Add `--no-fund` flag to opt-out of the funding notification when installing
@@ -80,18 +84,21 @@ Package maintainers want to clearly indentify how their software is currently, o
 **Example of `npm fund <pkg>`:**
 ```
 $ npm fund example-package 
-└─ example-package 
+└─ example-package@1.0.0 
    ├─ type: patreon 
    └─ url: https://www.patreon.com/example-package 
 ```
 ```
 $ npm fund 
-└─ example-package-dependency
+└─ example-dependency@1.0.0
    ├─ type: patreon 
-   └─ url: https://www.patreon.com/example-package-dependency
-└─ example-package-dependency-two
+   └─ url: https://www.patreon.com/example-dependency
+└─ example-dependency-two@1.0.0
    ├─ type: opencollective
-   └─ url: https://opencollective.com/example-package-dependency-two
+   └─ url: https://opencollective.com/example-dependency-two
+└─ example-dependency-three@1.0.0, example-dependency-four@1.0.0, example-dependency-five@1.0.0
+   ├─ type: individual
+   └─ url: https://sindresorhus.com/donate
 ```
 
 ## Prior Art
