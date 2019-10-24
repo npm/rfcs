@@ -30,7 +30,7 @@ Package maintainers want to clearly indentify how their software is currently, o
   * `url` is required for `npm fund` to execute
   * `type` is an optional field that can be inferred by the `url`
   * Note: if `funding` is defined as a string, that value will be mapped to `url` & a `type` may be inferred
-  * Note: it is not advicsed to add arbitrary key/values to `funding` as additional fields may be added in the future 
+  * Note: it is not advised to add arbitrary key/values to `funding` as additional fields may be added in the future 
 * Add notification at the end of output of package installation that references the number of packages with `funding` defined 
   * ex. `23 packages are looking for funding. Run "npm fund" to find out more.`
 * Add `--no-fund` flag to opt-out of the funding notification when installing
