@@ -84,9 +84,7 @@ Package maintainers want to clearly indentify how their software is currently, o
 **Example of `npm fund <pkg>`:**
 ```
 $ npm fund example-package 
-└─ example-package@1.0.0 
-   ├─ type: patreon 
-   └─ url: https://www.patreon.com/example-package 
+# opens a browser with correpsonding `url` value: https://www.patreon.com/example-package 
 ```
 ```
 $ npm fund 
