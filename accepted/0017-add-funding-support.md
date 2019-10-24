@@ -11,11 +11,11 @@ Package maintainers want to clearly indentify how their software is currently, o
 ## Detailed Explanation
 
 * See [Prior Art](#prior-art)
-* Provide a means to **reference** existing backers or funding opportunities in `package.json`
-* Provide a means to **define the type** of backing or funding opportunities in `package.json`
-* Provide a means to **notify** package consumers of backers or funding opportunites with the cli
-* Provide a means to **view** dependency's backers or funding opportunites with the cli
-* Provide a means to **view** a package's backers or funding opportunites
+* Provide a means to **reference** existing funding opportunities in `package.json`
+* Provide a means to **define the type** of funding opportunities in `package.json`
+* Provide a means to **notify** package consumers of funding opportunites with the cli
+* Provide a means to **view** dependency's funding opportunites with the cli
+* Provide a means to **view** a package's funding opportunites
 
 ##  Rationale & Alternatives
 * Rationale: This is a straightforward and easily implemented solution to take the first step toward supporting Open Source Package Maintainence sustainability
@@ -26,25 +26,23 @@ Package maintainers want to clearly indentify how their software is currently, o
 ## Implementation
 
 * Add a `funding` field to `package.json`
-  * supports a string URL or object with...
-  * keys that support arbitrary string identifiers
-    * ex. `"sponsor"`, `"sponsors"`, `"donations"`, `"bounties"`, `"contributors"`, `"patrons"` etc.
-  * values that represent a string URL or an array of URLs
+  * supports an object with a specified `type` & `url` field
 * Add notification at the end of output of package installation that references the number of packages with `funding` defined 
   * ex. `23 packages are looking for funding. Run "npm fund" to find out more.`
 * Add `--no-fund` flag to opt-out of the funding notification when installing
 * Add `npm fund <pkg>` subcommand: 
-  * if a singular URL is defined for the specified package's `funding` field, it will try to open it using the `--browser` config param (similar to `npm repo <pkg>`)
-  * if an object is defined for the specified package's `funding` field, it will print out the tree of values
-  * if no package is specified, `npm` will try to print out a tree of all the funding references defined in the current project's installed dependencies
-* Add a visual representation for the funding field/value on package pages on `npmjs.com`
-
+  * if a package is specified, npm will attempt to open the `url` defined in `funding` using the `--browser` config param (similar to `npm repo <pkg>`)
+  * if no package is specified, `npm` will print out a tree of all the `funding` references defined in the current project's installed dependencies
+* Add a visual representation & link for the `funding` `type` & `url` fields of a package on `npmjs.com`
 
 **Examples of `funding` usage in `package.json`:**
 ```
 {
   ...
-  "funding": "https://www.patreon.com/my-account"
+  "funding": {
+    "type": "patreon",
+    "url": "https://www.patreon.com/my-account"
+  },
   ...
 }
 ```
@@ -52,8 +50,9 @@ Package maintainers want to clearly indentify how their software is currently, o
 {
   ...
   "funding": {
-    "foundations": "https://openjsf.org/"
-  }
+    "type": "foundation",
+    "url": "https://openjsf.org/"
+  },
   ...
 }
 ```
@@ -61,11 +60,9 @@ Package maintainers want to clearly indentify how their software is currently, o
 {
   ...
   "funding": {
-    "corporations": [
-      "https://microsoft.com/",
-      "https://google.com/"
-    ]
-  }
+    "type": "corporation",
+    "url": "https://microsoft.com/"
+  },
   ...
 }
 ```
@@ -73,19 +70,9 @@ Package maintainers want to clearly indentify how their software is currently, o
 {
   ...
   "funding": {
-    "sponsor": [
-      "https://github.com/users/my-account/sponsorship",
-      "https://opencollective.com/my-account",
-      "https://www.patreon.com/my-account"
-    ],
-    "sponsors": "https://github.com/users/my-account/sponsorship#sponsors",
-    "contributors": "https://opencollective.com/my-account#section-contributors",
-    "patrons": [
-      "https://patrons-site-one.com/",
-      "https://patrons-site-two.com/",
-      "https://patrons-site-three.com/"
-    ]
-  }
+     "type": "patreon",
+     "url": "https://www.patreon.com/my-account"
+  },
   ...
 }
 ```
@@ -93,17 +80,18 @@ Package maintainers want to clearly indentify how their software is currently, o
 **Example of `npm fund <pkg>`:**
 ```
 $ npm fund example-package 
-└─ example-package
-   ├─ sponsor
-   │  ├─ 0: https://github.com/users/my-account/sponsorship
-   │  ├─ 1: https://opencollective.com/my-account
-   │  └─ 2: https://www.patreon.com/my-account
-   ├─ sponsors: https://github.com/users/my-account/sponsorship#sponsors
-   ├─ contributors: https://opencollective.com/my-account#section-contributors
-   └─ patrons
-      ├─ 0: https://patrons-site-one.com/
-      ├─ 1: https://patrons-site-two.com/
-      └─ 2: https://patrons-site-three.com/
+└─ example-package 
+   ├─ type: patreon 
+   └─ url: https://www.patreon.com/example-package 
+```
+```
+$ npm fund 
+└─ example-package-dependency
+   ├─ type: patreon 
+   └─ url: https://www.patreon.com/example-package-dependency
+└─ example-package-dependency-two
+   ├─ type: opencollective
+   └─ url: https://opencollective.com/example-package-dependency-two
 ```
 
 ## Prior Art
