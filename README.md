@@ -20,12 +20,10 @@ feature requests made there will be redirected to the RFCs repository.
 
 ## How do I create an RFC?
 
-* Fork https://github.com/npm/rfcs.
-* Copy `accepted/0000-template.md` into `accepted/0000-your-rfc-name.md`.
-* Fill in and edit the template with your own proposal.
-* Submit a PR to the `npm/rfcs` repo.
-* Link to the PR in [the RFCs forum on npm.community](https://npm.community/c/ideas/rfcs)
-* Tell all your friends! (don't ping npm folks -- we already get immediately notified about RFCs)
+* Fork https://github.com/npm/rfcs
+* Copy `accepted/0000-template.md` into `accepted/0000-your-rfc-name.md`
+* Fill in and edit the template with your proposal
+* Submit a PR to the `npm/rfcs` repo
 
 ## How does review work?
 
