@@ -1,7 +1,7 @@
 # npm RFC Process
 
 This document describes the RFC process for the [npm
-CLI](https://github.com/npm/cli), and provides a way for the CLI team and the
+CLI](https://github.com/npm/cli), and provides a way for the [Community & Open Source Team]() and the
 wider community to have discussions about the features and direction of the
 package manager! It is based on [the WeAllJS RFC process](https://wealljs.org/rfc-process) and the [Rust RFC process](https://github.com/rust-lang/rfcs), and, by extension, the [Yarn RFC process](https://github.com/yarnpkg/rfcs)
 
@@ -35,11 +35,6 @@ discussion and ask questions and provide (constructive) feedback. Keep in mind
 that only npm collaborators are able to ratify the RFC itself, even if other
 users can comment.
 
-Side discussion can happen externally, in public or private, with general non-review
-discussion happening in [the RFC category in npm.community](https://npm.community/c/ideas/rfcs),
-where npm collaborators are available for more immediate back-and-forth discussions
-about RFCs and details.
-
 All discussions surrounding an RFC are covered by the [npm Code of
 Conduct](https://www.npmjs.com/policies/conduct). Please keep conversations
 constructive, civil, and low-temperature. If tensions flare during discussion,
@@ -57,8 +52,8 @@ RFC will be considered ratified.
 Until an RFC is ratified, it's expected that its original author continue
 discussing it and integrating feedback into the document until it's ready.
 
-RFCs have a minimum 24 hour waiting period before being accepted or rejected.
-Once an RFC has been reviewed on Github, with all interested collaborators
+RFCs have a **minimum 24 hour waiting period** before being accepted or rejected.
+Once an RFC has been reviewed on GitHub, with all interested collaborators
 having an opportunity to review it, and at least one npm collaborator has signed
 off on the changes, the PR will be accepted and all its connected changes
 merged. There are two exceptions to the collaborator rule:
