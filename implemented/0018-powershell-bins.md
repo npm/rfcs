@@ -2,6 +2,11 @@
 
 AKA Terminate Terminate Batch Job
 
+## Implemented
+
+Landed on [cmd-shim](https://github.com/npm/cmd-shim/pull/34) in v2.1.0,
+and in [npm/cli 6.11.0](https://github.com/npm/cli/releases/tag/v6.11.0).
+
 ## Summary
 
 Today, installing binaries using npm creates an executable bash script and a .cmd file with the same name. Unfortunately, terminating cmd scripts with SIGINT causes a useless prompt for windows users - "Terminate batch job (Y/N)". Also, Powershell is the default shell for Windows. By creating .ps1 scripts in addition to bash and .cmd, powershell users will have a better command line experience.
