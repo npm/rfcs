@@ -6,7 +6,7 @@ This RFC identifies an initial means of tooling to describe & notify consumers o
 
 ## Motivation
 
-Package maintainers want to clearly indentify how their software is currently, or could be in the future, supported monetarily.
+Package maintainers want to clearly identify how their software is currently, or could be in the future, supported monetarily.
 
 ## Detailed Explanation
 
