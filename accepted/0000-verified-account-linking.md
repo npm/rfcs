@@ -40,9 +40,13 @@ validating the integrity of associated accounts in the JavaScript ecosystem.
 
 ## Implementation
 
-* Add a new `link` subcommand under `npm profile`, which accepts an optional positional argument (e.g. `npm profile link github`).
-** If you run `npm profile link` with no arguments, the registry will return a list of third-party services that you can link.
-** If you provide one of these services as an argument to `npm profile link`, the registry will open a browser window and attempt to authenticate to your account on that third-party service.
+* Add a new `link` subcommand under `npm profile`, which accepts an optional
+  positional argument (e.g. `npm profile link github`).
+ * If you run `npm profile link` with no arguments, the registry will return a
+   list of third-party services that you can link.
+ * If you provide one of these services as an argument to `npm profile link`,
+   the registry will open a browser window and attempt to authenticate to your
+   account on that third-party service.
 * The CLI should generate a nonce to circumvent replay attacks.
 
 **NOTE:** If the CLI generates a nonce, all npm registries must also implement
