@@ -52,3 +52,14 @@ packument-signature-key: https://keybase.io/npmregistry/pgp_keys.asc
 ## Prior Art
 
 Debian's archive signing key is used to verify that registry contents have not been tampered with: https://ftp-master.debian.org/keys.html
+
+## Unresolved Questions
+
+### Support aggregate registries
+
+Private registry solutions provide aggregate registries (Artifactory calls these virtual repositories). In this case, it's possible to have multiple keys for the same registry url since the packuments may be coming from different registries.
+
+Some options:
+
+* We could add multi-key support to this proposal.
+* We could leave this up to private registries to support (I.e. resign all packuments with a single key)
