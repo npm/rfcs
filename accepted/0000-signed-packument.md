@@ -63,3 +63,12 @@ Some options:
 
 * We could add multi-key support to this proposal.
 * We could leave this up to private registries to support (I.e. resign all packuments with a single key)
+
+# Provide freshness guarantees
+
+With the current proposal, an attacker could:
+
+1) fetch a packument for a package and hold onto it
+2) wait for a vulnerability to be patched for a package
+3) begin delivering the stale packument to prevent clients from receiving the fix
+4) exploit the vulnerability
