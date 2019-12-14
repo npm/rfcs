@@ -64,7 +64,7 @@ Some options:
 * We could add multi-key support to this proposal.
 * We could leave this up to private registries to support (I.e. resign all packuments with a single key)
 
-# Provide freshness guarantees
+### Provide freshness guarantees
 
 With the current proposal, an attacker could:
 
