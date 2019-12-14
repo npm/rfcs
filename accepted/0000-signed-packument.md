@@ -38,7 +38,7 @@ This pushes trusting the result of an installation into user land as opposed to 
 ### `.npmrc`
 
 ```
-packument-signature-validate: true
+packument-signature-validate: false
 packument-signature-inband: true
 packument-signature-key: https://keybase.io/npmregistry/pgp_keys.asc
 ```
