@@ -39,14 +39,10 @@ This pushes trusting the result of an installation into user land as opposed to 
 
 ```
 packument-signature-validate: false
-packument-signature-inband: true
 packument-signature-key: https://keybase.io/npmregistry/pgp_keys.asc
 ```
 
-`packument-signature-validate` - validate signatures of the packuments it receives against a public key (defaults to `false`). Ideally we could default this to `true` at some point in the future but would need ecosystem support and a deprecation cycle to ensure compatibility with existing mirrors and private registries.
-
-`packument-signature-inband` - When set to `true`, signatures are delivered in an HTTP header (`x-npm-signature`) when the packument is downloaded otherwise it makes a separate HTTP request to `/[url].sig` for fetching the signature (defaults to `true`). Today mirroring the npm registry (for an in-network cache) can be done with a simple file server. While including the signature as a header saves a request, it requires that the server hosting the registry be able to generate that header. Having a file based signature gives us a way to remain compatible with these simple mirroring solutions.
-
+`packument-signature-validate` - validate signatures of the packuments it receives against a public key (defaults to `false`). Ideally we could default this to `true` at some point in the future but would need ecosystem support and a deprecation cycle to ensure compatibility with existing mirrors and private registries. When this is set to true, the cli will check the an HTTP header (`x-npm-signature`) for the packument's signature. If the header is missing, it makes a separate HTTP request to `/[url].sig`. Today mirroring the npm registry (for an in-network cache) can be done with a simple file server. While including the signature as a header saves a request, it requires that the server hosting the registry be able to generate that header. Having a file based signature gives us a way to remain compatible with these simple mirroring solutions.
 `packument-signature-key` - The key to validate packuments against (defaults to npm's public key).
 
 ## Prior Art
