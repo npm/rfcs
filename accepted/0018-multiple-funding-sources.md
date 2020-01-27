@@ -63,3 +63,29 @@ resolve@1.12.0
 ```
 
 The deduping might get a bit tricky since instead of a package name either being "by itself" or "grouped with others that have the same funding source", two packages could share one funding source, and then *not* share another funding source.
+
+## Update: resolution to above bikeshedding
+
+While working out the implementation with @ruyadorno, we decided the following:
+
+ - No longer display top-level package funding information, since this information is both useless to the maintainer of that package (since they provided the funding information) and also to avoid some tricky problems around deduping
+ - Invert the human output: instead of a deduped list of package names being the "key", the URL will be the "key"
+ - JSON output will be unchanged, except that the `funding` info, when specified as an array, will be an array in the output
+
+Here's some example `npm fund` output in the `resolve` repo:
+```sh
+resolve@1.12.0, @ljharb/eslint-config@15.0.2, safe-publish-latest@1.1.4, es-to-primitive@1.2.1, has-symbols@1.0.1
+├── url: https://github.com/sponsors/ljharb
+└─┬ glob@7.1.6
+  └── url: https://github.com/sponsors/isaacs
+```
+
+With the `@ljharb/eslint-config` package adding an array with two URLs, the `resolve` output will change to (modulo archy formatting):
+```sh
+resolve@1.12.0
+├─┬ https://github.com/sponsors/ljharb
+│ └── @ljharb/eslint-config@15.0.2, safe-publish-latest@1.1.4, es-to-primitive@1.2.1, has-symbols@1.0.1
+├─┬ https://tidelift.com/funding/github/npm/@ljharb/eslint-config
+│ └── @ljharb/eslint-config@15.0.2
+└─┬ https://github.com/sponsors/isaacs
+  └── glob@7.1.6
