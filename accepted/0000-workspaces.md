@@ -18,7 +18,7 @@ After sourcing feedback from the community, there are 2 major implementations/ch
 
 ## Rationale and Alternatives
 
-First and foremost there’s the alternative of leaving the problem set for userland to solve, there’s already the very popular project Lerna that provides all of these features.
+First and foremost there’s the alternative of leaving the problem set for userland to solve, there’s already the very popular project Lerna that provides some of these features.
 
 Also available is the alternative of supporting only the install (or bootstrap as Lerna names it) aspect of this proposal, following a less feature-rich approach but one that would still enable the basic goal of improving the user experience of managing multiple child packages but from all the feedback collected during the research phase of this RFC, this alternative is much less desirable to the community of maintainers involved.
 
