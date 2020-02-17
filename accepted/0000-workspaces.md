@@ -57,7 +57,7 @@ We're following the lead of Yarn in supporting the `workspaces` `package.json` f
 
 ### 2. Installing dependencies across child packages
 
-Change `npm install` (arborist) behavior to make it install every nested package by default once a valid configuration is defined.
+Change `npm install` ([arborist](https://www.npmjs.com/package/@npmcli/arborist)) behavior to make it install every nested package by default once a valid configuration is defined.
 
 Arborist should also be aware of all nested workspaces and correctly link to an internal workspace should it match the required semver version of an expected dependency anywhere in the installing tree. e.g:
 
