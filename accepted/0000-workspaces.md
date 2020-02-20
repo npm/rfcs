@@ -478,3 +478,4 @@ $ tree
 - Should we add a Workspace class (subclass of Node) in Arborist?
 - For this initial implementation there's no intention of adding a more ellaborate version/publish subcommand/workflow that would allow for bumping versions of nested packages + updating dependency references elsewhere across a workspace (similar to `lerna --independent` publish workflow).
 - Support for non-nested file structure workspaces (ex: adjacent directories)
+- Should we support an opt-out config? e.g: `workspacesEnabled`
