@@ -6,19 +6,20 @@ Publishing a package should prompt a confirmation prompt, allowing users to vali
 
 ## Motivation
 
-Breaking the prompt into a two-step operation allows for a validation of contents prior to uploading the package but it also enable new possibilities such as printing warnings promotting 2FA adoption, etc.
+Breaking the prompt into a two-step operation allows for a validation of contents prior to uploading the package.
 
 ## Detailed Explanation and Rationale
 
 `npm publish` should ask for a confirmation prompt prior to uploading the package tarball.
 
-Currently "publish" has a very nice behavior for users that have 2FA enabled, one in which it stops the publish process in order to ask for the OTP code, allowing for a review of the file contents prior to uploading the tarball file.
+Currently "publish" has a very nice **unintended UX** for users with 2FA enabled, in which it stops the publish process in order to ask for the OTP code, allowing for a review of the file contents (and even cancelling the process altogether) prior to uploading the tarball file.
 
-It would be very nice to expand that "review" 
+A broader population of package authors can benefit from this UX if we formalize it. Allowing for review of contents and cancelation of package publishing.
 
 ## Alternatives
 
-Not change it, just keep the current behavior?
+1. Not change it, just keep the current behavior?
+2. Implement it behind an _opt-in_ config option
 
 ## Implementation
 
@@ -64,4 +65,4 @@ Currently `npm publish` will automatically publish the tarball to the registry i
 
 ## Unresolved Questions and Bikeshedding
 
-TBD
+- Could be tricky to handle publishing of multiple packages in the context of a **workspace** environment.
