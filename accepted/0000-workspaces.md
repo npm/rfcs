@@ -2,7 +2,7 @@
 
 ## Summary
 
-Add a set of features to the npm cli that provide support to managing multiple packages from within a singular top-level, root package.
+Add a set of features to the **npm cli** that provide support to managing multiple packages from within a singular top-level, root package.
 
 ## Motivation
 
@@ -12,21 +12,24 @@ The name “workspaces” is already established in the community with both Yarn
 
 ## Detailed Explanation
 
-After sourcing feedback from the community, there are 2 major implementations/changes required in the cli in order to provide the feature set that would enable a better management of nested packages.
-- Install: In a workspaces setup users expect to be able to install all nested packages and perform the associated lifecycle scripts from the root-level, it should also be aware of sibling packages that depend on one another and link them appropriately
-- Run some npm subcommands in the context of each nested workspace
+After sourcing feedback from the community, there are 3 major implementations/changes required in the **npm cli** in order to provide the feature set that would enable a better management of nested packages.
+- Make the **npm cli** **workspace**-aware.
+- Install: In a **npm workspaces** setup users expect to be able to install all nested packages and perform the associated lifecycle scripts from the **Top-level workspace**, it should also be aware of **workspaces** that have a **dependency** on one another and **symlink** them appropriately.
+- Run some npm subcommands in the context of each **workspace**.
+
+The set of features identified in this document are the ones that are essential to an initial [MVP](https://en.wikipedia.org/wiki/Minimum_viable_product) of the **npm workspaces** support. The community should expect further development of this feature based on the feedback we collected and documented at the end of this RFC.
 
 ## Rationale and Alternatives
 
-First and foremost there’s the alternative of leaving the problem set for userland to solve, there’s already the very popular project Lerna that provides some of these features.
+First and foremost there’s the alternative of leaving the problem set for userland to solve, there’s already the very popular project [Lerna](https://github.com/lerna/lerna) that provides some of these features.
 
 Also available is the alternative of supporting only the install (or bootstrap as Lerna names it) aspect of this proposal, following a less feature-rich approach but one that would still enable the basic goal of improving the user experience of managing multiple child packages but from all the feedback collected during the research phase of this RFC, this alternative is much less desirable to the community of maintainers involved.
 
 ## Implementation
 
-### 1. Make npm workspace-aware
+### 1. Workspaces configuration: Making the npm cli workspace-aware
 
-We're following the lead of Yarn in supporting the `workspaces` `package.json` field which defines a list of paths, each of these paths may be a workspace itself but it also support globs.
+We're following the lead of Yarn in supporting the `workspaces` `package.json` property which defines a list of paths, each of these paths may point to the location of a **workspace** in the file system but it also support **globs**.
 
 `package.json` example:
 
@@ -54,12 +57,14 @@ We're following the lead of Yarn in supporting the `workspaces` `package.json` f
 }
 ```
 
+The **npm cli** will read from the paths and **globs** defined in this **workspaces configuration** and look for valid `package.json` files in order to create a list of packages that will be treated as **workspaces**.
+
 
 ### 2. Installing dependencies across child packages
 
-Change `npm install` ([arborist](https://www.npmjs.com/package/@npmcli/arborist)) behavior to make it install every nested package by default once a valid configuration is defined.
+Change `npm install` ([arborist](https://www.npmjs.com/package/@npmcli/arborist)) behavior to make it properly install **dependencies** for every **workspace** defined in the **workspaces configuration** described above.
 
-Arborist should also be aware of all nested workspaces and correctly link to an internal workspace should it match the required semver version of an expected dependency anywhere in the installing tree. e.g:
+**Arborist** should also be aware of all **workspaces** in order to correctly link to another internal **workspace** should it match the required semver version of an expected **dependency** anywhere in the installing tree. e.g:
 
 ```
 // Given this package.json structure:
@@ -76,34 +81,30 @@ $ npm install
 │   ├── dep-a -> ./dep-a
 │   └── dep-b -> ./dep-b
 ├── dep-a
-│   └── node_modules
-│       └── dep-b -> ../../../node_modules/dep-b
 └── dep-b
 ```
 
-NOTE: The final implementation of the symlinking structure might differ from the examples laid out here (which are trying to be as illustrative as possible). Arborist might end up resolving all symlinks up to the actual place instead of creating a chain of symlinks.
+For the initial **workspaces** implementation, we're going to stick with **arborist**'s default algorithm that privileges **hoisting packages** but will place packages at nested `node_modules` whenever necessary.
 
 ### 3. Run commands across all child packages
 
-Make npm commands workspace-aware, so that running a command tries to run it within nested packages as long as a workspaces field is defined in `package.json`.
+Make **npm cli** subcommands **npm workspaces**-aware, so that running a command tries to run it within all **workspaces** as long as a **workspaces configuration** field is properly defined in `package.json`.
 
-Only a subset of npm commands are to be supported:
+Only a subset of commands are to be supported:
 
-- `fund` List funding info for all packages
-- `ls` List all packages
-- `outdated` List outdated deps for all packages
-- `publish` Publishes all packages
-- `run-script` Run arbitrary scripts for all packages
-- `rebuild` Rebuild all packages
+- `fund` List funding info for all workspaces
+- `ls` List all packages including workspaces
+- `outdated` List outdated deps including workspaces and its deps
+- `run-script` Run arbitrary scripts in all workspaces
+- `rebuild` Rebuild all workspaces
 - `restart`
 - `start`
 - `stop`
-- `test` Run tests in all packages
-- `update` Update a dependency in all packages
-- `version` Bump versions for all packages
-- `view` View registry info for all packages
+- `test` Run tests in all workspaces
+- `update` Updates a dependency across the entire installation tree, including workspaces
+- `view` View registry info but also including workspaces
 
-A new config value should be introduced in order to allow for filtering out a subset of the packages in which to run these commands. e.g: `--filter`
+A new **npm cli** configuration value should be introduced in order to allow for filtering out a subset of the **workspaces** in which to run these commands. e.g: `--filter`
 
 #### Test example:
 
@@ -132,14 +133,14 @@ npm ERR! Test failed.  See above for more details.
 
 ### 4. Publishing workspaces
 
-A workspace may not be published to the registry and for all publishing purposes having a valid `"workspace"` entry in a `package.json` is going to be the equivalent of `"private": true`.
+A **Top-level workspace** package may not be published to the registry and for all publishing purposes having a valid `"workspaces"` entry in a `package.json` is going to be the equivalent of `"private": true`.
 
 
 ## Examples
 
 ### 1. Simplistic example expanding on symlinking structure and `package-lock` file shape.
 
-Given a workspaces setup with the following contents:
+Given a **npm workspaces** setup with the following contents:
 
 ```
 $ cat ./package.json
@@ -185,6 +186,18 @@ $ cat ./packages/worskpace-b/package.json
         "react": "^16.x.x"
     }
 }
+
+$ cat ./packages/workspace-c/package.json
+{
+    "name": "workspace-c",
+    "version": "1.0.0",
+    "peerDependencies": {
+        "react": "^16.x.x"
+    },
+    "dependencies": {
+        "workspace-b": "^1.0.0"
+    }
+}
 ```
 
 Will result in the following symlinking structure:
@@ -198,25 +211,21 @@ $ tree
 │   ├── libnpmutil -> ./core/libnpmutil
 │   ├── workspace-a -> ./packages/workspace-a
 │   ├── workspace-b -> ./packages/workspace-b
+│   ├── workspace-c -> ./packages/workspace-c
 │   └── react
 ├── core
 │   └── libnpmutil
-│       ├── package-lock.json
-│       └── node_modules
-│           └── lodash -> ../../../node_modules/lodash
 └── packages
     ├── workspace-a
-    │   ├── package-lock.json
-    │   └── node_modules
-    │       ├── react -> ../../../node_modules/react
-    │       └── worspace-b -> ../../../node_modules/workspace-b
-    └─ worspace-b
-        ├── package-lock.json
-        └── node_modules
-            └── react -> ../../../node_modules/react
+    ├── workspace-b
+    └─ worspace-c
+        └── node_modules
+            └── workspace-b@1.0.0
 ```
 
 And the following `package-lock.json` files:
+
+NOTE: The following lockfile is for illustration purpose only and its final shape might differ.
 
 ```
 $ cat ./package-lock.json
@@ -256,13 +265,21 @@ $ cat ./package-lock.json
       "resolved": "packages/workspace-b",
       "link": true
     },
+    "node_modules/workspace-c": {
+      "resolved": "packages/workspace-c",
+      "link": true
+    },
     "packages/workspace-a": {
       "name": "workspace-a",
       "version": "1.7.3"
     },
     "packages/workspace-b": {
       "name": "workspace-b",
-      "version": "2.1.1"
+      "version": "1.0.0"
+    },
+    "packages/workspace-c": {
+      "name": "workspace-c",
+      "version": "1.0.0"
     }
   },
   "dependencies": {
@@ -279,192 +296,38 @@ $ cat ./package-lock.json
     },
     "workspace-b": {
       "version": "file:packages/workspace-b"
-    }
-  }
-}
-
-$ cat ./packages/workspace-a/package-lock.json
-{
-  "name": "workspace-a",
-  "version": "1.7.3",
-  "lockfileVersion": 2,
-  "requires": true,
-  "packages": {
-    "": {
-      "name": "workspace-a",
-      "version": "1.7.3",
+    },
+    "workspace-c": {
+      "version": "file:packages/workspace-c",
       "dependencies": {
-        "react": "^16.x.x",
-        "workspace-b": "^2.0.0"
+        "workspace-b": {
+          "version": "1.0.0",
+          "resolved": "https://registry.npmjs.org/workspace-b/-/workspace-b-1.0.0.tgz",
+          "integrity": "sha512-8xOcRHvCjnocdS5cpwXQXVzmmh5e5+saE2QGoeQmbKmRS6J3VQppPOIt0MnmE+4xlZoumy0GPG0D0MVIQbNA1A=="
+        },
       }
-    },
-    "../../../node_modules/workspace-b": {
-      "name": "workspace-b",
-      "version": "2.1.1"
-    }
-    "node_modules/react": {
-      "name": "react",
-      "version": "16.12.0",
-      "resolved": "https://registry.npmjs.org/react/-/react-16.12.0.tgz",
-      "integrity": "sha512-fglqy3k5E+81pA8s+7K0/T3DBCF0ZDOher1elBFzF7O6arXJgzyu/FW+COxFvAWXJoJN9KIZbT2LXlukwphYTA=="
-    },
-    "node_modules/workspace-b": {
-      "resolved": "../../../node_modules/workspace-b",
-      "link": true
-    }
-  },
-  "dependencies": {
-    "react": {
-      "version": "16.12.0",
-      "resolved": "https://registry.npmjs.org/react/-/react-16.12.0.tgz",
-      "integrity": "sha512-fglqy3k5E+81pA8s+7K0/T3DBCF0ZDOher1elBFzF7O6arXJgzyu/FW+COxFvAWXJoJN9KIZbT2LXlukwphYTA=="
-    },
-    "workspace-b": {
-      "version": "file:../../../node_modules/workspace-b"
-    }
-  }
-}
-
-$ cat ./packages/workspace-b/package-lock.json
-{
-  "name": "workspace-b",
-  "version": "2.1.1",
-  "lockfileVersion": 2,
-  "requires": true,
-  "packages": {
-    "": {
-      "name": "workspace-b",
-      "version": "2.1.1",
-      "dependencies": {
-        "react": "^16.x.x"
-      }
-    },
-    "node_modules/react": {
-      "name": "react",
-      "version": "16.12.0",
-      "resolved": "https://registry.npmjs.org/react/-/react-16.12.0.tgz",
-      "integrity": "sha512-fglqy3k5E+81pA8s+7K0/T3DBCF0ZDOher1elBFzF7O6arXJgzyu/FW+COxFvAWXJoJN9KIZbT2LXlukwphYTA=="
-    }
-  },
-  "dependencies": {
-    "react": {
-      "version": "16.12.0",
-      "resolved": "https://registry.npmjs.org/react/-/react-16.12.0.tgz",
-      "integrity": "sha512-fglqy3k5E+81pA8s+7K0/T3DBCF0ZDOher1elBFzF7O6arXJgzyu/FW+COxFvAWXJoJN9KIZbT2LXlukwphYTA=="
     }
   }
 }
 ```
 
-### 2. Expanded example using nested workspaces
 
-Given a workspaces setup:
+## Dictionary
 
-```
-$ cat package.json
-{
-    "workspaces": [
-        "apps/*",
-        "packages/*"
-        "plugins",
-        "ws2"
-    ]
-}
-```
+During the discussions around this RFC it was brought up to our attention that a lot of the vocabulary surrounding what the larger JavaScript community understands as "workspaces" can be confusing, for the sake of keeping the discussion as productive as possible we're taking the extra step of documenting what each of the terms used here means:
 
-In which `apps/` and `packages/` are folders that contain nested packages within. While `plugins/` and `ws2/` are folders that contains a `package.json` file that describes a nested workspace for each. e.g:
-
-```
-$ cat ./ws2/package.json
-{
-    "workspaces": [
-        "apps/*",
-        "packages/*"
-    ]
-}
-```
-
-The following output illustrates the resulting symlinking structure. With special attention to the hoisting characteristic of each workspace that will centralize deps at the top-level `node_modules` folder for each workspace in order to symlink it for all its nested packages.
-
-
-```
-$ tree
-.
-├── apps
-│  ├── x
-│  │  └── node_modules
-│  │     ├── bar -> ../../../node_modules/bar
-│  │     ├── baz -> ../../../node_modules/baz
-│  │     └── foo -> ../../../node_modules/foo
-│  ├── y
-│  │  └── node_modules
-│  │     ├── bar -> ../../../node_modules/bar
-│  │     ├── baz -> ../../../node_modules/baz
-│  │     └── foo -> ../../../node_modules/foo
-│  └── z
-│     └── node_modules
-│        ├── bar -> ../../../node_modules/bar
-│        ├── baz -> ../../../node_modules/baz
-│        └── foo -> ../../../node_modules/foo
-├── node_modules
-│  ├── bar -> ../packages/bar
-│  ├── baz -> ../packages/baz
-│  ├── foo -> ../packages/foo
-│  ├── x -> ../apps/x
-│  ├── y -> ../apps/y
-│  └── z -> ../apps/z
-├── package.json
-├── packages
-│  ├── bar
-│  │  └── node_modules
-│  │     ├── baz -> ../../../node_modules/baz
-│  │     └── foo -> ../../../node_modules/foo
-│  ├── baz
-│  │  └── node_modules
-│  │     ├── bar -> ../../../node_modules/bar
-│  │     └── foo -> ../../../node_modules/foo
-│  └── foo
-│     └── node_modules
-│        ├── bar -> ../../../node_modules/bar
-│        └── baz -> ../../../node_modules/baz
-├── plugins
-│  ├── a
-│  │  └── node_modules
-│  │     ├── baz -> ../../node_modules/baz
-│  │     └── foo -> ../../node_modules/foo
-│  ├── b
-│  │  └── node_modules
-│  │     ├── baz -> ../../node_modules/baz
-│  │     └── foo -> ../../node_modules/foo
-│  ├── c
-│  │  └── node_modules
-│  │     ├── baz -> ../../node_modules/baz
-│  │     └── foo -> ../../node_modules/foo
-│  ├── d
-│  │  └── node_modules
-│  │     ├── baz -> ../../node_modules/baz
-│  │     └── foo -> ../../node_modules/foo
-│  ├── node_modules
-│  │  ├── baz -> ../../node_modules/baz
-│  │  └── foo -> ../../node_modules/foo
-│  └── package.json
-└── ws2
-   ├── apps
-   │  └── twoapp
-   │     └── node_modules
-   │        └── two -> ../../../node_modules/two
-   ├── node_modules
-   │  ├── bar -> ../../node_modules/bar
-   │  ├── big-external-dep
-   │  ├── two -> ../packages/two
-   │  └── twoapp -> ../apps/twoapp
-   ├── package.json
-   └── packages
-      └── two
-         └── node_modules
-            ├── bar -> ../../../node_modules/bar
-            └── big-external-dep -> ../../../node_modules/big-external-dep
-```
+- **npm cli**: The [npm cli](https://github.com/npm/cli/) :wink:
+- **npm workspaces**: The feature name, meaning the ability to the **npm cli** to support a better workflow for working with multiple packages.
+- **workspaces**: A set of **workspace**s.
+- **workspace**: A nested package within the **Top-level workspace** file system that is explicitly defined as such via **workspaces configuration**.
+- **Top-level workspace**: The root level package that contains a **workspaces configuration** defining **workspaces**.
+- **workspaces configuration**: The blob of json configuration defined within `package.json` that declares where to find **workspaces** for this **Top-level workspace** package.
+- **dependency**: A package that is depended upon by another given package.
+- **dependent**: A package which depends on another given package.
+- **symlink**: A [symbolic link](https://en.wikipedia.org/wiki/Symbolic_link) between files.
+- **[globs](https://en.wikipedia.org/wiki/Glob_(programming))**: String patterns that specifies sets of filenames with special characters.
+- **[Arborist](https://github.com/npm/arborist)**: The npm@7 install library
+- **hoisting packages**: Bringing packages up a level in the context of an installation tree.
 
 
 ## Prior Art
@@ -475,7 +338,5 @@ $ tree
 
 ## Unresolved Questions and Bikeshedding
 
-- Should we add a Workspace class (subclass of Node) in Arborist?
-- For this initial implementation there's no intention of adding a more ellaborate version/publish subcommand/workflow that would allow for bumping versions of nested packages + updating dependency references elsewhere across a workspace (similar to `lerna --independent` publish workflow).
 - Support for non-nested file structure workspaces (ex: adjacent directories)
 - Should we support an opt-out config? e.g: `workspacesEnabled`
