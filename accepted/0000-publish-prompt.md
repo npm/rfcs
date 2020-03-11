@@ -14,7 +14,7 @@ Breaking the prompt into a two-step operation allows for a validation of content
 
 Currently "publish" has a very nice **unintended UX** for users with 2FA enabled, in which it stops the publish process in order to ask for the OTP code, allowing for a review of the file contents (and even cancelling the process altogether) prior to uploading the tarball file.
 
-A broader population of package authors can benefit from this UX if we formalize it. Allowing for review of contents and cancelation of package publishing.
+A broader population of package authors can benefit from this UX if we formalize it. Allowing for review of contents and cancellation of package publishing.
 
 ## Alternatives
 
