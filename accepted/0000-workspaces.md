@@ -92,17 +92,17 @@ Make **npm cli** subcommands **npm workspaces**-aware, so that running a command
 
 Only a subset of commands are to be supported:
 
-- `fund` List funding info for all workspaces
-- `ls` List all packages including workspaces
-- `outdated` List outdated deps including workspaces and its deps
-- `run-script` Run arbitrary scripts in all workspaces
-- `rebuild` Rebuild all workspaces
+- `fund` List funding info for all **workspaces**
+- `ls` List all packages including **workspaces**
+- `outdated` List outdated **dependencies** including **workspaces** and its **dependencies**
+- `run-script` Run arbitrary **scripts** in all **workspaces**, skip any **workspace** that does not have a targetting **script**
+- `rebuild` Rebuild all **workspaces**
 - `restart`
 - `start`
 - `stop`
-- `test` Run tests in all workspaces
-- `update` Updates a dependency across the entire installation tree, including workspaces
-- `view` View registry info but also including workspaces
+- `test` Run test **scripts** in all **workspaces**
+- `update` Updates a **dependency** across the entire installation tree, including **workspaces**
+- `view` View registry info, also including **workspaces**
 
 A new **npm cli** configuration value should be introduced in order to allow for filtering out a subset of the **workspaces** in which to run these commands. e.g: `--filter`
 
@@ -318,16 +318,18 @@ During the discussions around this RFC it was brought up to our attention that a
 
 - **npm cli**: The [npm cli](https://github.com/npm/cli/) :wink:
 - **npm workspaces**: The feature name, meaning the ability to the **npm cli** to support a better workflow for working with multiple packages.
-- **workspaces**: A set of **workspace**s.
+- **workspaces**: A set of **workspace**.
 - **workspace**: A nested package within the **Top-level workspace** file system that is explicitly defined as such via **workspaces configuration**.
 - **Top-level workspace**: The root level package that contains a **workspaces configuration** defining **workspaces**.
 - **workspaces configuration**: The blob of json configuration defined within `package.json` that declares where to find **workspaces** for this **Top-level workspace** package.
+- **dependencies**: A set of **dependency**.
 - **dependency**: A package that is depended upon by another given package.
 - **dependent**: A package which depends on another given package.
 - **symlink**: A [symbolic link](https://en.wikipedia.org/wiki/Symbolic_link) between files.
 - **[globs](https://en.wikipedia.org/wiki/Glob_(programming))**: String patterns that specifies sets of filenames with special characters.
 - **[Arborist](https://github.com/npm/arborist)**: The npm@7 install library
 - **hoisting packages**: Bringing packages up a level in the context of an installation tree.
+- **[scripts](https://docs.npmjs.com/misc/scripts)**: Arbitrary and lifecycle scripts defined in a `package.json`
 
 
 ## Prior Art
