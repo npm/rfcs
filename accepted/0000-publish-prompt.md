@@ -1,4 +1,4 @@
-# Publish prompt
+# Publish confirmation prompt
 
 ## Summary
 
@@ -18,7 +18,7 @@ A broader population of package authors can benefit from this UX if we formalize
 
 ### Feedback from the discussion around this RFC
 
-- Should be implemented behind an opt-in/experimental flag for npm@7
+- Should be implemented behind an opt-in flag for npm@7
 - Non-TTY environments should skip the prompt.
 
 ## Alternatives
@@ -27,10 +27,10 @@ A broader population of package authors can benefit from this UX if we formalize
 
 ## Implementation
 
-Prompts the user for confirmation when using the experimental flag:
+Prompts the user for confirmation when using the opt-in flag:
 
 ```sh
-$ npm publish --experimental-publish-confirmation
+$ npm publish --publish-confirmation
 
 npm notice
 npm notice 📦  disparity@3.0.0
@@ -60,7 +60,7 @@ Do you wish to proceed? [y/N]
 The user can also provide a `--yes` option that can skip the prompt and keep current behavior:
 
 ```
-$ npm publish --experimental-publish-confirmation --yes
+$ npm publish --publish-confirmation --yes
 ```
 
 ## Prior Art
