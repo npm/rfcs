@@ -16,17 +16,21 @@ Currently "publish" has a very nice **unintended UX** for users with 2FA enabled
 
 A broader population of package authors can benefit from this UX if we formalize it. Allowing for review of contents and cancelation of package publishing.
 
+### Feedback from the discussion around this RFC
+
+- Should be implemented behind an opt-in/experimental flag for npm@7
+- Non-TTY environments should skip the prompt.
+
 ## Alternatives
 
-1. Not change it, just keep the current behavior?
-2. Implement it behind an _opt-in_ config option
+1. Not implement it, keep the current behavior.
 
 ## Implementation
 
-This is a breaking change from the current `npm publish` behavior, it would prompt the user for confirmation:
+Prompts the user for confirmation when using the experimental flag:
 
 ```sh
-$ npm publish
+$ npm publish --experimental-publish-confirmation
 
 npm notice
 npm notice 📦  disparity@3.0.0
@@ -56,13 +60,9 @@ Do you wish to proceed? [y/N]
 The user can also provide a `--yes` option that can skip the prompt and keep current behavior:
 
 ```
-$ npm publish --yes
+$ npm publish --experimental-publish-confirmation --yes
 ```
 
 ## Prior Art
 
-Currently `npm publish` will automatically publish the tarball to the registry in case the user does not have OTP enabled.
-
-## Unresolved Questions and Bikeshedding
-
-- Could be tricky to handle publishing of multiple packages in the context of a **workspace** environment.
+Currently `npm publish` will automatically publish the tarball to the registry without any confirmation prompt in case the user does not have OTP enabled.
