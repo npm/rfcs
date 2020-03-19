@@ -58,6 +58,8 @@ We're following the lead of Yarn in supporting the `workspaces` `package.json` p
 
 The **npm cli** will read from the paths and **globs** defined in this **workspaces configuration** and look for valid `package.json` files in order to create a list of packages that will be treated as **workspaces**.
 
+**Note:** The `packages` property should support familiar patterns from [npm-packlist](https://www.npmjs.com/package/npm-packlist) `files` definition such as negative globs.
+
 
 ### 2. Installing dependencies across child packages
 
