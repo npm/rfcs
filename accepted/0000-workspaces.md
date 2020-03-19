@@ -90,7 +90,7 @@ For the initial **workspaces** implementation, we're going to stick with **arbor
 
 ## Examples
 
-### 1. Simplistic example expanding on symlinking structure and `package-lock` file shape.
+### Expanding on symlinking structure and `package-lock` file shape.
 
 Given a **npm workspaces** setup with the following contents:
 
