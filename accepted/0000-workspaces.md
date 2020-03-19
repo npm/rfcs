@@ -12,10 +12,9 @@ The name “workspaces” is already established in the community with both Yarn
 
 ## Detailed Explanation
 
-After sourcing feedback from the community, there are 3 major implementations/changes required in the **npm cli** in order to provide the feature set that would enable a better management of nested packages.
+After sourcing feedback from the community, there are 2 major implementations/changes required in the **npm cli** in order to provide the feature set that would enable a better management of nested packages.
 - Make the **npm cli** **workspace**-aware.
 - Install: In a **npm workspaces** setup users expect to be able to install all nested packages and perform the associated lifecycle scripts from the **Top-level workspace**, it should also be aware of **workspaces** that have a **dependency** on one another and **symlink** them appropriately.
-- Run some npm subcommands in the context of each **workspace**.
 
 The set of features identified in this document are the ones that are essential to an initial [MVP](https://en.wikipedia.org/wiki/Minimum_viable_product) of the **npm workspaces** support. The community should expect further development of this feature based on the feedback we collected and documented at the end of this RFC.
 
@@ -85,55 +84,6 @@ $ npm install
 ```
 
 For the initial **workspaces** implementation, we're going to stick with **arborist**'s default algorithm that privileges **hoisting packages** but will place packages at nested `node_modules` whenever necessary.
-
-### 3. Run commands across all child packages
-
-Make **npm cli** subcommands **npm workspaces**-aware, so that running a command tries to run it within all **workspaces** as long as a **workspaces configuration** field is properly defined in `package.json`.
-
-Only a subset of commands are to be supported:
-
-- `fund` List funding info for all **workspaces**
-- `ls` List all packages including **workspaces**
-- `outdated` List outdated **dependencies** including **workspaces** and its **dependencies**
-- `run-script` Run arbitrary **scripts** in all **workspaces**, skip any **workspace** that does not have a targetting **script**
-- `rebuild` Rebuild all **workspaces**
-- `restart`
-- `start`
-- `stop`
-- `test` Run test **scripts** in all **workspaces**
-- `update` Updates a **dependency** across the entire installation tree, including **workspaces**
-- `view` View registry info, also including **workspaces**
-
-A new **npm cli** configuration value should be introduced in order to allow for filtering out a subset of the **workspaces** in which to run these commands. e.g: `--filter`
-
-#### Test example:
-
-```
-├── package.json { "name": "foo", "workspaces": ["dep-a", "dep-b"] }
-├── dep-a
-│   └── package.json { "version": "1.0.0" }
-└── dep-b
-    └── package.json { "version": "1.3.1" }
-
-$ npm test
-
-> foo@1.0.0 test /Users/username/foo
-> echo "Error: no test specified" && exit 1
-
-Error: no test specified
-npm ERR! Test failed.  See above for more details.
-
-> dep-a@1.0.0 test /Users/username/foo/dep-a
-> done
-
-> dep-b@1.3.1 test /Users/username/foo/dep-b
-> done
-```
-
-
-### 4. Publishing workspaces
-
-A **Top-level workspace** package may not be published to the registry and for all publishing purposes having a valid `"workspaces"` entry in a `package.json` is going to be the equivalent of `"private": true`.
 
 
 ## Examples
@@ -340,5 +290,6 @@ During the discussions around this RFC it was brought up to our attention that a
 
 ## Unresolved Questions and Bikeshedding
 
-- Support for non-nested file structure workspaces (ex: adjacent directories)
 - Should we support an opt-out config? e.g: `workspacesEnabled`
+- Should we prevent **publish** of the **Top-level workspace** package? Previous note on it:
+  - A **Top-level workspace** package may not be published to the registry and for all publishing purposes having a valid `"workspaces"` entry in a `package.json` is going to be the equivalent of `"private": true`.
