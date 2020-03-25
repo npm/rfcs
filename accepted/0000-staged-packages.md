@@ -54,7 +54,7 @@ which we and our community are both familiar.
   published to staging.
 * A new `--stage` flag for the `npm install` command that allows a package to be
   installed from staging.
-* A new `--stage` flag for the `npm view` command that allows us to retrive data
+* A new `--stage` flag for the `npm view` command that allows us to retrieve data
   for staged packages.
 * A new `npm promote` command that allows a user to promote a staged package.
 * The ability to set a `staging` scope on auth tokens so we can grant read or
