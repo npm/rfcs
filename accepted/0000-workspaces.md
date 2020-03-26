@@ -289,9 +289,3 @@ During the discussions around this RFC it was brought up to our attention that a
 - [Lerna](https://github.com/lerna/lerna)
 - [Yarn workspaces](https://classic.yarnpkg.com/en/docs/workspaces/)
 - [Pnpm workspaces](https://pnpm.js.org/en/workspaces)
-
-## Unresolved Questions and Bikeshedding
-
-- Should we support an opt-out config? e.g: `workspacesEnabled`
-- Should we prevent **publish** of the **Top-level workspace** package? Previous note on it:
-  - A **Top-level workspace** package may not be published to the registry and for all publishing purposes having a valid `"workspaces"` entry in a `package.json` is going to be the equivalent of `"private": true`.
