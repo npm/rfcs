@@ -24,10 +24,10 @@ The best way to handle the problem currently is by using `npm link`, but this ha
 
 ## Detailed Explanation
 
-This RFC proposes the addition of the special `link#[semver](comment)` syntax for specifying package versioning. On running `npm install` and encountering such a version string, npm would do the following:
+This RFC proposes the addition of the special `link#[semver](comment)` syntax for specifying package versioning, where `(comment)` is optional. On running `npm install` and encountering such a version string, npm would do the following:
 
-1. Check to see if the given package exists in the global npm directory. If not, throw error with comment if given, or generic "Expected package [package] to be linked, but not found. You must npm link package [package-name] at version [version] to continue."
-2. If package does exist, check its `package.json` file to verify that the version that is linked fulfills the given version spec. If not, throw error with comment if given, or generic "The version of linked package [package-name] does not fulfill the required version [version]. Please fix."
+1. Check to see if the given package exists in the global npm directory. If not, throw error with text, "Expected package [package] to be linked, but not found. You must npm link package [package-name] at version [version] to continue. Comment: (comment, if given)"
+2. If package does exist, check its `package.json` file to verify that the version that is linked fulfills the given version spec. If not, throw error with comment if given, or generic "The version of linked package [package-name] does not fulfill the required version [version]. Please fix. Comment: (comment, if given)"
 3. If everything is good, output warning containing the specific version of the linked package along with the comment, if given, and move on.
 
 Imagine we've just cloned a repo we're excited to contribute to. That repo has the following `package.json` file:
@@ -48,7 +48,9 @@ cd ~/my-repos
 git clone git@github.com:me/new-project.git
 cd new-project
 npm install
-[ERROR] Expected package `nother-dep` to be linked, but not found. You must npm link package `nother-dep` at version ^5.15.0 to continue. Comment: "clone github.com:cool-producer/nother-dep.git and check out branch great-improvements"
+[ERROR] Expected package `nother-dep` to be linked, but not found. You must npm link package
+`nother-dep` at version ^5.15.0 to continue. Comment: "clone github.com:cool-producer/nother-dep.git
+and check out branch great-improvements"
 
 # Ok, we know exactly what to do.... but let's say we weren't paying that much attention
 cd ~/my-repos
@@ -59,7 +61,9 @@ npm link
 # Now we've got the repo (but at the wrong branch). Let's try again
 cd ../new-project
 npm install
-[ERROR] The version of linked package `nother-dep` does not fulfill the required version ^5.15.0. Please fix. Comment: "clone github.com:cool-producer/nother-dep.git and check out branch great-improvements"
+[ERROR] The version of linked package `nother-dep` does not fulfill the required version ^5.15.0.
+Please fix. Comment: "clone github.com:cool-producer/nother-dep.git and check out branch
+great-improvements"
 
 # Oops! Go check out the right branch
 cd ../nother-dep
@@ -141,7 +145,7 @@ Npm allows you to use local file paths as package versions, but:
 
 ## Prior Art
 
-[Composer](https://getcomposer.org/) does a reasonably good job with a similar concept. They allow "version aliases", allowing you to communicate a) where to find the correct code; and b) what the target version of that as-yet unpublished code is. Their implementation looks like this:
+[Composer](https://getcomposer.org/) does a reasonably good job with a similar concept. They allow "version aliases", allowing you to communicate a) where to find the correct code, because you can specify a branch name; and b) what the target version of that as-yet unpublished code is, via the alias. Their implementation looks like this:
 
 ```json
 {
@@ -152,6 +156,8 @@ Npm allows you to use local file paths as package versions, but:
 ```
 
 This is ok, but it presents the minor issue of checking out the same repository multiple times across various projects, resulting in sometimes confusing varying states of development buried in `vendor/` directory hierarchies across projects. It is preferrable in development to leave the location of the repo up to the programmer (using `npm link`) and to then allow each project to target that location with specific version constraints (as this proposal recommends).
+
+Additionally, while it works well for PHP projects, which are not compiled, it is not adequate for Typescript projects and other compiled javascript.
 
 ## Unresolved Questions and Bikeshedding
 
