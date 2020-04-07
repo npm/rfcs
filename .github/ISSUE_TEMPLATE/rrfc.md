@@ -1,9 +1,10 @@
 ---
 name: RRFC
 about: Requesting Request For Comment
-title: '[RRFC] <title>'
-assignees:
-labels:
+title: "[RRFC] <title>"
+labels: ''
+assignees: ''
+
 ---
 
 <!--
