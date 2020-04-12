@@ -13,22 +13,39 @@ Allow package versions like `link#[semver](comment)` (comment is optional) to in
 }
 ```
 
+This syntax should be accepted in all places where versions are handled, including `package.json`, `package-lock.json`, `npm install [package-spec]`, and `npm link [package-spec]`.
+
 ## Motivation
 
-It's quite frequent that we develop several individual code libraries in concert, often using libraries in development across several other independent projects. There are several ways to facilitate this, all with serious drawbacks. The ones we will NOT discuss here are using git refs, using lerna, and using local paths, none of which are adequate solutions for a variety of reasons (see subsequent sections).
+It's quite frequent that we develop several individual code libraries in concert, often using libraries in development across several other independent projects. There are several ways to facilitate this, all with serious drawbacks. The methods we will NOT discuss here include a) using git refs; b) using lerna; and c) using local paths. None of these are adequate solutions for a variety of reasons (see subsequent sections).
 
 The best way to handle the problem currently is by using `npm link`, but this has the following serious drawbacks:
 
-* There's no way to communicate to other developers how to obtain the correct dependencies, since the target code has not yet been published. If a new developer were to clone your repo and run `npm install`, they would end up with broken code, since the system would obtain the dependency at an earlier, inadequate version (or not at all, if the dependency is new). They would furthermore have no way of knowing how to fix the problem.
-* There's no way to enforce version conformance of linked repositories to ensure they fulfill the requirements. You can `npm link` any version of a package into your codebase and npm does no further checking.
+* There's no way to communicate to other developers how to obtain the correct dependencies, since the target code has not yet been published. If a new developer were to clone your repo and run `npm install`, they would end up with broken code, since the system would obtain the dependency at an earlier, inadequate version (or not at all, if the dependency is new).
+* They would furthermore have no way of knowing how to fix the problem.
+* There's no way to enforce version conformance of linked repositories to ensure they fulfill the requirements. You can `npm link` any version of a package into your codebase and npm does no further checking on it.
 
 ## Detailed Explanation
 
-This RFC proposes the addition of the special `link#[semver](comment)` syntax for specifying package versioning, where `(comment)` is optional. On running `npm install` and encountering such a version string, npm would do the following:
+This RFC proposes the addition of the special `link#[semver](comment)` syntax for specifying package versioning, where `[semver]` is optional and defaults to "latest" and `(comment)` is optional and defaults to null. On encountering such a version string, npm would do the following:
 
-1. Check to see if the given package exists in the global npm directory. If not, throw error with text, "Expected package [package] to be linked, but not found. You must npm link package [package-name] at version [version] to continue. Comment: (comment, if given)"
-2. If package does exist, check its `package.json` file to verify that the version that is linked fulfills the given version spec. If not, throw error with comment if given, or generic "The version of linked package [package-name] does not fulfill the required version [version]. Please fix. Comment: (comment, if given)"
-3. If everything is good, output warning containing the specific version of the linked package along with the comment, if given, and move on.
+1. Check to see if the given package is already linked in the project.
+    a. If package is linked, check its `package.json` to verify that the version that is linked fulfills the given version spec.
+        i. If so, continue to step 3
+        ii. If not, throw error with text, "The version of linked package [package-name] does not fulfill the required version [version]. Please fix. Comment: (comment, if given)".
+    b. If package not linked, proceed to next step.
+2. Check to see if the given package exists in the global npm directory.
+    a. If package does exist, check its `package.json` file to verify that the version that is linked fulfills the given version spec.
+        i. If so, link package into project and continue to step 3
+        ii. If not, throw error with text, "The version of linked package [package-name] does not fulfill the required version [version]. Please fix. Comment: (comment, if given)"
+    b. If not, attempt to download* package to global directory at given version (current functionality, with the addition of the new functionality for checking version).
+        i. If found, download and re-enter loop at the top.
+        ii. If not found, issue standard ENOENT or ENOTARGET error with the addition of the following text: "Package [package-name] is specified as 'linked'. You may need to clone it separately at version [semver] and run `npm link`. Comment: (comment, if given)"
+3. If everything is good, output warning containing the specific version of the linked package along with the comment, if given, and move on. E.g., "Using linked dependency `[package name]` at version 5.15.1 for required version ^5.15.0. Comment: (comment, if given)".
+
+\* Note: I strongly dislike the silent downloading of dependencies declared as links, but it is current functionality and I think it makes sense for this RFC to be as backward-compatible as possible.
+
+### Example
 
 Imagine we've just cloned a repo we're excited to contribute to. That repo has the following `package.json` file:
 
@@ -48,9 +65,10 @@ cd ~/my-repos
 git clone git@github.com:me/new-project.git
 cd new-project
 npm install
-[ERROR] Expected package `nother-dep` to be linked, but not found. You must npm link package
-`nother-dep` at version ^5.15.0 to continue. Comment: "clone github.com:cool-producer/nother-dep.git
-and check out branch great-improvements"
+# npm tries to download `nother-dep` at ^5.15.0 but can't find it because this is a new branch of development
+[ERROR] Package `nother-dep` is specified as 'linked'. You may need to clone it separately at
+version ^5.15.0 and run `npm link`. Comment: "clone github.com:cool-producer/nother-dep.git and
+check out branch great-improvements"
 
 # Ok, we know exactly what to do.... but let's say we weren't paying that much attention
 cd ~/my-repos
@@ -97,8 +115,8 @@ The resulting `package.json` file would be:
 ```json
 {
   "dependencies": {
-    "nother-dep": "link#^5.15.0(clone github.com:cool-producer/nother-dep.git and check out branch great-improvements)",
-    "my-dep": "link#^3.0.0"
+    "my-dep": "link#^3.0.0",
+    "nother-dep": "link#^5.15.0(clone github.com:cool-producer/nother-dep.git and check out branch great-improvements)"
   }
 }
 ```
@@ -141,7 +159,7 @@ Npm allows you to use local file paths as package versions, but:
 
 ## Implementation
 
-(To be drafted)
+(To be drafted - see https://github.com/kael-shipman/cli/blob/rfc-pr-%23121/FEATURE-SPEC-RFC-PR-%23121.md for initial ideas)
 
 ## Prior Art
 
