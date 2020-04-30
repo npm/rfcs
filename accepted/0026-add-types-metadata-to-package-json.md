@@ -102,4 +102,4 @@ These can happen during `npm package` in the CLI.
 
 ## Prior Art
 
-[The algolia npm-search index](https://github.com/algolia/npm-search/) - which I believe powers the search on https://www.npmjs.com
+[The algolia npm-search index](https://github.com/algolia/npm-search/) - which is currently the best index of what packages have types included in their modules
