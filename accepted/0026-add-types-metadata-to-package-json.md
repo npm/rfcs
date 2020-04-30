@@ -21,29 +21,7 @@ Working with one of my libraries which ships with both Flow and TypeScript types
   "description": "Unit tests for Team Culture",
   "main": "distribution/danger.js",
   "typings": "distribution/danger.d.ts",
-  "bin": {
-    // 
-  }
-  "prettier": {
-    // ...
-  },
-  "scripts": {
-    // ...
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/danger/danger-js.git"
-  },
-  "keywords": [
-    "danger",
-    "ci"
-  ],
-  "author": "Orta Therox",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/danger/danger-js/issues"
-  },
-  "homepage": "https://github.com/danger/danger-js#readme",
+   //... 
   "devDependencies": {
     // ...
   },
@@ -55,7 +33,7 @@ Working with one of my libraries which ships with both Flow and TypeScript types
 
 This `package.json` unambiguously declares that it has TypeScript types. However, a flow user has no idea that I put the time in [to maintain](https://unpkg.com/browse/danger@10.1.0/distribution/danger.js.flow) support for them!
 
-I propose that [the packument version of this package](https://registry.npmjs.org/danger/10.1.0) have a new field `"_types"` which would look like:
+I propose that [the packument version of this package](https://registry.npmjs.org/danger/10.1.0) have a new field `"_typesRoot"` which would look like:
 
 ```json5
 {
@@ -65,17 +43,36 @@ I propose that [the packument version of this package](https://registry.npmjs.or
   },
   "gitHead": "66e18daae5286ea64ed49484fd5835685684c156",
   "_id": "danger@10.0.0",
-  "_types": {
-    "ts": "included",
-    "flow": "included"
+  "_typesRoot": {
+    "ts": "distribution/danger.d.ts",
+    "flow": "distribution/danger.js.flow"
   }
 }
 
 ```
 
-The shape of this copies the work we did in [Algolia's npm search index](https://github.com/algolia/npm-search/pull/346). 
+The shape of this info is based on the work we did in [Algolia's npm search index](https://github.com/algolia/npm-search/pull/346). The information can be generated via:
 
-This RFC would explicitly _exclude_ information on 3rd party types hosted on [DefinitelyTyped](https://github.com/DefinitelyTyped/) and [FlowTyped](https://github.com/flow-typed/flow-typed) - the assumption is that anyone wanting to provide comprehensive type information for _any_ package would check their registries if no type information is present in the packument.
+- Detecting explicit `"types"` or `"typings"` (for TS explicitly, from reading [their docs](https://flow.org/en/docs/declarations/), Flow does not have a field like this) in the manifest, and just moving that field's value across directly
+- Resolving the `main` with both TypeScript and Flow's extra file resolvers (e.g. when `distribution/danger.js` look for the files `distribution/danger.js.flow` and `distribution/danger.d.ts`)
+- If we got here then there are no TS/Flow files in the package, and we could do nothing or leave an empty `"_typesRoot": {}`
+
+This RFC would explicitly _exclude_ information on 3rd party types hosted on [DefinitelyTyped](https://github.com/DefinitelyTyped/) and [FlowTyped](https://github.com/flow-typed/flow-typed) - the assumption is that anyone wanting to provide comprehensive type information for _any_ package would check their registries if no type information is present in the packument. Both registries can make it easy for others to grab the listing e.g. the [types-registry](https://www.npmjs.com/package/types-registry) package.
+
+<details>
+  <summary><i>Note:</i> The original version of this proposal used boolean values...</summary>
+    
+Which assumed that API clients would do some of the work themselves to get the root of the types:
+
+```json
+"_types": {
+  "ts": "included",
+  "flow": "included"
+}
+```
+
+We can already do the work ahead of time, and `_typeRoots` is less likely to have conflicts in the registry I imagine.
+</details>
 
 ### "Unambiguous"
 
@@ -88,8 +85,14 @@ Both flow and TypeScript types work on projects which don't declare that they ha
 
 ## Rationale and Alternatives
 
-1.  Don't have that metadata on the site. Both TS/Flow represent unofficial extensions of JavaScript and who knows what the future holds.
-1.   Ping the algolia npm index for that information. I would expect you to want to keep your server side dependencies low, and including this information in the registry would allow you to keep one source of information.
+1. Use the `npm package` command to make maintainers explicitly fill out the `"types"` field when a `.d.ts` can be inferred from `"main"` via a warning for a few releases, then a fail.  
+
+   This could work, however it would favour TypeScript today. There isn't a similar manifest field for Flow, though they could definitely pick one and roll with it also. 
+  
+   This would mean that we don't need to add reserved fields to the packument, and these fields becomes a cultural norm. The downside is that this puts work on existing maintainers to amend their package.jsons. 
+
+1. Don't have that metadata on the site. Both TS/Flow represent unofficial extensions of JavaScript and who knows what the future holds.
+1. Ping the algolia npm index for that information. I would expect you to want to keep your server side dependencies low, and including this information in the registry would allow you to keep one source of information.
 
 ## Implementation
 
