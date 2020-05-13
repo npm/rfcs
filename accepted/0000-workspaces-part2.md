@@ -72,7 +72,13 @@ npm ERR! Test failed.  See above for more details.
 
 ### 2. Filter a subset of workspaces
 
-Rather than defining a strict UX, the current proposal is to adhere to a `workspace` command prefix in the form of either: `npm workspace <workspace_name> <command>` OR `npm ws <workspace_name> <command>` OR an even shorter shortcut using a symbol `npm :<workspace_name> <command>`, for example running `test` in a specific **workspace** named `foo` with these different ideas:
+Filter is done via positional argument and here are some of the reasons why we decided to go that route:
+- [Lerna filters](https://www.npmjs.com/package/@lerna/filter-options) were the starting point but early in the discussion some other considerations were brought forward
+- npm configs have some baggage, configs might apply to the larger behavior of the cli or to a specific subcommand and they're all mixed together
+- defining a subset of workspaces in a `.npmrc` file might be just a footgun leading users into confusion
+- Yarn v1 uses positional arguments for filter in the form of `yarn workspace <workspace_name> <cmd>`, so there's precedent
+
+Leading this RFC to a proposal using positional arguments. Rather than defining a strict UX, the current proposal is to adhere to a `workspace` command prefix in the form of either: `npm workspace <workspace_name> <command>` OR `npm ws <workspace_name> <command>` OR an even shorter shortcut using a symbol `npm :<workspace_name> <command>`, for example running `test` in a specific **workspace** named `foo` with these different ideas:
 
 - `npm workspace foo test`
 - `npm ws foo test`
@@ -89,6 +95,8 @@ npm workspace foo install tap
 npm ws foo install tap
 npm :foo install tap
 ```
+
+Note: **Globs** are not supported as a _subset/filter_ argument, the alternative is to use `npm workspace <alias> <cmd>` in which the `alias` can be defined beforehand in your **workspace** configuration as detailed in the next section.
 
 ### 3. Grouping/Aliasing workspaces
 
