@@ -130,7 +130,7 @@ $ cat ./packages/workspace-a/package.json
     }
 }
 
-$ cat ./packages/worskpace-b/package.json
+$ cat ./packages/workspace-b/package.json
 {
     "name": "workspace-b",
     "version": "2.1.1",
