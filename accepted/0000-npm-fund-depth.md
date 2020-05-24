@@ -76,7 +76,7 @@ Unsure at this time. Likely will need feedback from npm team here.
 
 ## Prior Art
 
-`npm fund` is a command unique to npm. There are no other known examples of a similar command in other package manger CLIs.
+`npm fund` is a command unique to npm. There are no other known examples of a similar command in other package manager CLIs.
 
 ## Unresolved Questions and Bikeshedding
 
