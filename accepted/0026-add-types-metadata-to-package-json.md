@@ -51,9 +51,9 @@ I propose that [the packument version of this package](https://registry.npmjs.or
 
 ```
 
-The shape of this info is based on the work we did in [Algolia's npm search index](https://github.com/algolia/npm-search/pull/346). The information can be generated via:
+The shape of this info is based on the work we did in [Algolia's npm search index](https://github.com/algolia/npm-search/pull/346) but different. The information can be generated automatically via:
 
-- Detecting explicit `"types"` or `"typings"` (for TS explicitly, from reading [their docs](https://flow.org/en/docs/declarations/), Flow does not have a field like this) in the manifest, and just moving that field's value across directly
+- Detecting explicit `"types"` or `"typings"` (for TS explicitly, from reading [their docs](https://flow.org/en/docs/declarations/), Flow does not have a field like this) in the manifest, and just moving that field's value across directly.
 - Resolving the `main` with both TypeScript and Flow's extra file resolvers (e.g. when `distribution/danger.js` look for the files `distribution/danger.js.flow` and `distribution/danger.d.ts`)
 - If we got here then there are no TS/Flow files in the package, and we could do nothing or leave an empty `"_typesRoot": {}`
 
@@ -96,7 +96,7 @@ Both flow and TypeScript types work on projects which don't declare that they ha
 
 ## Implementation
 
-Personally, I think a simple check for the inclusion in the package tarball for any `.d.ts` file should be enough for TypeScript, and _I believe_ that a check for `.js.flow` would be enough for Flow typings. 
+Personally, I think a check for the inclusion in the package tarball for any `.d.ts` file should be enough for TypeScript, and _I believe_ that a check for `.js.flow` would be enough for Flow typings. 
 
 These can happen during `npm package` in the CLI.
 
