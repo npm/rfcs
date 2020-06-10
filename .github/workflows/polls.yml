@@ -1,4 +1,4 @@
-mame: GitHub Polls Actions Bot
+name: polls
 on:
   issue_comment:
     types: [created, edited]
