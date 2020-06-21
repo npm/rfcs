@@ -9,7 +9,7 @@ dependencies that can be used.
 
 npm does not currently provide a method for a package which supports
 `node.js >=4` to allow upgrade of a dependency which requires `node.js >=6`
-unless they also bump their own minimum verion.  This proposal would allow
+unless they also bump their own minimum version.  This proposal would allow
 such authors to declare that an alternative version of the dependency can
 be used if that version is already being installed by another dependency.
 Generally this would be used when the dependency is only a breaking change
@@ -28,7 +28,7 @@ application it is no longer necessary to function on node.js 4.x.
 ## Detailed Explanation
 
 npm would support reading `acceptDependencies` object from package.json.
-This object would declaring alternative versions of packages listed in
+This object would declare alternative versions of packages listed in
 `dependencies`, `devDependencies`, `optionalDependencies` or
 `peerDependencies`.
 
