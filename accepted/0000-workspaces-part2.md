@@ -124,7 +124,7 @@ It's possible to define a **groups** property within your **workspaces configura
     "version": "1.0.0",
     "workspaces": {
         "groups": {
-            "core": ["core/*"], // accepts fs location
+            "core": ["core/*"], // accepts globs
             "plugins": ["lorem", "ipsum"], // also accepts workspaces names
             "common": ["util", "helpers"]
         },
@@ -157,6 +157,12 @@ Further example, install a **peer dependency** across a group of packages named 
 $ npm workspace core install react@16 --save-peer
 $ npm ws core install react@16 --save-peer
 $ npm :core install react@16 --save-peer
+```
+
+It should also be possible to define groups as cli arguments, so that the following example will be equivalent to the previous examples:
+
+```
+$ npm workspace core install react@16 --save-peer --workspace-group core=core/*
 ```
 
 ## Prior Art
@@ -193,4 +199,13 @@ During the discussions around this RFC it was brought up to our attention that a
 
 ## Unresolved Questions and Bikeshedding
 
-TBD
+- Filter syntax:
+    - `npm workspace foo test`
+    - `npm ws foo test`
+    - `npm :foo test`
+    - `npm --workspace=foo test`
+    - `npm -w=foo test`
+- Groups as a cli argument: `--workspace-group`
+    - how to define the `key=value` nature of it?
+    - is there any arg currently in the cli using key/value pairs?
+    - maybe it's not worth having it?
