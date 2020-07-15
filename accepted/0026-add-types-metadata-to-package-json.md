@@ -33,36 +33,30 @@ Working with one of my libraries which ships with both Flow and TypeScript types
 
 This `package.json` unambiguously declares that it has TypeScript types. However, a flow user has no idea that I put the time in [to maintain](https://unpkg.com/browse/danger@10.1.0/distribution/danger.js.flow) support for them!
 
-I propose that [the packument version of this package](https://registry.npmjs.org/danger/10.1.0) have a new field `"_typesRoot"` which would look like:
+I propose that [the packument version of this package](https://registry.npmjs.org/danger/10.1.0) we emulate the file resolvers for TS + Flow and ensure their fields are filled if they are not present. For example, when publishing a field for "flow" would be added:
 
-```json5
+```diff
 {
   // ...
   "dependencies": {
     // ...
   },
-  "gitHead": "66e18daae5286ea64ed49484fd5835685684c156",
-  "_id": "danger@10.0.0",
-  "_typesRoot": {
-    "ts": "./distribution/danger.d.ts",
-    "flow": "./distribution/danger.js.flow"
-  }
++  "gitHead": "66e18daae5286ea64ed49484fd5835685684c156",
++  "flow": "./distribution/danger.js.flow"
 }
-
 ```
 
-The shape of this info is based on the work we did in [Algolia's npm search index](https://github.com/algolia/npm-search/pull/346) but different. The information can be generated automatically via:
+- When there is an explicit `"types"` or `"typings"` (for TS explicitly, from reading [their docs](https://flow.org/en/docs/declarations/), do nothing. Flow does not have a field like this) in the manifest, and so this would _add_ that field.
 
-- Detecting explicit `"types"` or `"typings"` (for TS explicitly, from reading [their docs](https://flow.org/en/docs/declarations/), Flow does not have a field like this) in the manifest, and just moving that field's value across directly.
-- Resolving the `main` with both TypeScript and Flow's extra file resolvers (e.g. when `distribution/danger.js` look for the files `./distribution/danger.js.flow` and `./distribution/danger.d.ts`)
-- If we got here then there are no TS/Flow files in the package, and we could do nothing or leave an empty `"_typesRoot": {}`
+- If there is not the explicit fields: Resolving the `main` with both TypeScript and Flow's extra file resolvers (e.g. when `distribution/danger.js` look for the files `./distribution/danger.js.flow` and `./distribution/danger.d.ts`)
 
-This RFC would explicitly _exclude_ information on 3rd party types hosted on [DefinitelyTyped](https://github.com/DefinitelyTyped/) and [FlowTyped](https://github.com/flow-typed/flow-typed) - the assumption is that anyone wanting to provide comprehensive type information for _any_ package would check their registries if no type information is present in the packument. Both registries can make it easy for others to grab the listing e.g. the [types-registry](https://www.npmjs.com/package/types-registry) package.
+- If we got here then there are no TS/Flow files in the package, do nothing
+
 
 ##### Path handling
 
-When handling a custom `main`, `types`, or `typings`: if the path is a relative path to the root, the `_typesRoot` version should verify that the file exists and add a `./` as a prefix. 
-This allows for downstream consumers to be able to differentiate between a module hosting their types and a file available inside the package. 
+This RFC would always add the relative path to an existing file if the fields are empty.  
+This allows for downstream consumers to be able to differentiate between a module hosting their types and a file available inside the package.
 
 <details>
   <summary><i>Note:</i> The original version of this proposal used boolean values...</summary>
@@ -81,7 +75,11 @@ We can already do the work ahead of time, and `_typeRoots` is less likely to hav
 
 ### "Unambiguous"
 
-Both flow and TypeScript types work on projects which don't declare in the `package.json` that they have types. I could remove `"typings"` in the above `package.json` and TypeScript would exhibit the same behavior. That would mean that the current `package.json` would not have any indication that there is typed support for either tools.
+Both flow and TypeScript types work on projects which don't declare in the `package.json` that they have types. 
+
+For example, I could remove `"typings"` in the above `package.json` and TypeScript would exhibit the same behavior. That would mean that the current `package.json` would not have any indication that there is typed support for either tools.
+
+This ambiguity makes it hard for someone wanting to build tools which offer information about whether the package offers types.
 
 ### Downside of Recommendation
 
@@ -101,7 +99,7 @@ Both flow and TypeScript types work on projects which don't declare in the `pack
 
 ## Implementation
 
-Personally, I think a check for the inclusion in the package tarball for any `.d.ts` file should be enough for TypeScript, and _I believe_ that a check for `.js.flow` would be enough for Flow typings. 
+Personally, I think a check for the inclusion in the package tarball for any `.d.ts` file should be enough for TypeScript, and the check for `.js.flow` would be enough for Flow typings. 
 
 These can happen during `npm package` in the CLI.
 
