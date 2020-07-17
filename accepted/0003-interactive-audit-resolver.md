@@ -52,6 +52,10 @@ All decisions are stored in `audit-resolve.json` file as key-value, where key is
 - **postpone** *audit resolver* marks the issue as postponed to a timestamp 24h in the future. Instead of ignoring an issue permanently just to make a build pass, one can postpone it when in rush, but make it show up as a CI faiure on the next working day. The option is separate to ignore for better visibility of the intention of a person in a rush. This is to build better security culture in a team.
 - **none** an entry in decisions list was generated but the decision was not made or was explicitly cancelled in the future
 
+
+Proposed npm functionality is implemented in userland here: https://www.npmjs.com/package/npm-audit-resolver  
+The `check-audit` command from the above package is providing the exact functionality proposed here.
+
 ## Rationale and Alternatives
 
 **Ignoring is necessary but must be under control at all times**
