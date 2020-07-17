@@ -1,49 +1,56 @@
-# Interactive audit resolver
+# Audit resolutions
 
 ## Summary
 
-This proposal is for adding means for a human to resolve issues from `npm audit` and interactively make decisions about each issue. Available as `npm audit resolve` command.
+Historically this proposal was titled "Interactive audit resolver". That idea was too wide to introduce in one go and parts of it are better served in userland packages. This is now the core subset of the original proposal containing support for resolutions file.
+
+This proposal is for adding means for a human to resolve issues from `npm audit` by making and documenting decisions to ignore particular false positives. 
+The implementation should introduce support for reading and applying decisions from `audit-resolve.json` file
 
 Features:
-- Remember the resolutions and allow them to affect `npm audit` behavior.
-- Decision options include 'ignore', 'remind later', 'fix', 'remove'.
+- Let users save tecisions about vulnerabilities and change `npm audit` behavior to accomodate that.
+- Decision options include 'ignore', 'remind later', 'fix', 'none'.
 - Allow tracking who resolved an issue and when using git history.
-
+- Define a format to be used by userland packages when helping users make and store decisions.
 
 ## Motivation
 
 At times, running `npm audit fix` won't fix all audit issues. Fixes might not be available or the user might not want to apply some of them, eg. major version updates or build/test dependencies.
 
-It should be possible to make `npm audit` a step in a CI pipeline to go red every time a new vulnerability affects the project. Managing security of dependencies should be quick to update, effective, easy to audit over time and secure in itself.
+It should be possible to make `npm audit` a step in a CI pipeline to go red every time a new vulnerability affects the project. In cases when `npm audit` reports a vulnerability that is not affecting the project, user should be able to ignore it. 
 
-For that, the user needs a new tool which makes addressing issues one by one convenient even across a whole ecosystem of projects.
+examples: 
+- yargs-parser as a transitive dependency of an API gateway is not something that should break a CI run if vulnerable
+- ReDoS vulnerability in a dependency of a commandline tool
+
+Managing security of dependencies should be quick to update, effective, easy to audit over time and secure in itself.
+
 
 ## Detailed Explanation
 
-`npm audit resolve` runs audit and iterates over all actions from the output with a prompt for a decision on each. 
-If fix is available, it's offered as one of the options to proceed. Other options include: ignore, remind later and delete.
+`npm audit` consumes decisions about what to ignore or warn about when an issue comes back that was already fixed.
 
 All decisions are stored in `audit-resolve.json` file as key-value, where key is `${advisory id}|${dependency path}` and value is:
 
 ```js
 {
-  decision: "fix|ignore|postpone",
+  decision: "fix|ignore|postpone|none",
   madeAt: <timestamp of when the decision was made>
+  expiresAt: <timestamp of when the decision was made>
 }
 ```
 
-`npm audit` reads `audit-resolve.json` and respects the resolution (ignores ignored issues, ignores issues postponed to a date in the future)
+`npm audit` reads `audit-resolve.json` to get decisions
+
+`audit-resolve.json` file could be created manually, but the expected UX of that file would be via a userland package that reads audit output, helps the user decide what to do and saves the decision. This tool will be referenced as *audit resolver* below.
+
+
 
 ### resolutions
-- **fix** runs the fix proposed in audit action and marks the issue as fixed in `audit-resolve.json`. On each subsequent run of `npm audit resolve` if the issue comes up again, the user is also warned that the problem was supposed to be fixed already.
-- **ignore** marks the issue as ignored and `npm audit` will no longer fail because of it (but should display a single line warning about the issue being ignored). If a new vulnerability is found in the same dependency, it does not get ignored. If another dependency is installed with the same vulnerability advisory id it is not ignored. If the same package is installed as a dependency to another dependency (different path) it is not ignored.
-- **postpone** marks the issue as postponed to a timestamp 24h in the future. Instead of ignoring an issue permanently just to make a build pass, one can postpone it when in rush, but make it show up as a CI faiure on the next working day. 
-- **remove** runs `npm rm` on the top level dependency containing the issue. It's a convenience option for the user to remove an old package which they no longer intend to use. 
-
-- **investigate** when fix is not available, investigate option shows instead. It goes up through the dependencies chain and finds the one that needs their package.json updated with new version specification to enable a fix. 
-The result can be a call to action to create a PR (patch to package.json could be automatically generated)
-
-**skip** and **abort** options should also be provided.
+- **fix** - a fix was applied and *audit resolver* marked issue as fixed in `audit-resolve.json`. On each subsequent run of `npm audit` if the issue comes up again, the user is also warned that the problem was supposed to be fixed already.
+- **ignore** - *audit resolver* marks the issue as ignored and `npm audit` will no longer fail because of it (but should display a single line warning about the issue being ignored). If a new vulnerability is found in the same dependency, it does not get ignored. If another dependency is installed with the same vulnerability advisory id it is not ignored. If the same package is installed as a dependency to another dependency (different path) it is not ignored.
+- **postpone** *audit resolver* marks the issue as postponed to a timestamp 24h in the future. Instead of ignoring an issue permanently just to make a build pass, one can postpone it when in rush, but make it show up as a CI faiure on the next working day. The option is separate to ignore for better visibility of the intention of a person in a rush. This is to build better security culture in a team.
+- **none** an entry in decisions list was generated but the decision was not made or was explicitly cancelled in the future
 
 ## Rationale and Alternatives
 
@@ -62,16 +69,13 @@ Resolution format must be readable for a JavaScript developer.
 
 A separate file referred to as `audit-resolve.json` has the benefit of being single purpose, easy to track and audit, easy to version and migrate between versions of `npm` and comfortable for the users to review in git history and pull requests.
 
-**postpone, remove, investigate**
+**postpone, remove**
 Other options are helpers for more elaborate actions a developer would take when confronted with an issue they can't or don't want to fix. 
 
 Why is postpone useful at all? It's designed to build a secure development culture where one didn't yet form. Without it, a developer under time pressure would mark an issue as ignored with intention to un-mark it later. 
 While shipping with a known vulnerability is a bad practice, NPM's mission with the community should be to empower people to build more secure products and trust their skill and understanding of their project's particular needs. We should also aspire to help teams introduce more secure workflows effortlessly, so letting a build pass without risking compromising security long-term is a win. 
 
-Remove is only useful as a convenience. Imagine a developer introducing `npm audit` and having to go through tens of issues. If they notice one of the first issues is caused by a dependency they no longer use, instead of remembering to clean it up later, they can choose this option.
-
-Investigate option is there to aid the user and direct them towards fixing the issue upstream.
-This RFC doesn't cover potential future usecases where NPM could do things ranging from linking to resources on mitigation to generating local fixes or providing a marketplace of companies offering services fixing the issue for customers (business potential for NPM).
+*audit-resolver* could perform more actions, like let the user remove a package entirely or help find a patch in the future.
 
 ### Alternatives
 
@@ -81,11 +85,12 @@ Paid alternatives for managing security of a node.js project are available, incl
 
 ## Implementation
 
-reference implementation https://github.com/npm/cli/pull/10
+prototype of a working *audit-resolver* (in production use) https://www.npmjs.com/package/npm-audit-resolver
 
-prototype of a working tool (in production use) https://www.npmjs.com/package/npm-audit-resolver
+Core capability covering reading, parsing, validating and representing the `audit-resolve.json` file was extracted from npm-audit-resolver into https://www.npmjs.com/package/audit-resolve-core - API of that package to be discussed. Functionality is there.
 
 The implementation is, and should remain, runnable standalone as a separate package with minor wrapping code - useful for testing new features without bundling unfinished work with npm cli versions and therefore node.js
+
 
 ### audit-resolve.json
 
@@ -100,6 +105,7 @@ map key-value where key is the advisory number concatenated with package path
       "decision": "RESOLUTION_TYPE",
       "reason": "Reason provided by the person making the decision (optional)",
       "madeAt": timestamp
+      "expiresAt": timestamp
     }
   }
 }
@@ -123,37 +129,13 @@ example
 ```
 
 JSON schema
-```js
-{
-  properties: {
-    version: {
-      'type': 'number',
-      'minimum': 1
-    },
-    decisions: {
-      type: 'object',
-      additionalProperties: {
-        type: 'object',
-        required: ['decision'], 
-        properties: {
-          decision: {
-            type: 'string',
-            enum: ['fix','ignore','postpone']
-          },
-          reason: { type: 'string' },
-          madeAt: { type: 'number' }
-        }
-      }
-    }
-  },
-  required: [
-      'version',
-      'decisions'
-  ]
-}
-```
 
-*initially npm-audit-resolver used a different format*
+https://github.com/naugtur/audit-resolve-core/blob/master/auditFile/versions/v1.js
+
+Schema defines `version` and `decisions` fields.  
+The `rules` field is meant for the *audit-resolver* as instructions how to behave.
+
+*initially npm-audit-resolver used a different format, audit-resolve-core supports detecting old format and converting it*
 
 ## Prior Art
 
@@ -161,5 +143,7 @@ I recall a tool wrapping `nsp check` that gave me the idea to store exact paths 
 Not aware of other prior art. Didn't find much in the npm packages ecosystem when researching it at the time of release of npm audit.
 
 ## Unresolved Questions and Bikeshedding
+
+- adding means to fill in the content of `audit-resolve.json` file to npm itself should be a matter of another RFC
 
 
