@@ -91,6 +91,18 @@ that config defaults are maintained, without blowing up the size of the
 environment for lifecycle processes, or requiring access to the npm config
 subsystem in every npm CLI dependency.
 
+In addition to these, the following environment variables will be
+preserved from npm v6's set, in order to provide an easier upgrade path:
+
+* `npm_package_name`
+* `npm_package_version`
+* `npm_package_config_*` Each key in the `config` object will be included,
+  but npm will _not_ override values with a `<pkgname>:<keyname>` config
+  value if one exists.
+* `npm_package_engines_*`
+* `npm_package_main`
+* `npm_package_bin_*`
+
 ## Rationale and Alternatives
 
 Possible alternatives:
