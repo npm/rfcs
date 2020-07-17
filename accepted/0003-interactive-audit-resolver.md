@@ -40,6 +40,8 @@ All decisions are stored in `audit-resolve.json` file as key-value, where key is
 }
 ```
 
+For human-writeability the timestamp could support readable date fromats as well.
+
 `npm audit` reads `audit-resolve.json` to get decisions
 
 `audit-resolve.json` file could be created manually, but the expected UX of that file would be via a userland package that reads audit output, helps the user decide what to do and saves the decision. This tool will be referenced as *audit resolver* below.
