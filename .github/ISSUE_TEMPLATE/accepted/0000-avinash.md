@@ -24,9 +24,4 @@ Currently if i click on select all checkbox, all the transactions got selected i
 If a different action type can be introduced in rows selection other than the common action (rowsSelected), then it might be greatly helpful ot perform the operations.
 
 ### References
-<!-- Examples
-* Related/Reference to #0
-* Depends on #0
-* Blocked by #0
--->
-* n/a
+https://www.npmjs.com/package/material-datatable
