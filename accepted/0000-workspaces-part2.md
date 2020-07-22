@@ -6,7 +6,7 @@ Introduces basic support to running **npm commands** across nested **workspaces*
 
 ## Motivation
 
-The need for running **npm commands** across nested **workspaces** was sourced from the community during the ellaboration of the [original **npm workspaces** RFC](https://github.com/npm/rfcs/pull/103).
+The need for running **npm commands** across nested **workspaces** was sourced from the community during the elaboration of the [original **npm workspaces** RFC](https://github.com/npm/rfcs/pull/103).
 
 ## Detailed Explanation
 
@@ -72,31 +72,50 @@ npm ERR! Test failed.  See above for more details.
 
 ### 2. Filter a subset of workspaces
 
-Filter is done via positional argument and here are some of the reasons why we decided to go that route:
+Filter is done via named argument (`--workspace`, short: `-w`) and here are some of the reasons why we decided to go that route:
 - [Lerna filters](https://www.npmjs.com/package/@lerna/filter-options) were the starting point but early in the discussion some other considerations were brought forward
-- npm configs have some baggage, configs might apply to the larger behavior of the cli or to a specific subcommand and they're all mixed together
-- defining a subset of workspaces in a `.npmrc` file might be just a footgun leading users into confusion
-- Yarn v1 uses positional arguments for filter in the form of `yarn workspace <workspace_name> <cmd>`, so there's precedent
+- npm configs do have some baggage, configs might apply to to other cli commands and can also possibly be defined project or system-wide - that said, there are things we can do to avoid these pitfalls (such as making sure `npm_config_workspace` env varibable never gets set in `run-script`)
+- During the many discussions around this RFC a few strong points for named arguments stand out:
+  - Allow us to keep `npm workspace` for other command usages
+  - npm users are more familiar with usage of named configs, example: `npm test --workspace=foo` is very similar to `npm test --prefix=./packages/foo` - if you think on it in terms of "what workspace am I in" again, a named config makes more sense in npm
+  - [Organized a poll](https://github.com/npm/rfcs/issues/160) in which named arguments were the leading option, here are the results for reference:
+  ```
+  1. (12 votes) 21%  -  Positional argument with one-char alias: `npm workspace foo test` or `npm w foo test`
+  2. (11 votes) 11%  -  Positional argument but shorter default name: `npm ws foo test` or `npm w foo test`
+  3. (13 votes) 13%  -  Special character (operator-like): `npm :foo test`
+  4. (20 votes) 35%  -  Named argument: `npm --workspace=foo test` or `npm -w=foo test`
+  ```
 
-Leading this RFC to a proposal using positional arguments. Rather than defining a strict UX, the current proposal is to adhere to a `workspace` command prefix in the form of either: `npm workspace <workspace_name> <command>` OR `npm ws <workspace_name> <command>` OR an even shorter shortcut using a symbol `npm :<workspace_name> <command>`, for example running `test` in a specific **workspace** named `foo` with these different ideas:
+Given the results of all this preliminar work, the preferred way to run a command in the context of a workspace is to use the named `--workspace` argument or its `-w` short alias, e.g:
 
-- `npm workspace foo test`
-- `npm ws foo test`
-- `npm :foo test`
+In a project with the following structure:
+```
+./
+├── package.json { "name": "root", "workspaces": ["packages/foo", "packages/bar"] }
+└── packages/
+    ├── foo/
+    │   └── package.json { "name": "foo", "version": "1.0.0" }
+    └── bar/
+        └── package.json { "name": "foo", "version": "1.0.0" }
+```
 
-Leaving space to gather feedback from the community on whether to introduce one of this proposed commands or even introducing some novel interface.
+You can run tests for the `foo` workspace from the root of your project, with the following syntax:
+
+```
+npm test --workspace=foo
+```
+
 
 #### Install dependency example:
 
 Add `tap` as a **dependency** of a **workspace** named `foo`:
 
 ```sh
-npm workspace foo install tap
-npm ws foo install tap
-npm :foo install tap
+npm install tap --workspace=foo
 ```
 
-Note: **Globs** are not supported as a _subset/filter_ argument, the alternative is to use `npm workspace <alias> <cmd>` in which the `alias` can be defined beforehand in your **workspace** configuration as detailed in the next section.
+
+Note: **Globs** are not supported as a valid `--workspace` argument value, the alternative is to use `npm <cmd> --workspace=<alias>` in which the `alias` can be defined beforehand in your **workspace** configuration as detailed in the following up section.
 
 ### 3. Grouping/Aliasing workspaces
 
@@ -139,10 +158,7 @@ It's possible to define a **groups** property within your **workspaces configura
 Following up with the previous configuration example, it would be possible to run tests across all **workspaces** from the `plugins` group, as following:
 
 ```
-// one of these:
-$ npm workspace plugins test
-$ npm ws plugins test
-$ npm :plugins test
+$ npm test --workspace=plugins
 
 > lorem@1.0.0 test /root/plugins/lorem
 > done
@@ -154,16 +170,16 @@ $ npm :plugins test
 Further example, install a **peer dependency** across a group of packages named `core`:
 
 ```
-$ npm workspace core install react@16 --save-peer
-$ npm ws core install react@16 --save-peer
-$ npm :core install react@16 --save-peer
+$ npm install react@16 --save-peer --workspace=core
 ```
 
-It should also be possible to define groups as cli arguments, so that the following example will be equivalent to the previous examples:
+**TBD:** It might also be very handy being able to define groups as cli arguments, so that the following example will be equivalent to the previous examples:
 
 ```
 $ npm workspace core install react@16 --save-peer --workspace-group core=core/*
 ```
+
+This is a currently unresolved question since pitfalls of glob usage in cli arguments have already surfaced many times during the time of discussion for this RFC.
 
 ## Prior Art
 
@@ -199,12 +215,6 @@ During the discussions around this RFC it was brought up to our attention that a
 
 ## Unresolved Questions and Bikeshedding
 
-- Filter syntax:
-    - `npm workspace foo test`
-    - `npm ws foo test`
-    - `npm :foo test`
-    - `npm --workspace=foo test`
-    - `npm -w=foo test`
 - Groups as a cli argument: `--workspace-group`
     - how to define the `key=value` nature of it?
     - is there any arg currently in the cli using key/value pairs?
