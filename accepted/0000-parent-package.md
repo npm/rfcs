@@ -13,39 +13,51 @@ In modern monorepositories and or workspaces a lot of packages may share the sam
 ## Detailed Explanation
 
 Extend package.json format with an `extends` field. In this field an object can specified which contains the following keys:
-* name the name or url to the parent package.json. 
-* version The semantic versioning version of the parent package to use. 
+* name the name of the parent package.json.  
+* version, local path or Git repository to use to resolve the parent package.
 
-In general any npm package.json could be used as a parent package.json. No matter if published to a npm repository or on GitHub. A parent package.json must not be flagged as `private` though. 
+Example:
+````json
+{
+"extends": {"parent-foo": "~1.2"}
+} 
+````
+A child can only extend a single parent `package.json`. The parent package can be resolved just like any dependency (refer to https://docs.npmjs.com/files/package.json#dependencies), so semver, local path or git repository are all valid. 
 
-The child package.json would inherit `dependencies` (Dev, peer etc.) and `scripts` sections of the parent package.json if present. If a dependency or script is present in both the parent package.json as well as the child package.json the definition in the child always overrides the parent's definition. During `install` and `list` npm will mark these overrides in the package tree printed to the console. 
+In general any npm package.json could be used as a parent `package.json`. A parent `package.json` must not be flagged as `private` though. 
+
+The child `package.json` would inherit `dependencies` (Dev, peer etc.) and `scripts` sections of the parent `package.json` if present. If a dependency or script is present in both the parent package.json as well as the child `package.json` the definition in the child always overrides the parent's definition. 
+
 It could also be explored to inherit the entire parent package.json maybe it is desirable to share licenses or authors across packages for example.
-
-Possibly, the parent package.json should have a npm-shrinkwrap.json which could be used to make sure that child packages share the same lockfile segments to make sure dependency trees are equal.
 
 During `npm pack` the `package.json` will be resolved:
 
-* all `dependencies` and  `scripts` inherited from the parent `package.json` as well as the ones defined in the `package.json` will be combined into a file named `package-resolved.json`.
-* A combined `package-resolved-lock.json` will be created containing a dependency tree for `package-resolved.json`.
+* all `dependencies` and  `scripts` inherited from the parent `package.json` as well as the ones defined in the child will be combined into single `package.json`.
+* A combined lockfile will also be created.
 
-These files can be used by npm when the package is installed by the end user.
+These combined files will be written into the tarball. 
 
-This could have a couple of advantages:
+This has a couple of advantages:
 
 * Since the dependency tree is already resolved during `pack` it should be similar in performance during `install` as a normal, unextended package. This is crucial, since we would not want to punish users for installing packages that inheriting a parent `package.json`.
-* Similarly, this could be easier both for end users and developers, since they can have a quick look into `package-resolved.json` to see all `dependencies` and `scripts` at a glance.
+* Similarly, this could be easier both for end users and developers, since they can have a quick look into `package.json` to see all `dependencies` and `scripts` at a glance.
 * If a parent `package.json` is unavailable or unpublished this poses no problem for published inheriting packages, since they have the resolved files right in the published package. 
 
-However, since `scripts` and `dependencies` are resolved during `pack` the semantic version range provided in the `package.json` is only respected during `pack`. 
+For local development of the child package or a workspace the following adjustments could be made:
 
-There are at least two possible solutions to this problem:
-* npm could print out the exact version the `package.json` was resolved against during `install`. If a newer parent `package.json` is available npm could warn the user a newer version is available, but might not be necessary. Secondly, if users deem this necessary they can run `npm install <package-name> --force` to have the resolving step be run again for the package. This would update both `package-resolved.json` and `package-resolved-lock.json` before the `install`. If during this time the parent `package.json` is no longer available, because it is unpublished, npm should just receive a `404` from the registry and react accordingly.
-* Do not allow version ranges when specifying parent `package.json`. This also would not allow `tags` to be used as version.  
+  * ` npm list` will mark packages coming from a parent `package.json`. Also,  overrides in the package tree should be identifyable. 
+
+ * `npm outdated` comnmand would also need to be updated to check for an outdated parent `package.json`.
+ * Parent `package.json` needs to work with local files, links and workspaces too.  
+ * `npm run` should mark and list `scripts` from the parent `package.json`. Also,  overrides should be identifyable. Of course you should also be able to run inherited scripts. ;) 
+ * `npm update` should also be able to update the parent `package.json`.
+
+
 
 
 ## Rationale and Alternatives
 
-* Hoist dependencies: as explained in the motivation part this does not work when wanting independent CI builds or can lead to bloated to root package.jsons. 
+* Hoist dependencies: as explained in the motivation part this does not work when wanting independent CI builds or can lead to bloated root `package.json`s. 
 
 * `npm update <package name@version> --workspace` command: This command would search all packages in  the monorepository and update all instances of `<package name>` to `<version>`. However, this would not allow sharing `scripts`. Also, this would not allow for overrides if desired.  
 
@@ -63,23 +75,15 @@ There are at least two possible solutions to this problem:
 ## Unresolved Questions and Bikeshedding
 
 ### What exactly to inherit?
-The proposal basically starts with inheriting `dependencies` and `scripts`. These might be the most common to start with, but later the list could be extended to include other fields like `license`.  
+The proposal basically starts with inheriting `dependencies` and `scripts`. These might be the most common to start with, but later the list could be extended to include other fields like `license`, `config` or `authors`.  
 
 ### Should there be more limits as to what you can extend from? 
 Maybe limit it to the same scope? Or allow people to say that they do not want their packages to be extendable?
-### I feel the versioning aspect introduces a lot of complexity. 
-However, I think npm so far is pretty consistent with its version ranges and I think we should try to keep being consistent here. 
-### Other possible use cases? 
-The initial idea was to simplify projects in the same organization, team or scope. In these environments it is possibly not so bad that the version range of the parent `package.json` is only respected during `pack`, because the organization has all packages under its control (and they maybe even are all in the same CI pipeline). However, thinking further parent `package.json` may also be adopted by those providing starter projects on `GitHub` or library authors who want provide an ever evolving starting point for developers. In these scenarios authors of the parent `package.json` would not be in control of inherting packages and therefore once they update their parent package they do not have much control. Plus, other use cases and implications not yet thought about.
 
-### Should a parent package.json author be allowed to configure when it is resolved?
-The proposal calls for the `package.json` to be resolved during `pack`. However, as author I might already know that my package is updated often and I want inherting packages to resolve it during `install`. This could be specified through a `resolve` property in the parent, which is set to `eager`. The default would be `lazy` which would only resolve it during `pack` as intended in the proposal.  
+### What if I extend a parent `package.json` and it is also a dependency of the child?
+Consider a package extends the Typescript package and also uses Typescript as `devDependency`. This could be potentially problematic. For example during `npm update` how would one specify that you want to update the parent `package.json`? The easiest solution would probably just be to prohibit this scenario altogether. 
 
-### Should the depth of inheritance be restricted?
-There's not really a hard restriction in the proposal right now. Do we need one? 
-
-### Should this possibly be divided into multiple RFCs?
-This is getting very huge and very complex. It is definitely to think through the entire process in detail, but maybe a minimum viable feature (product) could be determined and the rest could be tackled at a later date once the MVP is implemented. 
+### Potentially, other areas for local development of the child package need to be touched on as well
 
 
 {{Write about any arbitrary decisions that need to be made (syntax, colors, formatting, minor UX decisions), and any questions for the proposal that have not been answered.}}
