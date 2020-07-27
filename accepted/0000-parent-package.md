@@ -39,7 +39,7 @@ These combined files will be written into the tarball.
 
 This has a couple of advantages:
 
-* Since the dependency tree is already resolved during `pack` it should be similar in performance during `install` as a normal, unextended package. This is crucial, since we would not want to punish users for installing packages that inheriting a parent `package.json`.
+* Since the dependency tree is already resolved during `pack` it should be similar in performance during `install` as a normal, unextended package. This is crucial, since we would not want to punish users for installing packages that inherit a parent `package.json`.
 * Similarly, this could be easier both for end users and developers, since they can have a quick look into `package.json` to see all `dependencies` and `scripts` at a glance.
 * If a parent `package.json` is unavailable or unpublished this poses no problem for published inheriting packages, since they have the resolved files right in the published package. 
 
@@ -47,7 +47,7 @@ For local development of the child package or a workspace the following adjustme
 
   * ` npm list` will mark packages coming from a parent `package.json`. Also,  overrides in the package tree should be identifyable. 
 
- * `npm outdated` comnmand would also need to be updated to check for an outdated parent `package.json`.
+ * `npm outdated` command would also need to be updated to check for an outdated parent `package.json`.
  * Parent `package.json` needs to work with local files, links and workspaces too.  
  * `npm run` should mark and list `scripts` from the parent `package.json`. Also,  overrides should be identifyable. Of course you should also be able to run inherited scripts. ;) 
  * `npm update` should also be able to update the parent `package.json`.
