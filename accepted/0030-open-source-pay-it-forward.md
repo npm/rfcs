@@ -16,31 +16,32 @@ Expected outcome: happier creator, better maintained packages.
 * open source **consumer**: Companies using open source libraries
 * **Accountants**: divy up money to creators
 * **package registry**: NPM
-* Open source creators (lodash maker, angular, react, …)
+* Open source **creators** (lodash maker, angular, react, …)
 
 #### Consumer
 * Consumer pays monthly contribution to accountants
 * Chooses amount
 * Link accountant that manages your open source monetary contributions
-    * Through link anyone can fetch if this consumer is compliant with all creator licenses 
+    * Through link anyone can fetch the amount the consumer contributes montly. To preserve privacy the amount returned by this call can be capped to eg: 50$. If the consumer pays more than this amount, then the call will return eg 50+.
     * This link can be provided to npm through a secure environment variable
-* Specify if you want npm to check commercial license compliance
+* Flag to specify if you want npm to check commercial license compliance (1)
+* Consumers can choose which accountant they want to use (lowest fee, best service, …)
 
 #### Creator 
-* Can include funding information into their package.json file of their libraries
+* Can include funding information into their package.json file of their libraries (already available)
 * Can set enable flag: minimal contribution for commercial use: 2€/maand (pay it forward)
+* Creators can choose to change their libraries license to the OSPIF license (see Unresolved Questions section)
 * Multiple maintainers of a package handle the split of the received funds amongst themselves
-* Creators can choose which accountant they want to use (lowest fee, best service, …)
 
 #### Accountants
 * Divy up the received funds and pay them to the creators
-* Calculate percentage of the amount for each creator based on KPI’s (usage/effort, …)
+* Calculate percentage of the amount for each creator based on KPI’s (usage, effort, update frequency, number of maintainers, code quality, …)
     * Exact KPI’s can be determined by the accountant
-* Takes % of of money transfers to pay hosting
-* Can play as a proxy to npm repository to have insight in usage of packages or npm can provide api to fetch usages
+* Takes small % of of money transfers to pay hosting (eg 1.5%)
+* Can act as a proxy to npm repository to have insight in usage of packages or npm can provide api to fetch usages.
 
-#### Package registry maintainer NPM / Yarn
-Verify monthly contribution is above usage requirement specified by creator if the consumer enabled a flag (opt in)
+#### NPM / Yarn CLI
+* Verify monthly contribution is above usage requirement specified by creator if the consumer enabled a flag (op-in) see (1)
 
 
 ## Detailed Explanation
@@ -52,18 +53,22 @@ Verify monthly contribution is above usage requirement specified by creator if t
 
 ## Rationale and Alternatives
 
-Currently there is the funding property in package.json: https://docs.npmjs.com/configuring-npm/package-json.html#funding
-  but this does not really give any incentive to companies to go pay ther creator.
-  The nice this about the OSPIF system is that they only need to setup payment info once with tyhe accountant, so it is less cumbersome.
-  Also creators can require a contribution in the license of their package, so companies need to comply with that if they want to use it.
+1. Currently there is the funding property in package.json: https://docs.npmjs.com/configuring-npm/package-json.html#funding
+    But this does not really give any incentive to companies to go pay the creators.
+    The nice thing about the OSPIF system is that they only need to setup payment info once with the accountant, so it is less cumbersome.
+    Also creators can require a contribution in the license of their package, so companies need to comply with that if they want to use the libray.
   
-The creator can change the license to be non commercial, but this is a very restrictive. If the company wants to use this library they would need to contact the creator and buy a license which creates a lot of friction. By specifying the montly amount that has to flow back to the opensource community the creator makes clear what the cost is ahead of time.
+2. The creator can change the license to be non commercial, but this is a very restrictive. 
+    If the company wants to use this library they would need to contact the creator and buy a license which creates a lot of friction. 
+    By specifying the montly amount that has to flow back to the opensource community the creator makes clear what the cost is ahead of time.
 
-No funding at all: This option is almost what we have now. But now creators are thorn between the choice of working on the package in their free time and working to make a living. This creates stress and the maintance of the packages suffers.
+3. No funding at all: This option is almost what we have now. 
+    But now creators are thorn between the choice of working on the package in their free time and working to make a living. 
+    This creates stress and the maintance of the packages suffers.
 
 ## Implementation
 
-We're submitting this proposal without filling in this section just to get some feedback. Do you see anything that can be improved or caveats in our thinking.
+We're submitting this proposal without filling in this section just to get some feedback. Do you see anything that can be improved or caveats in our thinking. Or costs that wont be met by the current compensations.
 
 {{Give a high-level overview of implementation requirements and concerns. Be specific about areas of code that need to change, and what their potential effects are. Discuss which repositories and sub-components will be affected, and what its overall code effect might be.}}
 
@@ -76,7 +81,9 @@ Somewhat similar to patreon, but lower friction since the payment info only has 
 ## Unresolved Questions and Bikeshedding
 
 Create opensource pay it forward license OSPIF license
-This license requires users to pay a certain amount back to the open source community through the OSPIF system
+    This license requires users to pay a certain amount back to the open source community through the OSPIF system
 
-Provide a spec for an accountant. Initially we see npm being the registry and the accountant. But this system should allow for multiple accountants. Each accountant can then use their own KPI's to divy up the money to the open source creators.
+Provide a spec for an accountant. 
+   Initially we see npm being the registry and the accountant. 
+   But this system should allow for multiple accountants. Each accountant can then use their own KPI's to divy up the money to the open source creators.
 
