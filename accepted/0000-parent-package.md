@@ -24,7 +24,7 @@ Example:
 ````
 A child can only extend a single parent `package.json`. The parent package can be resolved just like any dependency (refer to https://docs.npmjs.com/files/package.json#dependencies), so semver, local path or git repository are all valid. 
 
-In general any npm package.json could be used as a parent `package.json`. A parent `package.json` must not be flagged as `private` though. 
+In general any npm package.json could be used as a parent `package.json`. A parent `package.json` must not be flagged as `private` though. Secondly, there must not be a circular dependency: The child package must not be anywhere in the dependency tree of the parent package. 
 
 The child `package.json` would inherit `dependencies` (Dev, peer etc.) and `scripts` sections of the parent `package.json` if present. If a dependency or script is present in both the parent package.json as well as the child `package.json` the definition in the child always overrides the parent's definition. 
 
@@ -45,14 +45,17 @@ This has a couple of advantages:
 
 For local development of the child package or a workspace the following adjustments could be made:
 
-  * ` npm list` will mark packages coming from a parent `package.json`. Also,  overrides in the package tree should be identifyable. 
+  * `npm list` will output the combined dependency tree. It should additionally output the version of the resolved parent package. 
 
- * `npm outdated` command would also need to be updated to check for an outdated parent `package.json`.
- * Parent `package.json` needs to work with local files, links and workspaces too.  
- * `npm run` should mark and list `scripts` from the parent `package.json`. Also,  overrides should be identifyable. Of course you should also be able to run inherited scripts. ;) 
+ * `npm outdated` command would also need to be updated to check for an outdated parent `package.json`. The package could end up in the outdated output twice, once as dependency of the child and once as parent of the child. Therefore, the parent package name should somehow be marked, either as seperate entry or with a suffix to the package name such as `(parent)`.  
+
+ * `npm run` should additionally also list and run inherited scripts.  
  * `npm update` should also be able to update the parent `package.json`.
 
+Additionally an argument `--parent` should be introduced to `npm list` and `npm update`:
 
+* For `npm list` this would allow the user to see only inherited dependencies. This works similar to how `--dev` or `--prod` work today.
+* For `npm update` this would allow to only update the parent. This would help in a scenario where package `foo` is both a parent and a dependency of `bar`. Today, users can run `npm update foo`. This would still only update the dependency of `bar`. However, if they want to update the parent of bar they can simply run `npm update --parent`.   
 
 
 ## Rationale and Alternatives
@@ -80,8 +83,6 @@ The proposal basically starts with inheriting `dependencies` and `scripts`. Thes
 ### Should there be more limits as to what you can extend from? 
 Maybe limit it to the same scope? Or allow people to say that they do not want their packages to be extendable?
 
-### What if I extend a parent `package.json` and it is also a dependency of the child?
-Consider a package extends the Typescript package and also uses Typescript as `devDependency`. This could be potentially problematic. For example during `npm update` how would one specify that you want to update the parent `package.json`? The easiest solution would probably just be to prohibit this scenario altogether. 
 
 ### Potentially, other areas for local development of the child package need to be touched on as well
 
