@@ -190,9 +190,14 @@ It is somewhat related
 
 ## Unresolved Questions and Bikeshedding
 
-{{Write about any arbitrary decisions that need to be made (syntax, colors, formatting, minor UX decisions), and any questions for the proposal that have not been answered.}}
+Potentially have npm emit a ***short*** message about overrides specified in the
+top-level package and how those could cause unpredictable behavior.
 
-{{THIS SECTION SHOULD BE REMOVED BEFORE RATIFICATION}}
+This could potentially lower the amount of false bug-report being filed that
+originated from those overrides.
+But they should not trickle down the tree, so they are only shown to the user
+who defined the overrides.
+
 
 [#204]:<https://github.com/npm/rfcs/issues/204>
 [RFC-0025]:<https://github.com/npm/rfcs/blob/latest/accepted/0025-install-peer-deps.md>
