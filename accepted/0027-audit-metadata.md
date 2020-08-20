@@ -18,14 +18,14 @@ Like `npm-session` is used by the npm registry to identify individual user sessi
 
 * **Rationale:** 
   * This is easy to implement solution to provide such additional value in the HTTP request.
-  * Building this functionality will allow developers to easily set additional information that can be passed along in a heaer for third-party application use
+  * Building this functionality will allow developers to easily set additional information that can be passed along in a header for third-party application use
   
 * **Alternatives:** 
   * Use `preshrinkwrap` or/and `postshrinkwrap` scripts to install a custom value to the project like the `app-id`
 
 ## Implementation
 
-* Define a new `metadata` object that can be added to the package.json file `metadata`.
+* Define a new `metadata` object that can be added to the package.json file.
 * The `metadata` JSON object is picked up by the [npm cli](https://github.com/npm/cli) and sent as a `metadata` attribute in the HTTP header requests
 
 An illustrative `package.json` example:
