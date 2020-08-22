@@ -1,5 +1,55 @@
 # Peer-Dependency Overrides
 
+<!-- TOC -->
+
+- [Peer-Dependency Overrides](#peer-dependency-overrides)
+  - [Summary](#summary)
+  - [In Regards to the existing `overrides` RFC](#in-regards-to-the-existing-overrides-rfc)
+    - [Urgency of peer-overrides](#urgency-of-peer-overrides)
+    - [Preliminary Work on (unofficial) Implementation](#preliminary-work-on-unofficial-implementation)
+  - [Motivation](#motivation)
+    - [The Issue](#the-issue)
+    - [Going over them](#going-over-them)
+    - [The Absurdity](#the-absurdity)
+    - [Concluding](#concluding)
+  - [Detailed Explanation](#detailed-explanation)
+    - [Package Field](#package-field)
+    - [Example Config](#example-config)
+    - [Effect](#effect)
+    - [Logic and Examples](#logic-and-examples)
+      - [Base Resolution Logic](#base-resolution-logic)
+      - [Inheritance Logic](#inheritance-logic)
+      - [ResolutionExample Nought: No Override](#resolutionexample-nought-no-override)
+      - [ResolutionExample A: Simple Override](#resolutionexample-a-simple-override)
+      - [ResolutionExample B: Inherited Override](#resolutionexample-b-inherited-override)
+      - [ResolutionExample C: Re-defined Override](#resolutionexample-c-re-defined-override)
+      - [ResolutionExample D: Overruled *(disabled)* override](#resolutionexample-d-overruled-disabled-override)
+      - [ResolutionExample E: Override **with** acceptable peer present](#resolutionexample-e-override-with-acceptable-peer-present)
+      - [ResolutionExample F: Inherited Overruled *(disabled)* override](#resolutionexample-f-inherited-overruled-disabled-override)
+  - [Implementation](#implementation)
+    - [State of the Arborist Fork](#state-of-the-arborist-fork)
+    - [removal/replacement of existing ```peerOptional``` hooks and type](#removalreplacement-of-existing-peeroptional-hooks-and-type)
+      - [Pre-Existing Code affected by Removal of ```peerOptional```](#pre-existing-code-affected-by-removal-of-peeroptional)
+    - [Class Extensions](#class-extensions)
+      - [```class Edge```](#class-edge)
+      - [```class Node```](#class-node)
+    - [Inheritance logic and resolution of special spec *`local`* via the helper ```PeerDepsMeta```](#inheritance-logic-and-resolution-of-special-spec-local-via-the-helper-peerdepsmeta)
+    - [Peer-Swap in ```_loadDeps``` method of ```class Node```](#peer-swap-in-_loaddeps-method-of-class-node)
+  - [Prior Art and Alternatives](#prior-art-and-alternatives)
+    - [```--legacy-peers``` command line flag](#--legacy-peers-command-line-flag)
+    - [Alternative F mentioned in RFC-0025](#alternative-f-mentioned-in-rfc-0025)
+    - [Using a different field-name](#using-a-different-field-name)
+    - [Proposed RFC: overrides](#proposed-rfc-overrides)
+    - [RFC-0023](#rfc-0023)
+  - [Unresolved Questions and Bikeshedding](#unresolved-questions-and-bikeshedding)
+    - [Potentially Emit Warning](#potentially-emit-warning)
+    - [Implement a separate save-type for ```peerOverrides``` if needed](#implement-a-separate-save-type-for-peeroverrides-if-needed)
+    - [Using a different field-name](#using-a-different-field-name-1)
+  - [Foot-Notes](#foot-notes)
+    - [Test Coverage of the fork](#test-coverage-of-the-fork)
+    - [References](#references)
+
+<!-- /TOC -->
 
 ## Summary
 
@@ -25,6 +75,8 @@ co-exist with them.**
 > notebook), and it's not going to be included in npm 7.0.0, but will be added
 > in the 7.x line as a semver-minor feature update.
 
+*[back to top]*
+
 [As mentioned in]:<https://github.com/npm/rfcs/pull/129#issuecomment-658906056>
 
 
@@ -37,6 +89,8 @@ Enabling peer-overrides is of much higher urgency than nested
 overrides and inclusion of this feature in v7 **at launch** will make upgrading
 more attractive, as without this feature, v7 **will be incompatible** with some
 development environments. [Elaborated in **Motivation**](#motivation)
+
+*[back to top]*
 
 
 ### Preliminary Work on (unofficial) Implementation
@@ -52,12 +106,16 @@ has not gone through any official green-lighting.
 
 Further details of its state can be found under [Implementation](#implementation)
 
+*[back to top]*
+
 
 ## Motivation
 
 Originally described in [Issue regarding npm-v7 peer-dependency behavior as
 described by RFC-0025-install-peer-deps and currently implemented in arborist
 and npm-v7-beta][#204]
+
+*[back to top]*
 
 
 ### The Issue
@@ -71,6 +129,8 @@ representative of my projects) will result in this message:
  > npm WARN @typescript-eslint/parser@2.34.0 requires a peer of eslint@^5.0.0 || ^6.0.0 but none is installed. Youmust install peer dependencies yourself.
  > npm WARN eslint-plugin-react@7.14.3 requires a peer of eslint@^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0 but none isinstalled. You must install peer dependencies yourself.
  > npm WARN eslint-plugin-import@2.18.2 requires a peer of eslint@2.x- 6.x but none is installed. You must installpeer dependencies yourself.
+
+*[back to top]*
 
 
 ### Going over them
@@ -87,6 +147,8 @@ representative of my projects) will result in this message:
 
 But what all of them have in common: I *never* had an issue with not meeting
 their peer deps, and have been using them extensively and for various edge-cases.
+
+*[back to top]*
 
 
 ### The Absurdity
@@ -120,6 +182,8 @@ and doesn't affect any users of the package. It's straight-up insanity.
  }
  ```
 
+*[back to top]*
+
 
 ### Concluding
 
@@ -135,6 +199,8 @@ to stay on top and ahead of things.
 
 The behavior described in [RFC-0025] and implemented in ```npm-beta-v4``` is
 incompatible with my development environment.
+
+*[back to top]*
 
 
 ## Detailed Explanation
@@ -158,6 +224,8 @@ consumer who specified them (eg. different module name in ```import```
 statements). As far as Arborist is concerned, the override is the correct
 package package **as is** and will be treated accordingly.
 
+*[back to top]*
+
 
 ### Package Field
 
@@ -180,6 +248,8 @@ interface PackageJson {
   }
 }
 ```
+
+*[back to top]*
 
 
 ### Example Config
@@ -209,6 +279,8 @@ With packages used in [Motivation](#motivation)
 }
 ```
 
+*[back to top]*
+
 
 ### Effect
 
@@ -220,10 +292,14 @@ resolution.
 **It will basically work as if the substitute was specified as the peer from the
 beginning.**
 
+*[back to top]*
+
 
 ### Logic and Examples
 
 Description of inheritance and resolution logic followed by a few examples.
+
+*[back to top]*
 
 
 #### Base Resolution Logic
@@ -233,6 +309,8 @@ NOTE: `in parent` refers to the processed overrides after inheriance, not just t
 1. override for your peer in parent ? **use override**
 2. matching peer in parent dep ? **use match**
 3. override for your peer in parent & matching peer in parent ? **use override**
+
+*[back to top]*
 
 
 #### Inheritance Logic
@@ -247,6 +325,8 @@ NOTE: `in parent` refers to the processed overrides after inheriance, not just t
    **don't** pass on override
 3. you inherit override and **don't** have a matching dep or override for it ?
    pass on **inherited** override
+
+*[back to top]*
 
 
 #### ResolutionExample Nought: No Override
@@ -276,6 +356,8 @@ Flattened:
 - ROOT(v1)
 - DEP(v1)
 - PEER(v1)
+
+*[BACK TO TOP]*
 
 
 #### ResolutionExample A: Simple Override
@@ -316,6 +398,8 @@ Flattened:
 - DEP(v1)
 - PEER(v2)
 - PEER_DEP(v1)
+
+*[BACK TO TOP]*
 
 
 #### ResolutionExample B: Inherited Override
@@ -358,6 +442,7 @@ Flattened:
 - DEP(v1)
 - PEER(v2)
 - SUB_DEP(v1)
+*[BACK TO TOP]*
 
 
 #### ResolutionExample C: Re-defined Override
@@ -403,6 +488,7 @@ Flattened:
 - PEER(v2)
 - SUB_DEP(v1)
 - PEER(v1)
+*[BACK TO TOP]*
 
 
 #### ResolutionExample D: Overruled *(disabled)* override
@@ -453,6 +539,7 @@ instead of defined)*
 - PEER(v2)
 - SUB_DEP(v1)
 - PEER(v1)
+*[BACK TO TOP]*
 
 
 #### ResolutionExample E: Override **with** acceptable peer present
@@ -491,6 +578,7 @@ Flattened:
 - DEP(v1)
 - PEER(v1)
 - PEER(v2)
+*[BACK TO TOP]*
 
 
 #### ResolutionExample F: Inherited Overruled *(disabled)* override
@@ -551,6 +639,7 @@ instead of defined)*
 - SUB_DEP_L1(v1)
 - PEER(v1)
 - SUB_DEP_L2(v1)
+*[BACK TO TOP]*
 
 
 ## Implementation
@@ -565,6 +654,7 @@ The following sections will include links to relevant source-code of the
 as work progresses. The code they reference is **subject to change**
 
 [aforementioned]:<#preliminary-work-on-unofficial-implementation>
+*[BACK TO TOP]*
 
 
 ### State of the Arborist Fork
@@ -588,6 +678,7 @@ Current *(as of 22 Aug 20)* implementation work encompasses:
 [new ```peerOverride``` type]:<#type-peeroverride-in-class-edge>
 [bare-bones test coverage]:<#test-coverage>
 [described above]:<#inheritance-logic>
+*[BACK TO TOP]*
 
 
 ### removal/replacement of existing ```peerOptional``` hooks and type
@@ -598,6 +689,7 @@ Current *(as of 22 Aug 20)* implementation work encompasses:
 Currently *(as of 22 Aug 20)* all hooks and fixtures relating to optional-peers
 have been either removed, disabled or --where appropriate-- replaced with the
 peer-override equivalent. A description of what that encompasses follows.
+*[BACK TO TOP]*
 
 
 #### Pre-Existing Code affected by Removal of ```peerOptional```
@@ -611,11 +703,13 @@ peer-override equivalent. A description of what that encompasses follows.
 - ```add-rm-pkg-deps.js```
   - removed hooks and special save type in the functions ```removeFromOthers```,
     ```addSingle``` and ```getSaveType```
+*[BACK TO TOP]*
 
 
 ### Class Extensions
 
 Besides the aforementioned modifications, the following fixtures were added.
+*[BACK TO TOP]*
 
 
 #### ```class Edge```
@@ -628,6 +722,8 @@ interface Edge {
   get override () { return this[_type] === 'peerOverride' /* || this[_type] === `override` */ }
 }
 ```
+
+*[BACK TO TOP]*
 
 
 #### ```class Node```
@@ -646,6 +742,8 @@ interface Node {
   get peerDependenciesMeta () { return this[typeof _peerDependenciesMeta] }
 }
 ```
+
+*[BACK TO TOP]*
 
 
 ### Inheritance logic and resolution of special spec *`local`* via the helper ```PeerDepsMeta```
@@ -775,6 +873,8 @@ interface PeerOverride {
 }
 ```
 
+*[BACK TO TOP]*
+
 
 ### Peer-Swap in ```_loadDeps``` method of ```class Node```
 
@@ -796,6 +896,7 @@ for each of your peers:
   ```type: 'peerOverride'```.
 - otherwise pass it to ```_loadDepType``` method with ```type: 'peer'```
   as usual.
+*[BACK TO TOP]*
 
 
 ## Prior Art and Alternatives
@@ -821,6 +922,7 @@ and enjoying those same features.
 In addition, the command line flag effectively acts as a catch-all, which could
 encourage people to include it by default, potentially poisoning the ecosystem
 to not benefit from some of the improvements made in npm v7
+*[BACK TO TOP]*
 
 
 ### Alternative F mentioned in RFC-0025
@@ -838,6 +940,7 @@ optional dep with a note in the projects README.
 If anything, all optional dependencies should be handled like the
 ```peerOptional``` implementation, but this topic is out of scope of this
 **RFC**
+*[BACK TO TOP]*
 
 
 ### Using a different field-name
@@ -847,6 +950,7 @@ usage] of ```peerDependenciesMeta```, i would prefer replacing that all
 together.
 
 [the current usage]:<#removalreplacement-of-existing-peeroptional-hooks-and-type>
+*[BACK TO TOP]*
 
 
 ### Proposed RFC: overrides
@@ -857,6 +961,7 @@ Similar in nature, but way more general, affecting all dependencies and with
 nesting overrides
 
 [Discussed in detail above](#in-regards-to-the-existing-overrides-rfc)
+*[BACK TO TOP]*
 
 
 ### RFC-0023
@@ -903,6 +1008,7 @@ engine support, it is **not** a goal of this RFC
 
 
 [it's Alternatives section]:<https://github.com/npm/rfcs/blob/latest/accepted/0023-acceptDependencies.md#alternatives>
+*[BACK TO TOP]*
 
 
 ## Unresolved Questions and Bikeshedding
@@ -928,6 +1034,8 @@ Something along the lines of:
 npm WARN Peer-Overrides have been specified. This could lead to unpredictable behavior in the affected modules.
 ```
 
+*[BACK TO TOP]*
+
 
 ### Implement a separate save-type for ```peerOverrides``` if needed
 
@@ -943,11 +1051,13 @@ directly.
 
 if there is a need for a separate save-type, it could be implemented easily
 enough
+*[BACK TO TOP]*
 
 
 ### Using a different field-name
 
 [discussed above]:<#removalreplacement-of-existing-peeroptional-hooks-and-type>
+*[BACK TO TOP]*
 
 
 ## Foot-Notes
@@ -966,6 +1076,7 @@ testing framework, so i have not been able to do all the necessary adjustments.
 Some very basic tests have been added including a few fixtures in the
 template-repo, but my understanding of the project isn't comprehensive enough to
 include more extensive tests.
+*[BACK TO TOP]*
 
 
 ### References
@@ -979,3 +1090,4 @@ include more extensive tests.
 [RFC-0023]:<https://github.com/npm/rfcs/blob/latest/accepted/0023-acceptDependencies.md>
 [RFC-overrides]:<https://github.com/npm/rfcs/blob/isaacs/overrides/accepted/0000-overrides.md>
 [Arborist Fork]:<https://github.com/KilianKilmister/arborist>
+[back to top]:<#peer-dependency-overrides>
