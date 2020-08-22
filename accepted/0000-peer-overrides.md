@@ -1109,4 +1109,4 @@ include more extensive tests.
 [RFC-0023]:<https://github.com/npm/rfcs/blob/latest/accepted/0023-acceptDependencies.md>
 [RFC-overrides]:<https://github.com/npm/rfcs/blob/isaacs/overrides/accepted/0000-overrides.md>
 [Arborist Fork]:<https://github.com/KilianKilmister/arborist>
-[back to top]:<#peer-dependency-overrides>
+[--> back to top -->]:<#peer-dependency-overrides>
