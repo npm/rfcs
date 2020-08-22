@@ -19,7 +19,7 @@ This RFC is trying to only address a single issue and is very much able to
 co-exist with them.**
 
 
-[As mentioned] in the overrides **PR** *(written on 15 Jul 20)*
+[As mentioned in] the overrides **PR** *(written on 15 Jul 20)*
 
 > No implementation work has been done on this (unless you count scribbles in a
 > notebook), and it's not going to be included in npm 7.0.0, but will be added
@@ -33,7 +33,7 @@ co-exist with them.**
 > [...], and it's not going to be included in npm 7.0.0, but will be added
 > in the 7.x line as a semver-minor feature update.
 
-Enabling peer-overrides is of much higher is of much higher urgency than nested
+Enabling peer-overrides is of much higher urgency than nested
 overrides and inclusion of this feature in v7 **at launch** will make upgrading
 more attractive, as without this feature, v7 **will be incompatible** with some
 development environments. [Elaborated in **Motivation**](#motivation)
@@ -44,15 +44,13 @@ development environments. [Elaborated in **Motivation**](#motivation)
 > No implementation work has been done on this (unless you count scribbles in a
 > notebook), [...]
 
-Accompanying this RFC is a [Fork of Arborist] working on implementing
+Accompanying this RFC is an [Arborist Fork] working on implementing
 peer-overrides.
 
-**NOTE:** This currently *(as of 19 Aug 20)* is a personal endeavour and as such
+**NOTE:** This currently *(as of 22 Aug 20)* is a personal endeavour and as such
 has not gone through any official green-lighting.
 
 Further details of its state can be found under [Implementation](#implementation)
-
-[Fork of Arborist]:<https://github.com/KilianKilmister/arborist>
 
 
 ## Motivation
@@ -136,8 +134,7 @@ and because all my work is in next-gen and frontier stuff, i really depend on it
 to stay on top and ahead of things.
 
 The behavior described in [RFC-0025] and implemented in ```npm-beta-v4``` is
-incompatible with my development environment and without a way of overriding
-that, the only way for me to resolve this problem would be to not use npm.
+incompatible with my development environment.
 
 
 ## Detailed Explanation
@@ -199,7 +196,7 @@ With packages used in [Motivation](#motivation)
     "standardx": "^5.0.0"
   },
   "peerDependenciesMeta": {
-    // the special `local` spec telling arborist to use the version present in
+    // the special `local` spec telling arborist to use the spec present in
     // (dev-)dependencies
     "ts-node": { "typescript": "local" },
     // a hard version override
@@ -231,24 +228,25 @@ Description of inheritance and resolution logic followed by a few examples.
 
 #### Base Resolution Logic
 
-NOTE: `in parent` refers to what the parent inherits, not just what the parent defines
+NOTE: `in parent` refers to the processed overrides after inheriance, not just to what the parent defines
 
-1. override for your peer in parent ? use override
-2. matching peer in parent ? use match
-3. override for your peer in parent & matching peer in parent ? use override
+1. override for your peer in parent ? **use override**
+2. matching peer in parent dep ? **use match**
+3. override for your peer in parent & matching peer in parent ? **use override**
 
 
 #### Inheritance Logic
 
 - Resolved in ```class Node``` constructor
 - **used by child, not self**
-- similarly, use the parent instruction, uninfluenced by your own inheritance
+- similarly, you yourself use the parent instruction, uninfluenced by your own inheritance
   logic
 
-1. you define override ? pass on override
+1. you define override ? **always** pass on **your** override
 2. you have dep satisfying a peer request that has originally been overridden ?
-   don't pass on override
-3. you inherit override and **don't** have a matching dep ? pass on override
+   **don't** pass on override
+3. you inherit override and **don't** have a matching dep or override for it ?
+   pass on **inherited** override
 
 
 #### ResolutionExample Nought: No Override
@@ -564,23 +562,24 @@ definite**
 
 The following sections will include links to relevant source-code of the
 [aforementioned] [Arborist Fork]. These links may occasionally fall out of sync
-as work progresses, and the code they reference is **subject to change**
+as work progresses. The code they reference is **subject to change**
 
 [aforementioned]:<#preliminary-work-on-unofficial-implementation>
 
 
 ### State of the Arborist Fork
 
-Current *(as of 19 Aug 20)* implementation work encompasses:
+Current *(as of 22 Aug 20)* implementation work encompasses:
 *(subject to change)*
 
 - complete removal of [optional peers].
 - implementation of the [basic fixtures necessary] for peer overrides.
-- [inheritance of overrides] and from parent to child and appropriate
-  replacement with child owned overrides.
+- [inheritance of overrides] based on the logic [described above].
 - [substitution mechanism] of peers
 - implementation of the [new ```peerOverride``` type]
 - some very [bare-bones test coverage]
+
+***STATE:** The implementation [appears to be][bare-bones test coverage] fully functional*
 
 [inheritance of overrides]:<#inheritance-and-resolution-of-special-spec-local>
 [basic fixtures necessary]:<#class-extensions>
@@ -588,6 +587,7 @@ Current *(as of 19 Aug 20)* implementation work encompasses:
 [substitution mechanism]:<#peer-swap-in-_loaddeps-method-of-class-node>
 [new ```peerOverride``` type]:<#type-peeroverride-in-class-edge>
 [bare-bones test coverage]:<#test-coverage>
+[described above]:<#inheritance-logic>
 
 
 ### removal/replacement of existing ```peerOptional``` hooks and type
@@ -595,7 +595,7 @@ Current *(as of 19 Aug 20)* implementation work encompasses:
 ***subject to change***
 [reasoning: see](#alternative-f-mentioned-in-rfc-0025)
 
-Currently *(as of 19 Aug 20)* all hooks and fixtures relating to optional-peers
+Currently *(as of 22 Aug 20)* all hooks and fixtures relating to optional-peers
 have been either removed, disabled or --where appropriate-- replaced with the
 peer-override equivalent. A description of what that encompasses follows.
 
@@ -609,7 +609,7 @@ peer-override equivalent. A description of what that encompasses follows.
 - ```class AuditReport```
   - adjusted ```toJSON``` method appropriately
 - ```add-rm-pkg-deps.js```
-  - removed hooks and special save type in functions ```removeFromOthers```,
+  - removed hooks and special save type in the functions ```removeFromOthers```,
     ```addSingle``` and ```getSaveType```
 
 
@@ -621,7 +621,7 @@ Besides the aforementioned modifications, the following fixtures were added.
 #### ```class Edge```
 
 Added convenience getter `override` *(could be used by [RFC-overrides] as well)*
-[code](https://github.com/KilianKilmister/arborist/blob/916ebb6a5a9a1a8c96aa5c1301bf891ac122e85e/lib/edge.js#L87-L87)
+[code](https://github.com/KilianKilmister/arborist/blob/916ebb6a5a9a1a8c96aa5c1301bf891ac122e85e/lib/edge.js#L88-L88)
 
 ```ts
 interface Edge {
@@ -633,64 +633,159 @@ interface Edge {
 #### ```class Node```
 
 In line with the existing practices Added ```unique symbol``` and
-getter ```peerDependenciesMeta``` hold the prepared override-mapping.
-[code](https://github.com/KilianKilmister/arborist/blob/916ebb6a5a9a1a8c96aa5c1301bf891ac122e85e/lib/node.js#L417-L417)
+getter ```peerDependenciesMeta``` holding the processed override-mapping.
+[code](https://github.com/KilianKilmister/arborist/blob/916ebb6a5a9a1a8c96aa5c1301bf891ac122e85e/lib/node.js#L927-L927)
 
 ```ts
-// the usual install specifiers like version, path, repo etc.
-// AND the special `local` spec
-type InstallSpecifier = string
 
-// accepting an `InstallSpecifier` for a version override or an object for a
-// substitution
-type PeerOverride = InstallSpecifier | { [substitute: string]: InstallSpecifier }
-
-const _peerDependenciesMeta = Symbol('_peerDependenciesMeta')
+declare const _peerDependenciesMeta = Symbol('_peerDependenciesMeta')
 
 interface Node {
-  [_peerDependenciesMeta]: {
-    [dependency: string]: { [peer: string]: PeerOverride }
-  }
+  [typeof _peerDependenciesMeta]: PeerDepsMeta
 
-  get peerDependenciesMeta () { return this[_peerDependenciesMeta] }
+  get peerDependenciesMeta () { return this[typeof _peerDependenciesMeta] }
 }
 ```
 
 
-### Inheritance and resolution of special spec *`local`*
+### Inheritance logic and resolution of special spec *`local`* via the helper ```PeerDepsMeta```
 
-[code](https://github.com/KilianKilmister/arborist/blob/916ebb6a5a9a1a8c96aa5c1301bf891ac122e85e/lib/node.js#L223-L239)
+[code](https://github.com/KilianKilmister/arborist/blob/916ebb6a5a9a1a8c96aa5c1301bf891ac122e85e/lib/peerOverride.js#L7-L107)
 
-~~At creation of a ```class Node``` instance, ```peerDependencyMeta``` is
-inherited from the parent Node instance and then merged with the packages own
-```peerDependencyMeta```. Own Package properties overwrite existing parent
-properties~~
-
-***EDIT:** more sophisticated method described in [Inheritance Logic] will
-replace current implementation*
 
 During construction of a node, the special install specifier *`local`* is
 replaced with the specifier of the corresponding package in defined in
 (dev-)dependencies.
 
+The [Inheritance Logic](#inheritance-logic) is applied here.
 
 **NOTE:** this will be *used by it's children*, the package itself will
 **always** use the overrides specified by in the parent-node, as those are the
 relevant overrides.
 
-[Inheritance Logic](#inheritance-logic)
+Typescript representation:
+
+```ts
+import npa  from 'npm-package-arg'
+import fromPath  from './from-path.js'
+import semver from 'semver'
+import {relative}  from 'path'
+
+import type Node from './node.js'
+
+export default class PeerDepsMeta extends Map<string, Map<string, PeerOverride>> {
+  constructor (node: Node) {
+
+    const {
+      package: {
+        dependencies: deps = {},
+        devDependencies: devDeps = {},
+        peerDependenciesMeta: peerDepsMeta = {},
+      },
+      parent,
+    } = node
+    const parentPeerDepsMeta = Object(parent).peerDependenciesMeta || []
+
+    super()
+
+    // iterate over parent peerDepMeta
+    for (const [dep, peers] of parentPeerDepsMeta) {
+      // try to get the corresponding entry in your own package.peerDependenciesMeta
+      const ownOverrides = peerDepsMeta[dep] || {}
+      // create a store
+      const overrideHash = new Map()
+      // iterate over the peer overrides in the parent peerDepMeta
+      for (const [peer, override] of peers) {
+        switch (true) {
+          // 1. if you have an override for that peer: use that
+          case peer in ownOverrides:
+            overrideHash.set(peer, formOverride(peer, ownOverrides[peer]))
+            break
+          // 2. if you have own deps that satisfies the original request: discard override
+          case canOverrule(peer, override.origSpec, node):
+            break
+          // 3. if not 1. or 2.: inherit the override
+          default:
+            overrideHash.set(peer, override)
+        }
+      }
+
+      // no need to save an empty hash
+      if (overrideHash.size) this.set(dep, overrideHash)
+    }
+
+    //*______
+    //* helpers
+    function formOverride (origPackage: string, spec: string | { [dep: string]: string }) {
+      const [overridePackage, overrideSpec] =
+        typeof spec === 'string'
+          ? [origPackage, spec]
+          : Object.entries(spec)[0] // should only have one entry
+      if (overrideSpec === 'local')
+        overrideSpec = deps[overridePackage] || devDeps[overridePackage]
+      return {
+        overridePackage,
+        overrideSpec
+      }
+    }
+
+    /**
+     * * NOTE: stripped down copy of `./deps-valid.js`
+     */
+    function canOverrule (name: string, spec?: string): boolean {
+      if (!spec) return false
+      try {
+        const requested = npa.resolve(name, spec, fromPath(node))
+        switch (requested.type) {
+          case 'range':
+            if (requested.fetchSpec === '*')
+              return true
+            // fallthrough
+          case 'version':
+            // if it's a version or a range other than '*', semver it
+            return semver.satisfies(name.package.version, requested.fetchSpec, true)
+
+          case 'directory':
+            // directory must be a link to the specified folder
+            return !!name.isLink &&
+              relative(name.realpath, requested.fetchSpec) === ''
+
+          case 'alias':
+            // check that the alias target is valid
+            return canOverrule(name, requested.subSpec)
+          default:
+            return false
+        }
+      } catch {
+        return false
+      }
+    }
+  }
+}
+
+
+//____________
+//* helper types
+
+// definition of an override
+interface PeerOverride {
+  origSpec: string // resolved in `Node[_loadDeps]`
+  overrideSpec: string
+  overridePackage: string
+}
+```
 
 
 ### Peer-Swap in ```_loadDeps``` method of ```class Node```
 
-[code](https://github.com/KilianKilmister/arborist/blob/916ebb6a5a9a1a8c96aa5c1301bf891ac122e85e/lib/node.js#L437-L470)
+[code](https://github.com/KilianKilmister/arborist/blob/916ebb6a5a9a1a8c96aa5c1301bf891ac122e85e/lib/node.js#L428-L458)
 
 The existing ```peerOptional``` hook is replaced with the peer-swapping
 mechanism:
 
 for each of your peers:
 
-- if **you** are referenced in the ```peerDependencyMeta``` of **your parent**
+- if **you** are referenced in the ```peerDependenciesMeta``` of **your parent**
   - check if **your peer** is referenced in that entry.
     - if so: do a swap.
       - if a an install specifier is referenced, swap it in.
@@ -700,18 +795,32 @@ for each of your peers:
 - if a peer was replaced, pass it to the ```_loadDepType``` method with
   ```type: 'peerOverride'```.
 - otherwise pass it to ```_loadDepType``` method with ```type: 'peer'```
-  like before.
-
-
-### ```type: 'peerOverride'``` in ```class Edge```
-
-[code](https://github.com/KilianKilmister/arborist/blob/916ebb6a5a9a1a8c96aa5c1301bf891ac122e85e/lib/edge.js#L16-L24)
-
-The former ```peerOptional``` type is replaced with the new ```peerOverride```
-type. And properties adjusted accordingly
+  as usual.
 
 
 ## Prior Art and Alternatives
+
+
+### ```--legacy-peers``` command line flag
+
+NPM v7-beta includes the command line flag ```--legacy-peers``` which will cause
+it to fall back to the v6 behavior with peers. While this does solve these
+issues, it is very much a patchwork solution, as v6 peer behavior is essentially
+not doing anything at all. This forfeits all the improvements arborist is trying to make.
+
+This flag is also applied on a global level, and such will be applied to
+**every** package in the tree, regardless of its peer-compliance. This could
+enable a package to float in a limbo of non-compliance, which might be difficult
+to ever escape from.
+
+This RFC aims at giving authors a way to alter peer resolution **on their level
+only**, and not only letting packages higher up the tree take full advantage of
+arborists improvements, but also have overrides fully integrated into the tree
+and enjoying those same features.
+
+In addition, the command line flag effectively acts as a catch-all, which could
+encourage people to include it by default, potentially poisoning the ecosystem
+to not benefit from some of the improvements made in npm v7
 
 
 ### Alternative F mentioned in RFC-0025
@@ -752,7 +861,7 @@ nesting overrides
 
 ### RFC-0023
 
-[acceptDependencies to allow deduplication of conditionally compatible dependency versions](https://github.com/npm/rfcs/blob/latest/accepted/0023-acceptDependencies.md)
+[link][RFC-0023]
 
 Similar in nature, but again more general. The inheritance of peer-overrides
 would potentially also allow for more deduplication but the degree would very
@@ -844,10 +953,26 @@ enough
 ## Foot-Notes
 
 
-### Test Coverage
+### Test Coverage of the fork
+
+***NOTE:** I've been using esm since node-v13 dropped and I've recently become a
+TypeScripter so it **is possible** that i missed mistakes which would usually be
+uncovered by their convenience.*
+
+Currently *(as of 22 Aug 20)* the [Arborist Fork] passes **every** test that is
+*not based on **pre-existing** snapshots*. I'm not very familiar with the
+testing framework, so i have not been able to do all the necessary adjustments.
+
+Some very basic tests have been added including a few fixtures in the
+template-repo, but my understanding of the project isn't comprehensive enough to
+include more extensive tests.
 
 
 ### References
+
+[original RRFC][#204]
+[RFC-overrides]
+[RFC about installing peer-deps][RFC-0025]
 
 [#204]:<https://github.com/npm/rfcs/issues/204>
 [RFC-0025]:<https://github.com/npm/rfcs/blob/latest/accepted/0025-install-peer-deps.md>
