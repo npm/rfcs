@@ -75,7 +75,7 @@ co-exist with them.**
 > notebook), and it's not going to be included in npm 7.0.0, but will be added
 > in the 7.x line as a semver-minor feature update.
 
-*[back to top]*
+*[--> back to top -->]*
 
 [As mentioned in]:<https://github.com/npm/rfcs/pull/129#issuecomment-658906056>
 
@@ -90,7 +90,7 @@ overrides and inclusion of this feature in v7 **at launch** will make upgrading
 more attractive, as without this feature, v7 **will be incompatible** with some
 development environments. [Elaborated in **Motivation**](#motivation)
 
-*[back to top]*
+*[--> back to top -->]*
 
 
 ### Preliminary Work on (unofficial) Implementation
@@ -106,7 +106,7 @@ has not gone through any official green-lighting.
 
 Further details of its state can be found under [Implementation](#implementation)
 
-*[back to top]*
+*[--> back to top -->]*
 
 
 ## Motivation
@@ -115,7 +115,7 @@ Originally described in [Issue regarding npm-v7 peer-dependency behavior as
 described by RFC-0025-install-peer-deps and currently implemented in arborist
 and npm-v7-beta][#204]
 
-*[back to top]*
+*[--> back to top -->]*
 
 
 ### The Issue
@@ -130,7 +130,7 @@ representative of my projects) will result in this message:
  > npm WARN eslint-plugin-react@7.14.3 requires a peer of eslint@^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0 but none isinstalled. You must install peer dependencies yourself.
  > npm WARN eslint-plugin-import@2.18.2 requires a peer of eslint@2.x- 6.x but none is installed. You must installpeer dependencies yourself.
 
-*[back to top]*
+*[--> back to top -->]*
 
 
 ### Going over them
@@ -148,7 +148,7 @@ representative of my projects) will result in this message:
 But what all of them have in common: I *never* had an issue with not meeting
 their peer deps, and have been using them extensively and for various edge-cases.
 
-*[back to top]*
+*[--> back to top -->]*
 
 
 ### The Absurdity
@@ -182,7 +182,7 @@ and doesn't affect any users of the package. It's straight-up insanity.
  }
  ```
 
-*[back to top]*
+*[--> back to top -->]*
 
 
 ### Concluding
@@ -200,7 +200,7 @@ to stay on top and ahead of things.
 The behavior described in [RFC-0025] and implemented in ```npm-beta-v4``` is
 incompatible with my development environment.
 
-*[back to top]*
+*[--> back to top -->]*
 
 
 ## Detailed Explanation
@@ -224,7 +224,7 @@ consumer who specified them (eg. different module name in ```import```
 statements). As far as Arborist is concerned, the override is the correct
 package package **as is** and will be treated accordingly.
 
-*[back to top]*
+*[--> back to top -->]*
 
 
 ### Package Field
@@ -249,7 +249,7 @@ interface PackageJson {
 }
 ```
 
-*[back to top]*
+*[--> back to top -->]*
 
 
 ### Example Config
@@ -279,7 +279,7 @@ With packages used in [Motivation](#motivation)
 }
 ```
 
-*[back to top]*
+*[--> back to top -->]*
 
 
 ### Effect
@@ -292,14 +292,14 @@ resolution.
 **It will basically work as if the substitute was specified as the peer from the
 beginning.**
 
-*[back to top]*
+*[--> back to top -->]*
 
 
 ### Logic and Examples
 
 Description of inheritance and resolution logic followed by a few examples.
 
-*[back to top]*
+*[--> back to top -->]*
 
 
 #### Base Resolution Logic
@@ -310,7 +310,7 @@ NOTE: `in parent` refers to the processed overrides after inheriance, not just t
 2. matching peer in parent dep ? **use match**
 3. override for your peer in parent & matching peer in parent ? **use override**
 
-*[back to top]*
+*[--> back to top -->]*
 
 
 #### Inheritance Logic
@@ -326,7 +326,7 @@ NOTE: `in parent` refers to the processed overrides after inheriance, not just t
 3. you inherit override and **don't** have a matching dep or override for it ?
    pass on **inherited** override
 
-*[back to top]*
+*[--> back to top -->]*
 
 
 #### ResolutionExample Nought: No Override
@@ -357,7 +357,7 @@ Flattened:
 - DEP(v1)
 - PEER(v1)
 
-*[back to top]*
+*[--> back to top -->]*
 
 
 #### ResolutionExample A: Simple Override
@@ -399,7 +399,7 @@ Flattened:
 - PEER(v2)
 - PEER_DEP(v1)
 
-*[back to top]*
+*[--> back to top -->]*
 
 
 #### ResolutionExample B: Inherited Override
@@ -443,7 +443,7 @@ Flattened:
 - PEER(v2)
 - SUB_DEP(v1)
 
-*[back to top]*
+*[--> back to top -->]*
 
 
 #### ResolutionExample C: Re-defined Override
@@ -490,7 +490,7 @@ Flattened:
 - SUB_DEP(v1)
 - PEER(v1)
 
-*[back to top]*
+*[--> back to top -->]*
 
 
 #### ResolutionExample D: Overruled *(disabled)* override
@@ -542,7 +542,7 @@ instead of defined)*
 - SUB_DEP(v1)
 - PEER(v1)
 
-*[back to top]*
+*[--> back to top -->]*
 
 
 #### ResolutionExample E: Override **with** acceptable peer present
@@ -582,7 +582,7 @@ Flattened:
 - PEER(v1)
 - PEER(v2)
 
-*[back to top]*
+*[--> back to top -->]*
 
 
 #### ResolutionExample F: Inherited Overruled *(disabled)* override
@@ -644,7 +644,7 @@ instead of defined)*
 - PEER(v1)
 - SUB_DEP_L2(v1)
 
-*[back to top]*
+*[--> back to top -->]*
 
 
 ## Implementation
@@ -658,7 +658,7 @@ The following sections will include links to relevant source-code of the
 [aforementioned] [Arborist Fork]. These links may occasionally fall out of sync
 as work progresses. The code they reference is **subject to change**
 
-*[back to top]*
+*[--> back to top -->]*
 
 [aforementioned]:<#preliminary-work-on-unofficial-implementation>
 
@@ -685,7 +685,7 @@ Current *(as of 22 Aug 20)* implementation work encompasses:
 [bare-bones test coverage]:<#test-coverage>
 [described above]:<#inheritance-logic>
 
-*[back to top]*
+*[--> back to top -->]*
 
 
 ### removal/replacement of existing ```peerOptional``` hooks and type
@@ -697,7 +697,7 @@ Currently *(as of 22 Aug 20)* all hooks and fixtures relating to optional-peers
 have been either removed, disabled or --where appropriate-- replaced with the
 peer-override equivalent. A description of what that encompasses follows.
 
-*[back to top]*
+*[--> back to top -->]*
 
 
 #### Pre-Existing Code affected by Removal of ```peerOptional```
@@ -712,14 +712,14 @@ peer-override equivalent. A description of what that encompasses follows.
   - removed hooks and special save type in the functions ```removeFromOthers```,
     ```addSingle``` and ```getSaveType```
 
-*[back to top]*
+*[--> back to top -->]*
 
 
 ### Class Extensions
 
 Besides the aforementioned modifications, the following fixtures were added.
 
-*[back to top]*
+*[--> back to top -->]*
 
 
 #### ```class Edge```
@@ -733,7 +733,7 @@ interface Edge {
 }
 ```
 
-*[back to top]*
+*[--> back to top -->]*
 
 
 #### ```class Node```
@@ -753,7 +753,7 @@ interface Node {
 }
 ```
 
-*[back to top]*
+*[--> back to top -->]*
 
 
 ### Inheritance logic and resolution of special spec *`local`* via the helper ```PeerDepsMeta```
@@ -883,7 +883,7 @@ interface PeerOverride {
 }
 ```
 
-*[back to top]*
+*[--> back to top -->]*
 
 
 ### Peer-Swap in ```_loadDeps``` method of ```class Node```
@@ -907,7 +907,7 @@ for each of your peers:
 - otherwise pass it to ```_loadDepType``` method with ```type: 'peer'```
   as usual.
 
-*[back to top]*
+*[--> back to top -->]*
 
 
 ## Prior Art and Alternatives
@@ -934,7 +934,7 @@ In addition, the command line flag effectively acts as a catch-all, which could
 encourage people to include it by default, potentially poisoning the ecosystem
 to not benefit from some of the improvements made in npm v7
 
-*[back to top]*
+*[--> back to top -->]*
 
 
 ### Alternative F mentioned in RFC-0025
@@ -953,7 +953,7 @@ If anything, all optional dependencies should be handled like the
 ```peerOptional``` implementation, but this topic is out of scope of this
 **RFC**
 
-*[back to top]*
+*[--> back to top -->]*
 
 
 ### Using a different field-name
@@ -964,7 +964,7 @@ together.
 
 [the current usage]:<#removalreplacement-of-existing-peeroptional-hooks-and-type>
 
-*[back to top]*
+*[--> back to top -->]*
 
 
 ### Proposed RFC: overrides
@@ -976,7 +976,7 @@ nesting overrides
 
 [Discussed in detail above](#in-regards-to-the-existing-overrides-rfc)
 
-*[back to top]*
+*[--> back to top -->]*
 
 
 ### RFC-0023
@@ -1024,7 +1024,7 @@ engine support, it is **not** a goal of this RFC
 
 [it's Alternatives section]:<https://github.com/npm/rfcs/blob/latest/accepted/0023-acceptDependencies.md#alternatives>
 
-*[back to top]*
+*[--> back to top -->]*
 
 
 ## Unresolved Questions and Bikeshedding
@@ -1050,7 +1050,7 @@ Something along the lines of:
 npm WARN Peer-Overrides have been specified. This could lead to unpredictable behavior in the affected modules.
 ```
 
-*[back to top]*
+*[--> back to top -->]*
 
 
 ### Implement a separate save-type for ```peerOverrides``` if needed
@@ -1068,14 +1068,14 @@ directly.
 if there is a need for a separate save-type, it could be implemented easily
 enough
 
-*[back to top]*
+*[--> back to top -->]*
 
 
 ### Using a different field-name
 
 [discussed above]:<#removalreplacement-of-existing-peeroptional-hooks-and-type>
 
-*[back to top]*
+*[--> back to top -->]*
 
 
 ## Foot-Notes
@@ -1095,7 +1095,7 @@ Some very basic tests have been added including a few fixtures in the
 template-repo, but my understanding of the project isn't comprehensive enough to
 include more extensive tests.
 
-*[back to top]*
+*[--> back to top -->]*
 
 
 ### References
