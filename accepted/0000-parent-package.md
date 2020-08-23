@@ -12,7 +12,9 @@ In modern monorepositories and or workspaces a lot of packages may share the sam
 
 ## Detailed Explanation
 
-Extend package.json format with an `extends` field. In this field an object can specified which contains the following keys:
+Add a new file called `source-package.json`. This source file is used to generate a new `package.json` with inhereted `dependencies`, `scripts` and `overrides`.  
+
+The source file contains an `extends` field, which specifies an object containing the following keys:
 * name the name of the parent package.json.  
 * version, local path or Git repository to use to resolve the parent package.
 
@@ -22,32 +24,33 @@ Example:
 "extends": {"parent-foo": "~1.2"}
 } 
 ````
-A child can only extend a single parent `package.json`. The parent package can be resolved just like any dependency (refer to https://docs.npmjs.com/files/package.json#dependencies), so semver, local path or git repository are all valid. 
+A source can only extend a single parent. The parent package can be resolved just like any dependency (refer to https://docs.npmjs.com/files/package.json#dependencies), so semver, local path or git repository are all valid. 
 
-In general any npm package.json could be used as a parent `package.json`. A parent `package.json` must not be flagged as `private` though. Secondly, there must not be a circular dependency: The child package must not be anywhere in the dependency tree of the parent package. 
+In general any npm package could be used as a parent `package.json`. A parent `package.json` must not be flagged as `private` though. Secondly, there must not be a circular dependency: The source package must not be anywhere in the dependency tree of the parent package. 
 
-The child `package.json` would inherit `dependencies` (Dev, peer etc.) and `scripts` sections of the parent `package.json` if present. If a dependency or script is present in both the parent package.json as well as the child `package.json` the definition in the child always overrides the parent's definition. 
+Additionally, the source file contains all sections that can be inherited.
 
-It could also be explored to inherit the entire parent package.json maybe it is desirable to share licenses or authors across packages for example.
+During `install` and `pack` 
 
-During `npm pack` the `package.json` will be resolved:
+* all `dependencies`,  `scripts` and `overrides` inherited from the parent as well as the ones defined in the source will be combined into single `package.json`. If a dependency, script, or override is present in both the parent as well as the source `package.json` the definition in the source always overrides the parent's definition. 
 
-* all `dependencies` and  `scripts` inherited from the parent `package.json` as well as the ones defined in the child will be combined into single `package.json`.
 * A combined lockfile will also be created.
-
-These combined files will be written into the tarball. 
 
 This has a couple of advantages:
 
 * Since the dependency tree is already resolved during `pack` it should be similar in performance during `install` as a normal, unextended package. This is crucial, since we would not want to punish users for installing packages that inherit a parent `package.json`.
-* Similarly, this could be easier both for end users and developers, since they can have a quick look into `package.json` to see all `dependencies` and `scripts` at a glance.
+* Similarly, this could be easier both for end users and developers, since they can have a quick look into `package.json` to see all `dependencies`, `scripts` and `overrides` at a glance.
 * If a parent `package.json` is unavailable or unpublished this poses no problem for published inheriting packages, since they have the resolved files right in the published package. 
+* Exisiting tooling that analyzes `package.json` or `package-lock.json` does not need to change because it can still read `package.json` as usual.
 
-For local development of the child package or a workspace the following adjustments could be made:
+For local development the following adjustments could be made:
 
-  * `npm list` will output the combined dependency tree. It should additionally output the version of the resolved parent package. 
+ 
+* `npm install <dependency>` will write the dependency to the source file. It will then regenerate `package.json`. 
+* 
+* `npm list` will output the combined dependency tree. It should additionally output the version of the resolved parent package. 
 
- * `npm outdated` command would also need to be updated to check for an outdated parent `package.json`. The package could end up in the outdated output twice, once as dependency of the child and once as parent of the child. Therefore, the parent package name should somehow be marked, either as seperate entry or with a suffix to the package name such as `(parent)`.  
+ * `npm outdated` command would also need to be updated to check for an outdated parent `package.json`. The package could end up in the outdated output twice, once as dependency of the source and once as parent of the source. Therefore, the parent package name should somehow be marked, either as seperate entry or with a suffix to the package name such as `(parent)`.  
 
  * `npm run` should additionally also list and run inherited scripts.  
  * `npm update` should also be able to update the parent `package.json`.
@@ -55,8 +58,7 @@ For local development of the child package or a workspace the following adjustme
 Additionally an argument `--parent` should be introduced to `npm list` and `npm update`:
 
 * For `npm list` this would allow the user to see only inherited dependencies. This works similar to how `--dev` or `--prod` work today.
-* For `npm update` this would allow to only update the parent. This would help in a scenario where package `foo` is both a parent and a dependency of `bar`. Today, users can run `npm update foo`. This would still only update the dependency of `bar`. However, if they want to update the parent of bar they can simply run `npm update --parent`.   
-
+* For `npm update` this would allow to only update the parent. This would help in a scenario where package `foo` is both a parent and a dependency of `bar`. Today, users can run `npm update foo`. This would still only update the dependency of `bar`. However, if they want to update the parent of bar they can simply run `npm update --parent`. 
 
 ## Rationale and Alternatives
 
@@ -77,14 +79,14 @@ Additionally an argument `--parent` should be introduced to `npm list` and `npm 
 
 ## Unresolved Questions and Bikeshedding
 
-### What exactly to inherit?
-The proposal basically starts with inheriting `dependencies` and `scripts`. These might be the most common to start with, but later the list could be extended to include other fields like `license`, `config` or `authors`.  
-
 ### Should there be more limits as to what you can extend from? 
 Maybe limit it to the same scope? Or allow people to say that they do not want their packages to be extendable?
 
+### Edits to package.json are potentially lost
+If a user edits package.json and adds a new `dependency`, `script` or `override`, the changes could potentially be lost on the next `install` or `pack`. Maybe we should warn the user about this and tell them to move the definitions to the source?
 
-### Potentially, other areas for local development of the child package need to be touched on as well
+
+### Potentially, other areas for local development of the source package need to be touched on as well
 
 
 {{Write about any arbitrary decisions that need to be made (syntax, colors, formatting, minor UX decisions), and any questions for the proposal that have not been answered.}}
