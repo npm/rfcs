@@ -2,7 +2,7 @@
 
 ## Summary
 
-Publishing a package should prompt a confirmation prompt, allowing users to validate their package info before uploading their package tarball.
+Publishing a package should prompt a confirmation prompt, allowing users to validate their package info and the target registry before uploading their package tarball.
 
 ## Motivation
 
@@ -53,7 +53,7 @@ npm notice integrity:     sha512-NAItmPQyt6dya[...]m5N3kfPPJYj0w==
 npm notice total files:   7
 npm notice
 
-This operation will publish your package to the npm registry.
+This operation will publish your package to the npm registry at https://registry.npmjs.org.
 Do you wish to proceed? [y/N]
 ```
 
