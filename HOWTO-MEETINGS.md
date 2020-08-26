@@ -58,7 +58,7 @@
 ### Agenda
 1. **Housekeeping**
 	1. Introduction(s) (ex. note the name of the call, state the week day & date)
-	1. Code of Conduct Acknowledgement
+	1. [Code of Conduct Acknowledgement](https://www.npmjs.com/policies/conduct)
 	1. Outline Intentions & Desired Outcomes (ex. want to interact with the community to ensure that there is movement on important issues/ideas for the project)
 	1. Announcements
 1. <agenda>
