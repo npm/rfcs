@@ -1,5 +1,3 @@
-# Peer-Dependency Overrides
-
 ## Notes for Open-RFC-Call 02 sep 20
 
 [meeting notes](https://hackmd.io/U93DWSLBQQKMqYsZwHEiwQ?view#PR-210-RFC-peer-specific-overrides)
@@ -72,6 +70,8 @@ Does C get requested peer B or override X?
 **Issue:** pre-release might cause unintended side-effects with unrelated deps, targeted override doesn't affect other packages which have that same peer-spec
 
 **Resolved:** was a bad idea in retrospect
+
+# Peer-Dependency Overrides
 
 <!-- TOC -->
 
