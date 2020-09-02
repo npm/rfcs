@@ -51,6 +51,33 @@
 
 <!-- /TOC -->
 
+## notes for open RFC call
+
+- [] overrides vs peerOverrides
+
+  - [] how do overrides work
+    - what if
+      - ROOT has dep on A
+      - A has peer of B
+      - A has dep on C
+      - C has peer of B
+      - B is overridden with X by ROOT
+      does C get requested peer B or override X
+
+  - [] trickle down of peerOverrides
+  - [] special spec `local` -> use whatever version definer of override uses
+  - [] `--legacy-peer-deps`
+    - [] how is the tree affected?
+    - [] if one of my deps was developed with `--legacy-peer-deps` because it could not satisfy a requested peer, will i even be able to use it without the `--legacy-peer-deps` flag, and how would that work?
+
+- [] error message and warning
+- [] "optional-peers"
+- [] should semver-check on peers accept pre-releases?
+  - [] pre-release might cause unintended side-effects with unrelated deps,
+    targeted override doesn't affect other packages which have that same
+    peer-spec
+ 
+
 ## Summary
 
 Addition of a package field where overrides of peer dependencies could be
