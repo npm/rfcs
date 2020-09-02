@@ -1,6 +1,7 @@
 ## Notes for Open-RFC-Call 02 sep 20
 
 [meeting notes](https://hackmd.io/U93DWSLBQQKMqYsZwHEiwQ?view#PR-210-RFC-peer-specific-overrides)
+[project tracking these points](https://github.com/KilianKilmister/rfcs/projects/1)
 
 - [X] overrides
   - [X] how do overrides work
@@ -16,61 +17,7 @@
   - [x] pre-release might cause unintended side-effects with unrelated deps,
     targeted override doesn't affect other packages which have that same
     peer-spec
-
-
-### overrides
-
-#### Question 'What if'
-
-What if:
-- ROOT has dep on A
-- A has peer of B
-- A has dep on C
-- C has peer of B
-- B is overridden with X by ROOT
-
-Does C get requested peer B or override X?
-
-**Answer:** C will get X. override is absolute
-
-
-#### Inheritance
-
-**Resolved:** none: overrides will only be respected if defined at the Root-level
-
-
-### peerOverrides:
-
-#### special spec `local`
-
-***open***
-
-
-### `--legacy-peer-deps`
-
-#### how is the tree affected?
-
-**Question:** if one of my deps was developed with `--legacy-peer-deps` because it could not satisfy a requested peer, will i even be able to use it without the `--legacy-peer-deps` flag, and how would that work?
-
-***open***
-
-
-### Error-Messages and Warnings
-
-***open***
-
-
-### About 'Optional Peers'
-
-**Resolved:** it's a common options among the package managers
-
-
-### Should Semver-Check on Peers accept Pre-Releases?
-
-**Issue:** pre-release might cause unintended side-effects with unrelated deps, targeted override doesn't affect other packages which have that same peer-spec
-
-**Resolved:** was a bad idea in retrospect
-
+    
 # Peer-Dependency Overrides
 
 <!-- TOC -->
