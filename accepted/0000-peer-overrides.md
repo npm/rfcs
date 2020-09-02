@@ -1,6 +1,6 @@
 ## Notes for Open-RFC-Call 02 sep 20
 
-[meeting notes](https://hackmd.io/U93DWSLBQQKMqYsZwHEiwQ?view#PR-210-RFC-peer-specific-overrides)
+[meeting notes](https://github.com/npm/rfcs/blob/latest/meetings/2020-09-02.md#open-rfc-meeting-npm)
 
 [project tracking these points](https://github.com/KilianKilmister/rfcs/projects/1)
 
