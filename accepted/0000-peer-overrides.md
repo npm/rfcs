@@ -25,6 +25,7 @@
 
 - [Peer-Dependency Overrides](#peer-dependency-overrides)
   - [Summary](#summary)
+  - [About the degree of controle of Authors and Maintainars](#about-the-degree-of-controle-of-authors-and-maintainars)
   - [In Regards to the existing `overrides` RFC](#in-regards-to-the-existing-overrides-rfc)
     - [Urgency of peer-overrides](#urgency-of-peer-overrides)
     - [Preliminary Work on (unofficial) Implementation](#preliminary-work-on-unofficial-implementation)
@@ -80,9 +81,8 @@ specified to be accepted as valid peers and used by **Arborist**.
 
 ## About the degree of controle of Authors and Maintainars
  
-This caused confusion in the last meeting (*[meeting notes]*) and we ran out of time before i could properly adress it, so i'm going to state it clearly here: 
-I 
-**No user will be able to override peers in your branch unless you want them to be able to.
+This caused confusion in the last meeting (*[meeting notes]*) and we ran out of time before i could properly adress it, so i'm going to state it clearly here:
+**No user will be able to override peers in your branch unless you want them to be able to.**
 
 There are two conditions that must be true for an override to trickle past your package:
 
@@ -91,15 +91,22 @@ There are two conditions that must be true for an override to trickle past your 
 
 **So as long as you have an averride for a requested peer fulfill the requested peer with your deps, that will ALLWAYS take priority.**
 
-This puts the controle fully in the hands of the authors and maintainers AND allows a user to define an override for a nested peer-dep which isn't fulfilled at a higher level. eg. If a package just relays (or simply doesn't fulfill) a peer requested by its deps.
+This puts the controle fully in the hands of the authors and maintainers AND allows a user to define an override for a nested peer-dep which isn't fulfilled at a higher level. eg. If a package just relays (or simply doesn't fulfill) a peer requested by its deps. ([detailed section](#logic-and-examples))
 
 [meeting notes]:<https://github.com/npm/rfcs/blob/latest/meetings/2020-09-02.md#open-rfc-meeting-npm>
 
 ## In Regards to the existing `overrides` RFC
 
-While there is some overlap with [RFC-overrides], this RFC was drafted to be
+**EDIT: [RFC-overrides] is NOT inherited by package consumers. Its overrides are only applied when the defining package is at the root-level**
+This fact leaves very little overlap between the two and arguably makes peer-specific-overrides or something of equal functionality an absolute must.
+[RFC-overrides] also applies its overrides **globally**, eg. if you overrride package A with with package X, every requested dep of package A will be substituted by package X. This could lead to unintended side-effecs in otherwhise independent parts of the tree.
+
+**peer-specific-overrides** as discribed by this proposal **are branch-specific** and the effects of a peer override is isolated from the rest of the tree. not only that, they will not have any effects on anything but their intended targets, as the precence of another override definition for that request **OR** the presence of a dependency that would fulfill the **original** request will void the previous override.
+**EDITEND**
+
+~~While there is some overlap with [RFC-overrides], this RFC was drafted to be
 specific to peer dependencies *only*, which allows for much simpler and thus
-faster implementation.
+faster implementation.~~
 
 
 **This RFC is in no way meant to compete with the more general `overrides`.
@@ -107,9 +114,9 @@ This RFC is trying to only address a single issue and is very much able to
 co-exist with them.**
 
 
-[As mentioned in] the overrides **PR** *(written on 15 Jul 20)*
+~~[As mentioned in] the overrides **PR** *(written on 15 Jul 20)*~~ *became irrelevant*
 
-> No implementation work has been done on this (unless you count scribbles in a
+>~~No implementation work has been done on this (unless you count scribbles in a
 > notebook), and it's not going to be included in npm 7.0.0, but will be added
 > in the 7.x line as a semver-minor feature update.
 
@@ -120,21 +127,24 @@ co-exist with them.**
 
 ### Urgency of peer-overrides
 
-> [...], and it's not going to be included in npm 7.0.0, but will be added
-> in the 7.x line as a semver-minor feature update.
+As this proposals purpouse now clearly **isn't** covered by [RFC-overrides],
+it becomes vital to form a solution to the issues it tries to tackle.
+In my opinion, npm-v7 needs at the very least a plan to solve these issues **at launch**.
 
-Enabling peer-overrides is of much higher urgency than nested
+~~Enabling peer-overrides is of much higher urgency than nested
 overrides and inclusion of this feature in v7 **at launch** will make upgrading
 more attractive, as without this feature, v7 **will be incompatible** with some
-development environments. [Elaborated in **Motivation**](#motivation)
+development environments. [Elaborated in **Motivation**](#motivation)~~
 
 *[--> back to top -->]*
 
 
 ### Preliminary Work on (unofficial) Implementation
 
-> No implementation work has been done on this (unless you count scribbles in a
+> ~~No implementation work has been done on this (unless you count scribbles in a
 > notebook), [...]
+
+**NOTE:** discussions are ongoing and any work on it is put on hold until some basics get worked out
 
 Accompanying this RFC is an [Arborist Fork] working on implementing
 peer-overrides.
@@ -336,6 +346,7 @@ beginning.**
 ### Logic and Examples
 
 Description of inheritance and resolution logic followed by a few examples.
+*see the [straight-forward explanation](#about-the-degree-of-controle-of-authors-and-maintainars)*
 
 *[--> back to top -->]*
 
@@ -706,7 +717,7 @@ as work progresses. The code they reference is **subject to change**
 Current *(as of 22 Aug 20)* implementation work encompasses:
 *(subject to change)*
 
-- complete removal of [optional peers].
+~~- complete removal of [optional peers].~~ *will probably be reintroduced*
 - implementation of the [basic fixtures necessary] for peer overrides.
 - [inheritance of overrides] based on the logic [described above].
 - [substitution mechanism] of peers
@@ -728,27 +739,11 @@ Current *(as of 22 Aug 20)* implementation work encompasses:
 
 ### removal/replacement of existing ```peerOptional``` hooks and type
 
-***subject to change***
-[reasoning: see](#alternative-f-mentioned-in-rfc-0025)
+**This will probably not happen**
 
-Currently *(as of 22 Aug 20)* all hooks and fixtures relating to optional-peers
+~~Currently *(as of 22 Aug 20)* all hooks and fixtures relating to optional-peers
 have been either removed, disabled or --where appropriate-- replaced with the
-peer-override equivalent. A description of what that encompasses follows.
-
-*[--> back to top -->]*
-
-
-#### Pre-Existing Code affected by Removal of ```peerOptional```
-
-- ```class Node```
-  - removed hook in ```_loadDeps``` method
-- ```class Edge```
-  - adjusted getters appropriately
-- ```class AuditReport```
-  - adjusted ```toJSON``` method appropriately
-- ```add-rm-pkg-deps.js```
-  - removed hooks and special save type in the functions ```removeFromOthers```,
-    ```addSingle``` and ```getSaveType```
+peer-override equivalent. A description of what that encompasses follows.~~
 
 *[--> back to top -->]*
 
@@ -951,7 +946,14 @@ for each of your peers:
 ## Prior Art and Alternatives
 
 
-### ```--legacy-peers``` command line flag
+### ```--legacy-peer-deps``` command line flag
+
+**EDIT:** An important question has come to mind. Usage of `--legacy-peer-deps`
+could force subsequent consumers to having to use the flag by default.
+outcome of that issue might be important to more increase the validity of this proposal.
+
+*[link to the issue](https://github.com/npm/rfcs/issues/218)*
+
 
 NPM v7-beta includes the command line flag ```--legacy-peers``` which will cause
 it to fall back to the v6 behavior with peers. While this does solve these
@@ -980,25 +982,29 @@ to not benefit from some of the improvements made in npm v7
 *this is implemented in the npm beta-v4*
 *[link](https://github.com/npm/rfcs/tree/latest/accepted#f-use-peerdependenciesmeta-to-trigger-auto-install)*
 
-I don't think that the author should specify which peer-deps get auto installed
+**Edit:** Irrellevant
+
+~~I don't think that the author should specify which peer-deps get auto installed
 and which don't. This could possibly lead to similar user-confusion and
 resulting (re-)moval of peer-deps as we are seeing it now. I think the decision
 to include a peer-dep should be declarative, and being able to make a peer-dep
 defacto optional defeats the purpose, as it could just as well be filed as an
-optional dep with a note in the projects README.
+optional dep with a note in the projects README.~~
 
-If anything, all optional dependencies should be handled like the
-```peerOptional``` implementation, but this topic is out of scope of this
-**RFC**
+~~If anything, all optional dependencies should be handled like the
+```peerOptional``` implementation, but this topic is out of scope of this~~
+**RFC**~~
 
 *[--> back to top -->]*
 
 
 ### Using a different field-name
 
-Any field-name could of course be used, but since i take issue with [the current
+~~Any field-name could of course be used, but since i take issue with [the current
 usage] of ```peerDependenciesMeta```, i would prefer replacing that all
-together.
+together.~~
+
+Exact course of action will be decided, but `peerDependenciesMeta` will likely remain with it's current usage.
 
 [the current usage]:<#removalreplacement-of-existing-peeroptional-hooks-and-type>
 
@@ -1009,8 +1015,10 @@ together.
 
 *[link][RFC-overrides]*
 
-Similar in nature, but way more general, affecting all dependencies and with
-nesting overrides
+**Does not sufficiently cover functionality of this proposal sufficiently**
+
+~~Similar in nature, but way more general, affecting all dependencies and with
+nesting overrides~~
 
 [Discussed in detail above](#in-regards-to-the-existing-overrides-rfc)
 
