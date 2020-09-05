@@ -78,6 +78,22 @@
 Addition of a package field where overrides of peer dependencies could be
 specified to be accepted as valid peers and used by **Arborist**.
 
+## About the degree of controle of Authors and Maintainars
+ 
+This caused confusion in the last meeting (*[meeting notes]*) and we ran out of time before i could properly adress it, so i'm going to state it clearly here: 
+I 
+**No user will be able to override peers in your branch unless you want them to be able to.
+
+There are two conditions that must be true for an override to trickle past your package:
+
+1. You yourself don't define an override for that peer.
+2. You don't specify a dependency that satisfies the original peer-request
+
+**So as long as you have an averride for a requested peer fulfill the requested peer with your deps, that will ALLWAYS take priority.**
+
+This puts the controle fully in the hands of the authors and maintainers AND allows a user to define an override for a nested peer-dep which isn't fulfilled at a higher level. eg. If a package just relays (or simply doesn't fulfill) a peer requested by its deps.
+
+[meeting notes]:<https://github.com/npm/rfcs/blob/latest/meetings/2020-09-02.md#open-rfc-meeting-npm>
 
 ## In Regards to the existing `overrides` RFC
 
