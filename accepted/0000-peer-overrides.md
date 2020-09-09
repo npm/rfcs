@@ -6,18 +6,25 @@
 
 - [X] overrides
   - [X] how do overrides work
-  - [x] inheritance:
-- [ ] peerOverrides:
-  - [ ] special spec `local` -> use whatever version definer of override uses
-- [ ] `--legacy-peer-deps`
-  - [ ] how is the tree affected?
-  - [ ] if one of my deps was developed with `--legacy-peer-deps` because it could not satisfy a requested peer, will i even be able to use it without the `--legacy-peer-deps` flag, and how would that work?
-- [ ] error message and warning
+  - [x] inheritance
 - [x] "optional-peers"
 - [x] should semver-check on peers accept pre-releases?
   - [x] pre-release might cause unintended side-effects with unrelated deps,
     targeted override doesn't affect other packages which have that same
     peer-spec
+    
+- [ ] `--legacy-peer-deps`
+  - [ ] how is the tree affected?
+  - [ ] if one of my deps was developed with `--legacy-peer-deps` because it could not satisfy a requested peer, will i even be able to use it without the `--legacy-peer-deps` flag, and how would that work?
+- [ ] peerOverrides:
+  - [ ] special spec `local` -> use whatever version definer of override uses
+  - [ ] adress concerns and explain resolution and inheritance
+- [ ] error message, warnings etc.
+  - [ ] warnings
+    - nodeJS like error-message
+    - only emit warning for overrides defined at the root level
+  - [ ] commands
+    - `npm list overrides`
     
 # Peer-Dependency Overrides
 
