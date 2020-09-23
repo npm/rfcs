@@ -107,14 +107,4 @@ It's less than ideal and complicates publishing, to name a few issues:
   same effect. Instead, this proposal omits the need for a new field and
   leverages the already well-known and used `{ "optional": true }`.
 
-## Unresolved Questions and Bikeshedding
-
-- Is this the best option to move forward? Should `{ "autoinstall": false }` be
-  implemented instead?
-
-- Are pnpm and Yarn able to follow this implementation? cc/ @arcanis, @zkochan
-
-- Can a solution be implemented before npm v7 is final? It would be a breaking
-  change to alter the current behavior afterward.
-
 [0025-install-peer-deps]: https://github.com/npm/rfcs/blob/latest/accepted/0025-install-peer-deps.md
