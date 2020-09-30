@@ -13,7 +13,11 @@ Allows the user to request and receive an audit result for a package that has no
 
 ## Detailed Explanation
 
-To query audit information on a specific package the `view` command is extended with an `--audit` parameter. The CLI would then query the `advisory endpoint` and get a full advisory for the specified package and version as well as its dependencies. The advisory is similar to `npm audit`, but references to `npm audit fix` can be omitted. 
+To query audit information on a specific package the `audit` command is extended with an optional package parameter. `npm audit typescript` would fetch audit information for the typescript package. 
+
+Addtionally, the  `view` command is extended with audit information too. This can be skipped with a parameter called `--no-audit` like during `install`.
+ 
+The CLI would query the `advisory endpoint` and get a full advisory for the specified package and version as well as its dependencies. The advisory is similar to `npm audit`, but references to `npm audit fix` can be omitted. It should also output the version of the package that was queried. 
 
 ## Rationale and Alternatives
 
@@ -33,4 +37,4 @@ To query audit information on a specific package the `view` command is extended 
 
 {{Write about any arbitrary decisions that need to be made (syntax, colors, formatting, minor UX decisions), and any questions for the proposal that have not been answered.}}
 
-{{THIS SECTION SHOULD BE REMOVED BEFORE RATIFICATION}}
+Do we need to distinguish between locally installed packages and not yet installed packages?
