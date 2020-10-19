@@ -4,7 +4,8 @@
 
 Detect unresolvable `peerDependencies` in packages being installed, and
 provide mechanisms for users to decide whether this should be treated as a
-failure or a warning.
+failure or a warning, with defaults that surface errors with minimal
+disruption to existing workflows.
 
 ## Motivation
 
@@ -267,7 +268,7 @@ at the peer set creation stage of the process:
 It is possible for a peer set to conflict with an existing non-peer
 dependency in the tree in the only location where it can be placed.  In
 these cases, we prioritize the non-peer dependency over the peers in the
-peer set.
+peer set, unless the non-peer dependency can be nested deeper in the tree.
 
 Example 1:
 
@@ -303,16 +304,52 @@ However, it is important to note the conflict with the peer set when
 attempting to place the `(y@1, z@1)` peer set, so that it can be
 placed deeper in the tree, underneath `x@1`.
 
-When a conflict cannot be resolved correctly, as in Example 1 above, do the
-following:
+Sometimes, a non-peer dependency will have been placed more shallowly in
+the tree than is strictly necessary, as part of npm's "maximally naive
+deduplication" tree generation algorithm.  For example:
+
+```
+root -> (x@1)
+x -> (y@1)
+```
+
+This will result in the following dependency tree on disk:
+
+```
+root
++-- x@1
++-- y@1
+```
+
+If we then were to add a package `z@1` with a peer dependency on `y@2`,
+then we _must_ place `y@2` in the root `node_modules` folder.
+
+```
+root -> (x@1, z@1)
+x@1 -> (y@1)
+z@1 -> PEER(y@2)
+```
+
+And thus prioritize the peer dependency over the non-peer dependency
+because it can be nested, resulting in this dependency tree:
+
+```
+root
++-- x@1
+|   +-- z@1
++-- y@1
++-- z@2
+```
+
+When a conflict cannot be resolved correctly, as in the examples above, do
+the following:
 
 - **Strict mode**: Raise an error and halt the ideal tree building process.
 - **Force mode**: Warn about the conflict.  Skip the conflicted peer
   dependency, and keep the non-peer dependency.
-- **Non-strict mode**: If the source of the conflicted non-peer dependency
-  is the root project, then raise an error and halt the process.  If it is
-  not, then raise a warning about the conflict and proceed as with force
-  mode.
+- **Non-strict mode**: If the source of the conflicted dependency is the
+  root project, then raise an error and halt the process.  If it is not,
+  then raise a warning about the conflict and proceed as with force mode.
 
 #### Peer Set Conflicts with Peer Dependency in Tree
 
@@ -369,13 +406,16 @@ the only place where its dependencies can be placed, causing the conflict.
 
 ### Summary
 
-In all cases, conflicts will _at least_ generate a warning.  The behavior
-can be summarized as:
+In all cases, conflicts will _at least_ generate a warning if a correct
+package tree cannot be calculated.  The behavior can be summarized as:
 
-- **Strict mode**: Enforce all peer dependency contracts fully, and fail to
-  build a dependency tree when this is not possible.
+- **Strict mode**: Enforce all peer dependency contracts fully, at all
+  levels, and fail to build a dependency tree when this is not possible.
+  Do not install dependencies which have conflicts within their
+  dependencies, even if these conflicts could potentially be resolved.
 - **Force mode**: Guarantee that _some_ dependency solution will be generated,
-  albeit one that might be incorrect, even arbitrarily so.
+  albeit one that might be incorrect, even arbitrarily so, even if the
+  problem is the fault of the root project.
 - **Non-strict mode**: Enforce peer dependency contracts in the root
   project, and allow violations of those contracts deeper in the dependency
   graph, choosing the best solution possible.
@@ -391,7 +431,8 @@ position to fix.
 Another approach would be to allow _all_ peer dependency conflicts,
 effectively defaulting to "force" mode at all times.  However, this would
 result in incorrect package trees being installed without explicit user
-consent, when the user is in a position to correct the error.
+consent or knowledge, even when the user is in a position to correct the
+error.
 
 By effectively behaving in "strict" mode whenever we are dealing with a
 package's _own_ direct dependencies, we surface the problems where they can
@@ -404,15 +445,15 @@ potentially hazardous, but more disruptive, and violates the npm design
 principle of only erroring on cases that the user can reasonably be
 expected to fix.
 
-Since the previous behavior in such cases would have been to install _no_
-peer dependency in those cases, the current proposal is not any worse than
-the previous behavior.  By erroring in cases caused by the root project, we
-guide the npm userbase towards more correct use of `peerDependencies`, thus
-reducing the occurrence of these cases over time.
+Since the previous behavior (that is, of npm v2 through v6) in such cases
+would have been to install _no_ peer dependency in those cases, the current
+proposal is not any worse than the previous behavior.  By erroring in cases
+caused by the root project, we guide the npm userbase towards more correct
+use of `peerDependencies`, thus reducing the occurrence of these cases over
+time.
 
 ## Implementation
 
-Review the `_loadPeerSet`, `_problemEdges`, `_canPlace`, and
-`_canPlacePeers` methods in `Arborist.buildIdealTree` to ensure that they
-are detecting the conditions described above, and responding appropriately
-to the settings of the `force` and `strictPeerDeps` options.
+This is implemented in the `_loadPeerSet`, `_problemEdges`, `_canPlace`,
+and `_canPlacePeers` methods in `Arborist.buildIdealTree`, as of npm
+v7.0.2.
