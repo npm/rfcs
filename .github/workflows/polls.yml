@@ -1,0 +1,13 @@
+name: polls
+on:
+  issue_comment:
+    types: [created, edited]
+  issues:
+    types: [opened, edited]
+jobs:
+  polls:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: imjohnbo/gh-polls-bot-action@master
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

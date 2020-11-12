@@ -1,13 +1,13 @@
-# npm RFC Process
+# RFC Process
 
 This document describes the RFC process for the [npm
-CLI](https://github.com/npm/cli), and provides a way for the CLI team and the
+CLI](https://github.com/npm/cli), and provides a way for the [Community & Open Source Team](https://github.com/orgs/npm/teams/cli-team) and the
 wider community to have discussions about the features and direction of the
 package manager! It is based on [the WeAllJS RFC process](https://wealljs.org/rfc-process) and the [Rust RFC process](https://github.com/rust-lang/rfcs), and, by extension, the [Yarn RFC process](https://github.com/yarnpkg/rfcs)
 
 ## What's an RFC?
 
-The name itself is a reference to the IETF's Request For Comments process, and
+The name itself is a reference to the **IETF's Request For Comments** process, and
 basically involves a document or series of documents which are drafted,
 reviewed, and eventually ratified (approved) by the npm team through discussion
 among those interested, both within and outside of the npm team.
@@ -20,12 +20,10 @@ feature requests made there will be redirected to the RFCs repository.
 
 ## How do I create an RFC?
 
-* Fork https://github.com/npm/rfcs.
-* Copy `accepted/0000-template.md` into `accepted/0000-your-rfc-name.md`.
-* Fill in and edit the template with your own proposal.
-* Submit a PR to the `npm/rfcs` repo.
-* Link to the PR in [the RFCs forum on npm.community](https://npm.community/c/ideas/rfcs)
-* Tell all your friends! (don't ping npm folks -- we already get immediately notified about RFCs)
+* Fork https://github.com/npm/rfcs
+* Copy `accepted/0000-template.md` into `accepted/0000-your-rfc-name.md`
+* Fill in and edit the template with your proposal
+* Submit a PR to the `npm/rfcs` repo
 
 ## How does review work?
 
@@ -34,11 +32,6 @@ Anyone, both npm collaborators and non-collaborators, may participate in the
 discussion and ask questions and provide (constructive) feedback. Keep in mind
 that only npm collaborators are able to ratify the RFC itself, even if other
 users can comment.
-
-Side discussion can happen externally, in public or private, with general non-review
-discussion happening in [the RFC category in npm.community](https://npm.community/c/ideas/rfcs),
-where npm collaborators are available for more immediate back-and-forth discussions
-about RFCs and details.
 
 All discussions surrounding an RFC are covered by the [npm Code of
 Conduct](https://www.npmjs.com/policies/conduct). Please keep conversations
@@ -57,8 +50,8 @@ RFC will be considered ratified.
 Until an RFC is ratified, it's expected that its original author continue
 discussing it and integrating feedback into the document until it's ready.
 
-RFCs have a minimum 24 hour waiting period before being accepted or rejected.
-Once an RFC has been reviewed on Github, with all interested collaborators
+RFCs have a **minimum 24 hour waiting period** before being accepted or rejected.
+Once an RFC has been reviewed on GitHub, with all interested collaborators
 having an opportunity to review it, and at least one npm collaborator has signed
 off on the changes, the PR will be accepted and all its connected changes
 merged. There are two exceptions to the collaborator rule:
@@ -85,11 +78,22 @@ integration into the CLI may also be deferred to a later date, or a later
 semver-major CLI release, at the npm collaborators' discretion. All the RFC does
 is communicate the team's consensus to accept a change.
 
+### Implementation
+
 When the changes described in an RFC have been implemented and merged into the
 relevant repository (and thus, due to be released), the corresponding RFC will
 be moved from `accepted/` to `implemented/`. If you'd like to implement an
 accepted RFC, please make a PR in the appropriate repo and mention the RFC in
-the PR. Feel free to do this even for work-in-progress code!
+the PR. Feel free to do this even for work-in-progress code.
+
+### Withdrawal
+
+From time to time npm collaborators will review RFCs awaiting implementation to
+ensure their accuracy and relevance. In cases where a previously ratified RFC is
+deemed to no longer be a viable candidate for implementation, an [**amendment
+section**](withdrawn/0000-template.md) will be added **to the top** of the
+document outlining the reason for repeal and subsequently moved to the
+`withdrawn/` section of this repository.
 
 ## How do I change an RFC after ratification?
 
