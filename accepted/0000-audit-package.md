@@ -14,20 +14,21 @@ Allows the user to request and receive an audit result for a package that has no
 ## Detailed Explanation
 
 To query audit information on a specific package the `audit` command is extended with an optional package parameter. `npm audit typescript` would fetch audit information for the typescript package. 
-
-Addtionally, the  `view` command is extended with audit information too. This can be skipped with a parameter called `--no-audit` like during `install`.
  
-The CLI would query the `advisory endpoint` and get a full advisory for the specified package and version as well as its dependencies. The advisory is similar to `npm audit`, but references to `npm audit fix` can be omitted. It should also output the version of the package that was queried. 
+The CLI would query the `advisory endpoint` and get a full advisory for the specified package and version as well as its dependencies. The advisory is similar to `npm audit`, but references to `npm audit fix` should be changed to only give users indication if the vulnerabilities can be fixed. It should also output the version of the package that was queried. 
 
 ## Rationale and Alternatives
 
-* An alternative would be to provide this information on the package detail page in on npmjs.com, but this would probably be harder to implement (since data would need to be cached) and it might be taken as "blame" by package authors. 
+* An alternative would be to provide this information on the package detail page in on npmjs.com, but this would probably be harder to implement (since data would need to be cached) and it might be taken as "blame" by package authors. However, this could be explored in a different RFC. Developers should be able to query this information with the CLI too. 
 
 ## Implementation
 
-{{Give a high-level overview of implementation requirements and concerns. Be specific about areas of code that need to change, and what their potential effects are. Discuss which repositories and sub-components will be affected, and what its overall code effect might be.}}
+* Extend npm audit endpoint to allow querying for a specific package and version. 
+* Possibly extend aborist to allow to query a single package.
+* Extend `npm-audit-report` with a readonly mode, which would change the output of available fixes to something that would signal to the user that a vulnerability can be fixed. 
+* Modify `lib/audit.js` of the CLI to introduce the new command. 
 
-{{THIS SECTION IS REQUIRED FOR RATIFICATION -- you can skip it if you don't know the technical details when first submitting the proposal, but it must be there before it's accepted}}
+
 
 ## Prior Art
 
