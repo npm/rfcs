@@ -170,7 +170,7 @@ $ tree
 └── packages
     ├── workspace-a
     ├── workspace-b
-    └─ worspace-c
+    └── workspace-c
         └── node_modules
             └── workspace-b@1.0.0
 ```
@@ -279,9 +279,9 @@ During the discussions around this RFC it was brought up to our attention that a
 - **dependent**: A package which depends on another given package.
 - **symlink**: A [symbolic link](https://en.wikipedia.org/wiki/Symbolic_link) between files.
 - **[globs](https://en.wikipedia.org/wiki/Glob_(programming))**: String patterns that specifies sets of filenames with special characters.
-- **[Arborist](https://github.com/npm/arborist)**: The npm@7 install library
+- **[Arborist](https://github.com/npm/arborist)**: The npm@7 install library.
 - **hoisting packages**: Bringing packages up a level in the context of an installation tree.
-- **[scripts](https://docs.npmjs.com/misc/scripts)**: Arbitrary and lifecycle scripts defined in a `package.json`
+- **[scripts](https://docs.npmjs.com/misc/scripts)**: Arbitrary and lifecycle scripts defined in a `package.json`.
 
 
 ## Prior Art
