@@ -24,6 +24,57 @@ be done at install time due to needing to constrain usage of lifecycle scripts.
 
 ## Detailed Explanation
 
+### Defaults should be permissive
+
+In order to prevent backwards incompatibility from packages lacking
+`"permissions"` the default behavior should be to accept all ambient permissions
+and to not perform integrity checks at runtime. This would allow for packages
+to continue to run if users are willing to install them without `"permissions"`.
+
+### Listing modules needing integrity checks
+
+It isn't feasible to know this, with default permissiveness it shouldn't be checked.
+
+A flag to assert integrity on all files would be possible for easy configuration, but it might be too restrictive.
+
+Likely flagging individual files can be left to a follow on.
+### Listing possible packages that could be loaded
+
+A combination of `import`/`require` call sites comparing what is resolved on
+disk and the `node:` built-ins. Can use:
+
+```cjs
+require('module').builtinModules
+```
+
+To determine what valid built-ins are.
+
+Static tools like `tofu` used by `node-policy` might be a way to automatically
+estimate what the expectation is for a permissions field.
+
+### Produce a guide on noise/signal usage for the feature
+
+Avoid CVE prototype pollution style noise/signal ratio somehow.
+
+### Produce usage guides for the produced artifacts.
+
+Example, show the potential to keep an audit log of the permissions that an
+application could duse from the produced `policy.json` file.
+
+Example, show the potential to detect invalid alteration of the program prior
+to running.
+### Produce a set of best practices
+
+- Why have a policy file outside of the current directory?
+
+Explain need for --policy-integrity to avoid mutation of policy file causing a
+privilege escalation. Explain denial of service if policy file is modified.
+
+### Produce a tool for authors to get estimated field value
+
+Some workflow that can be done as a PR bot, cli prior to publishing, and/or
+Github action to ease package authors enabling the field should exist.
+
 {{Describe the expected changes in detail, }}
 
 ## Rationale and Alternatives
