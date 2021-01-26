@@ -2,7 +2,7 @@
 
 In versions of npm up to v6, the following items are all placed into the
 environment of scripts run for various lifecycle events (install, prepare,
-etc., as well as explicit scripts such as test and start).
+etc., as well as explicit scripts such as `test` and `start`).
 
 - `PATH` Configured to include `.../node_modules/.bin` for current and all
   parent `node_modules` directories.
@@ -50,7 +50,7 @@ which has some problems.
 5. The environment is created anew for every script that's run.  This could
    be optimized further, but as it currently stands, it's pretty
    inefficient.
-6. Lastly, exposing the full configuration and package.json makes the
+6. Lastly, exposing the full configuration and `package.json` makes the
    environment significantly larger, and can lead to problems on
    memory-constrained systems.
 
@@ -86,7 +86,7 @@ have the one-time password provided in the config.
 5. `PATH` will continue to be provided as it currently is, so that scripts
    find their dependencies' executables first.
 
-This makes it easier to find and rely on package.json data, while ensuring
+This makes it easier to find and rely on `package.json` data, while ensuring
 that config defaults are maintained, without blowing up the size of the
 environment for lifecycle processes, or requiring access to the npm config
 subsystem in every npm CLI dependency.
