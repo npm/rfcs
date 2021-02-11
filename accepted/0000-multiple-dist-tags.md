@@ -26,7 +26,7 @@ comma-separated list of tags.
 ## Rationale and Alternatives
 
 One approach is to have postinstall scripts that handle this. This is
-what some maintaners are doing now and it is not very practical because
+what some maintainers are doing now and it is not very practical because
 it is simply working around the limitations of the existing system only
 allowing one tag at a time.  Adding lifecycle methods is less preferable
 to being able to specify the tags all at once when you would be changing
