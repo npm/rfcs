@@ -114,7 +114,9 @@ This category of **npm cli** subcommand is completely unrelated to anything that
 - `whoami`
 - `workspaces`
 
-#### Test example:
+#### Example:
+
+Running tests across all configured **workspaces**:
 
 ```
 ├── package.json { "name": "foo", "workspaces": ["dep-a", "dep-b"] }
@@ -123,7 +125,7 @@ This category of **npm cli** subcommand is completely unrelated to anything that
 └── dep-b
     └── package.json { "version": "1.3.1" }
 
-$ npm test
+$ npm ws test
 
 > foo@1.0.0 test /Users/username/foo
 > echo "Error: no test specified" && exit 1
