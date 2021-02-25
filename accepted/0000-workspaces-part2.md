@@ -38,18 +38,13 @@ We identified 5 different categories of subcommands based on how they're expecte
 Commands that, from an user point of view, are the equivalent of: `cd <workspace-name> && npm <cmd>`.
 
 - `docs`
+- `doctor`
 - `diff` Package diff in the context of specific **workspaces**
 - `dist-tag` List dist-tags for specific **workspaces**
-- `exec` Run exec in the context of specific **workspaces**
-- `init` Initialize a new **workspace**
-- `outdated` List outdated **dependencies** including **workspaces** and its **dependencies**
 - `pack` Run pack in the context of specific **workspaces**
 - `publish` Run publish in the context of specific **workspaces**
-- `run-script|restart|start|stop|test` Run arbitrary **scripts** in all **workspaces**, skip any **workspace** that does not have a targetting **script**
 - `repo`
-- `rebuild` Rebuild all **workspaces**
 - `set-script`
-- `update` Updates a **dependency** across the entire installation tree, including **workspaces**
 - `unpublish`
 - `version` Run version in the context of specific **workspaces**
 - `view` View registry info, also including **workspaces**
@@ -64,6 +59,7 @@ General class of helper commands that load from the installed tree to produce so
 - `explain`
 - `fund` List funding info for all **workspaces**
 - `ls` List all packages including **workspaces**
+- `outdated` List outdated **dependencies** including **workspaces** and its **dependencies**
 
 ##### 2.2. Modify installed dependency tree
 
@@ -75,12 +71,18 @@ The set of commands that will modify an install tree (from an implementer point 
 - `install-test`
 - `install`
 - `link`
+- `rebuild` Rebuild all **workspaces**
+- `update` Updates a **dependency** across the entire installation tree, including **workspaces**
 - `uninstall`
 - `update`
 
 ##### 2.3. Other
 
 A command that needs a special/custom workspace-aware implementation outside of the context of reading/writing to the install tree (using **Arborist**).
+
+- `exec` Run exec in the context of specific **workspaces**
+- `init` Initialize a new **workspace**
+- `run-script|restart|start|stop|test` Run arbitrary **scripts** in all **workspaces**, skip any **workspace** that does not have a targetting **script**
 
 #### 3. Unsupported
 
@@ -93,7 +95,6 @@ This category of **npm cli** subcommand is completely unrelated to anything that
 - `completion`
 - `config|get|set`
 - `deprecate`
-- `doctor`
 - `edit`
 - `explore`
 - `help`
