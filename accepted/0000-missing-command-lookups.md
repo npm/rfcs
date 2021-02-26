@@ -13,7 +13,7 @@ npm tsc
 
 I have two main motivations:
 
-- Personal, looking at the list of yarn commands I [use in an average month](https://gist.github.com/orta/489dbfa1b7467804955ea7800adf1494#file-last_month_yarn-txt) (1200) roughly 30% (400) of those commands are using the shorthand syntax to run a command installed into `node_modules/.bin` in a project.
+- Personal, looking at the list of yarn commands I [use in an average month](https://gist.github.com/orta/489dbfa1b7467804955ea7800adf1494#file-last_month_yarn-txt) (1200) roughly 30% (400 (^1)) of those commands are using the shorthand syntax to run a command installed into `node_modules/.bin` in a project.
 
 - Professional, it'd be great for the TypeScript docs to be able to simply say: `npm install typescript --save-dev' then `npm tsc index.ts` and there to be no ambiguity like our current recommendation for `npx tsc index.ts`.
 
@@ -56,8 +56,7 @@ Alternative to:
 
 ## Implementation
 
-I'm not sure on why so many npm commands on npm require the `--`.
-It feels like an internal abstraction (given that it had to be added to `npm exec` in npm 7) but I'd still advocate for it's removal here. `npm -- tsc` is a strange command to write. 
+I think the biggest question is the `--` below.
 
 ## Prior Art
 
@@ -68,3 +67,7 @@ Yarn does this, Berry does this and PNPM has indicated they're open to supportin
 I assume npm uses `--` to match the [unix format](https://unix.stackexchange.com/questions/11376/what-does-double-dash-mean) but I'd still advocate for it's removal here. `npm -- tsc` is a strange command to write, and the intention is quite obvious (given that npx also went with the same decision)
 
 I assume there are flags to npm which you may want to be able to include e.g. `npm --registry-something=mything.com deploy`. Which would call `npm deploy` after those options are set. I  assume that the npm client knows all of these commands ahead of time, and can either remove those before looking up the script/bin, or we can assume that any string beginning with `-` won't be a script/binary.
+
+---
+
+^1 - I basically just removed any traditional command, then slowly dropped anything which idn't look like it used a script or binary. Then rounded down to =assume there would be a bunch of exceptions.
