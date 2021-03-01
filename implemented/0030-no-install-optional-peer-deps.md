@@ -107,4 +107,4 @@ It's less than ideal and complicates publishing, to name a few issues:
   same effect. Instead, this proposal omits the need for a new field and
   leverages the already well-known and used `{ "optional": true }`.
 
-[0025-install-peer-deps]: https://github.com/npm/rfcs/blob/latest/accepted/0025-install-peer-deps.md
+[0025-install-peer-deps]: https://github.com/npm/rfcs/blob/latest/implemented/0025-install-peer-deps.md
