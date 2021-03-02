@@ -38,14 +38,14 @@ However, this does not address the following use cases:
   packages.
 
 - Alias package specifiers cannot point to any registries other than the
-  primary `--registry` configuration.  It would be useful in many scenarios
-  to be able to alias a package to a copy found on a different registry.
+  primary `--registry` configuration.  It would be useful in some scenarios
+  to be able to alias a package to a copy found on a different registry, or
+  to use aliases to multiple different registries at the same time.
 
-- Migrating packages from one registry to another is particularly
-  challenging, requiring downloading the tarball locally and then
-  re-uploading it.  It would be much simpler to script such migrations by
-  being able to do `npm publish <pkg from src registry> --registry=<dest
-  registry>`.
+- Migrating packages from one registry to another can be challenging,
+  requiring downloading the tarball locally and then re-uploading it.  It
+  would be much simpler to script such migrations by being able to do `npm
+  publish registry:https://source#pkgname --registry=https://destination/`.
 
 - Using multiple different registries in the best of cases always requires
   using a `.npmrc` file for configuration, which is a challenge in some
@@ -88,12 +88,12 @@ to `registry:https://registry.npmjs.org#foo@latest`.
 ### Deduping
 
 Two packages with the same name and version which come from different
-registries *must not* be deduped against one another unless:
+registries *must not* be deduplicated against one another unless:
 
 - If either has a defined `integrity` value, then their `integrity` values
   must match.
 - If neither has a defined `integrity` value, they will be considered
-  dedupable if their `resolved` values match (for example, `registry-a`
+  deduplicable if their `resolved` values match (for example, `registry-a`
   lists the tarball in `registry-b` as its `dist.tarball` url.)
 
 ### Specifying Package Name
@@ -107,6 +107,25 @@ For example, `foo@registry:https://url.com#foo@1.x` is acceptable.
 
 This avoids the hazards of attempting to infer whether the `hash` portion
 of the url is a SemVer, dist-tag, or package name.
+
+### Meta-Dependency Resolution
+
+When a package is installed from a `registry` specifier, its dependencies
+should in turn also be fetched from the registry in the specifier, falling
+back to the main configured registry if they are not found.
+
+In most cases, a package will be published to a given registry with the
+expectation that its dependencies will be found in the same registry, ie by
+doing `npm install pkgname --registry=https://internal-registry.com`.
+
+If a package's dependencies are instead fetched from the default configured
+registry, then this expectation would be contradicted.
+
+Thus, any package resolved via a `registry` specifier _must_ have its
+dependencies in turn resolved against the same registry that it came from.
+Note that they _may_ still be deduplicated against packages by the same
+name from other registries, but only if the integrity values match
+(indicating that they are identical content).
 
 ### Examples:
 
@@ -146,6 +165,14 @@ specifiers in their dependencies will fail to install on older npm versions
 that do not support the new spec type, so there is no chance of fetching
 from the _wrong_ registry.
 
+The main hazard imposed by this proposal is that, if the specified registry
+is unreachable, it cannot be installed.  Packages may be published to the
+public registry that reference a registry only accessible to certain people
+or at certain times.  However, this is no worse than the current situation
+of supporting tarball and git URLs, and at least adds the support for
+version ranges and dist-tags in those cases, and avoids the hazard of
+fetching meta-dependencies from the wrong place.
+
 ## Implementation
 
 - Add support for `registry:` specifiers in `npm-package-arg` module.  **This
@@ -154,7 +181,19 @@ from the _wrong_ registry.
 - Upgrade all modules depending on `npm-package-arg` to ensure that they
   will behave properly with `registry:` specifiers.  (Note: this is most of
   npm.)
+- Track the "specifier registry" in Arborist's `buildIdealTree`
+  implementation, so that subsequent dependencies are fetched from the
+  appropriate registry.
 
 ## Prior Art
 
 Alias specifiers already present in npm.
+
+URL and git specifiers.
+
+## Future Work
+
+A subsequent RFC may add support for mapping registry names to full URLs,
+either in `package.json` or in npm configuration, using a shorter syntax
+that desugars to `registry:` specifiers in much the same way as the `npm:`
+alias specifier.  Registry short names are out of scope for this proposal.
