@@ -101,6 +101,8 @@ There is the potential that when run in interactive mode we can also display a l
 
 Is `where` the best name for this config? What if there are too many conflicts in dependencies?
 
+What would the shortcut be? `-w` will be used for workspaces.
+
 ### `npm config`
 
 Should we prevent a user from setting protected fields like `_auth` or `_token` to a project level config?
