@@ -66,8 +66,8 @@ Proposed behavior of `npm foo` when both a script named `"foo"` and a package na
 npm ERR! unknown command: foo
 npm ERR!
 npm ERR! Did you mean one of these?
-npm ERR!     npm run foo
-npm ERR!     npm exec -- foo
+npm ERR!     npm run foo        # (runs the "foo" script)
+npm ERR!     npm exec -- foo    # (runs the "foo" binary in node_modules)
 ```
 
 The current behavior of `npm exec` is ambiguous enough that implementing these suggestions in a reasonable way there is near impossible. This feature would depend on a proposal such as [#336](https://github.com/npm/rfcs/pull/336) having been implemented in order to be able to avoid the current fallbacks built in to `npm exec`.
@@ -101,4 +101,3 @@ The most similar command is
 ```
 
 ## Unresolved Questions and Bikeshedding
-
