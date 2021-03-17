@@ -46,7 +46,6 @@ Commands that, from an user point of view, are the equivalent of: `cd <workspace
 - `repo`
 - `set-script`
 - `unpublish`
-- `version` Run version in the context of specific **workspaces**
 - `view` View registry info, also including **workspaces**
 
 #### 2. Custom implementation
@@ -83,6 +82,7 @@ A command that needs a special/custom workspace-aware implementation outside of 
 - `exec` Run exec in the context of specific **workspaces**
 - `init` Initialize a new **workspace**
 - `run-script|restart|start|stop|test` Run arbitrary **scripts** in all **workspaces**, skip any **workspace** that does not have a targetting **script**
+- `version` Run version in the context of specific **workspaces**, needs tweaked commit msg, tag
 
 #### 3. Unsupported
 
