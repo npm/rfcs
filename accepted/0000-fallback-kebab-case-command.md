@@ -2,7 +2,7 @@
 
 ## Summary
 
-If the command is unknown, then fallback to the kebab-case version of it if it is in the `PATH`.
+If the command is unknown, then fallback to it prefixed with `npm-` if that is in the `PATH`.
 
 ## Motivation
 
