@@ -30,8 +30,9 @@ All that will have to be done is have a conditional check before the fallback ch
 
 ## Prior Art
 
-N/A
+The prior art to this RFC is `git`. `git` allows you to create a custom command. For example, if you want to create a `git` command called `my-command`, then your would add `git-my-command` as the executable to the `PATH`. Here is a reference on creating custom commands for `git`: http://thediscoblog.com/blog/2014/03/29/custom-git-commands-in-3-steps/
 
 ## Related resources and links
 
-https://github.com/npm/rfcs/pull/332 was related to this proposal
+https://github.com/npm/rfcs/pull/332 was related to this proposal.
+http://thediscoblog.com/blog/2014/03/29/custom-git-commands-in-3-steps/ is a blog article on `git` custom commands.
