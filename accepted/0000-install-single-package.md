@@ -18,6 +18,8 @@ A flag like `npm install <package> --only` could drive installing only the speci
 
 One alternative would be to install everything from `package.json`, then try to figure out repeated dependencies and delete those directories. Besides being very cumbersome, this would *increase* the install time.
 
+Another one would be not declaring common dependencies at all in `package.json`.
+
 ## Implementation
 
 
