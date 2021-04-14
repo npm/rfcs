@@ -30,6 +30,44 @@ to allow them to provide their employees with internally patched or rebuilt
 versions of dependencies. (Current tooling, like Synk, subverts npm's
 expectations in ways that are potentially fragile.)
 
+## Scanario
+
+### "Hot fixes"
+
+A critical security flaw is found in a dependency of one of your
+depenedencies.  The author of the transitive dependency is unavailable to
+provide updates. The package is widely used in your organization, usually
+as a transitive dependency. The ecosystem will eventually switch to another
+module. In the meantime you need some remediation.
+
+You instruct your private registry to provide audit results for the affected
+versions of the module that indicate that a custom patched version is
+available, something like:
+
+```
+{
+    "example": [
+        {
+            "id": 99999,
+            "severity": "high",
+            "title": "Remote Code Execution",
+            "url": "https://npmjs.com/advisories/99999",
+            "vulnerable_versions": "<=3.0.1",
+            "overrides": {
+                "3.0.0": "npm:@company/example-patched@3.0.0"
+            }
+        }
+    ]
+}
+```
+
+This instructs `npm audit fix` to add an overrides section to your `package.json` like:
+
+```
+"overrides": {
+    "example@3.0.0": "npm:@company/example-patched@3.0.0"
+}
+```
 
 ## Implementation
 
@@ -39,15 +77,14 @@ Updating the npm audit report library may be required.
 
 Updating the `npm audit fix` subcommand will be necessary.
 
-Out of scope: Updating the npm audit end point to start giving this advice.
-Obviously that's desirable but that's ultimately a decision for the team
-supporting that end point.
+Out of scope: Updating the npm audit end point to start giving this advice. 
+It may or may not be desirable for the team that provides security advice
+for that end point, but that's ultimately up to them.
 
 ## Unresolved Questions and Bikeshedding
 
 Immediate plans: I (@iarna) intends to implement a proof-of-concept as a
 stand alone tool using yarn and pnpm overrides.
-
 
 1. Details of the changes to audit API endpoint result need to be nailed
 down. There are some requirements and nice-to-haves:
@@ -57,8 +94,11 @@ down. There are some requirements and nice-to-haves:
   2. Older clients should if possible report the new advice when they can't
   apply it.
 
-  3. Long term compatibility should not be at issue as all three major npm
-  clients use the same
+  3. Long term compatibility may not be at issue as all three major npm
+  clients use the same reporting library.  At the same time, it's not clear
+  how easy it will be for other package managers to support npm-audit-report
+  version 2, given that the official documentation is "use arborist" which
+  will be a non-starter for them.
 
-2. Would it be desirable to apply ALL audit fix results as overrides?
+2. ~~Would it be desirable to apply ALL audit fix results as overrides?~~ NO.
 
