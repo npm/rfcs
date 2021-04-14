@@ -30,7 +30,7 @@ to allow them to provide their employees with internally patched or rebuilt
 versions of dependencies. (Current tooling, like Synk, subverts npm's
 expectations in ways that are potentially fragile.)
 
-## Scanario
+## Scenario
 
 ### "Hot fixes"
 
