@@ -35,7 +35,7 @@ expectations in ways that are potentially fragile.)
 ### "Hot fixes"
 
 A critical security flaw is found in a dependency of one of your
-depenedencies.  The author of the transitive dependency is unavailable to
+dependencies.  The author of the transitive dependency is unavailable to
 provide updates. The package is widely used in your organization, usually
 as a transitive dependency. The ecosystem will eventually switch to another
 module. In the meantime you need some remediation.
