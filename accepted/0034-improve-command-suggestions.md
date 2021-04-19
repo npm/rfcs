@@ -1,4 +1,4 @@
-# {{TITLE: Improve command suggestions}}
+# Improve command suggestions
 
 ## Summary
 
@@ -40,6 +40,17 @@ npm ERR!
 npm ERR! Did you mean one of these?
 npm ERR!     npm run test
 npm ERR!     npm exec -- test
+```
+
+An alternative approach, without `exec` reference would be:
+```
+npm ERR! Missing script: "tes"
+npm ERR!
+npm ERR! Did you mean this?
+npm ERR!     npm test # Test a package
+npm ERR!
+npm ERR! To see a list of scripts, run:
+npm ERR!   npm run
 ```
 
 Current behavior of `npm foo` where `foo` is an unknown command:
@@ -99,5 +110,3 @@ git: 'commti' is not a git command. See 'git --help'.
 The most similar command is
 	commit
 ```
-
-## Unresolved Questions and Bikeshedding
