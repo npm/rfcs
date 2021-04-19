@@ -23,19 +23,13 @@ the defined registry:
 
 However, this does not address the following use cases:
 
-- Users publish a package to one registry as a "staging" area, and then
-  later wish to "upgrade" it to the public npm registry for broader
-  distribution.  Some code should fetch from the internal registry (for
-  example, for testing and validation prior to promotion), but this is
-  challenging unless the private registry also can serve _any_ public npm
-  package.
-
 - Users have a set of unscoped package dependencies, some of which come
   from the public registry, and others which have patches applied to them
   (either to the code, or to the packument to add warnings via the
-  `deprecated` field for example).  Again, this is only feasible right now
-  by making the internal registry capable of proxying the entire set of npm
-  packages.
+  `deprecated` field for example).  This can be done by making the registry
+  proxy any packages that are not patched in this way.  However, it becomes
+  challenging when using more than one such registry which serves different
+  purposes.
 
 - Alias package specifiers cannot point to any registries other than the
   primary `--registry` configuration.  It would be useful in some scenarios
@@ -47,11 +41,11 @@ However, this does not address the following use cases:
   would be much simpler to script such migrations by being able to do `npm
   publish registry:https://source#pkgname --registry=https://destination/`.
 
-- Using multiple different registries in the best of cases always requires
-  using a `.npmrc` file for configuration, which is a challenge in some
-  environments, and always adds a layer of indirection.  It would be more
-  straightforward at times to specify the registry right in the
-  package.json file or command line.
+- A tarball or git URL is sometimes the last resort for fetching a
+  dependency.  However, tarball urls cannot support SemVer ranges, and
+  their dependencies will be fetched from the user's configured registry.
+  By specifying a registry where a specific dependency should be found, it
+  is possible to _also_ fetch transitive dependencies from the same source.
 
 ## Detailed Explanation
 
@@ -79,8 +73,8 @@ using a registry specifier.
 
 ### Alias Specifiers
 
-Alias specifiers desugar into registry specifiers with the default
-configured registry url.
+Alias specifiers starting with `npm:` desugar into registry specifiers with
+the default configured registry url.
 
 For example, the alias dependency spec `npm:foo@latest` will be equivalent
 to `registry:https://registry.npmjs.org#foo@latest`.
@@ -106,13 +100,13 @@ For example, `foo@registry:https://url.com#foo@1.x` is acceptable.
 `foo` to the `1.x` package.
 
 This avoids the hazards of attempting to infer whether the `hash` portion
-of the url is a SemVer, dist-tag, or package name.
+of the url is a SemVer, dist-tag, or package name.  It is always a named
+specifier.
 
 ### Meta-Dependency Resolution
 
 When a package is installed from a `registry` specifier, its dependencies
-should in turn also be fetched from the registry in the specifier, falling
-back to the main configured registry if they are not found.
+should in turn also be fetched from the registry in the specifier.
 
 In most cases, a package will be published to a given registry with the
 expectation that its dependencies will be found in the same registry, ie by
@@ -134,7 +128,7 @@ name from other registries, but only if the integrity values match
     ```bash
     # the name may be specified
     npm install forked@registry:https://internal.local#forked
-    # but is not required
+    # but is not required, as with other specifier types
     npm install registry:https://internal.local#name-optional@2.x
     ```
 
@@ -165,13 +159,20 @@ specifiers in their dependencies will fail to install on older npm versions
 that do not support the new spec type, so there is no chance of fetching
 from the _wrong_ registry.
 
+Tarball URLs can be used as dependency specifiers, however:
+
+- They do not support SemVer ranges or dist-tags.
+- The dependencies _of_ a package fetched via a tarball url specifier will
+  be fetched from the configured registry, creating a name collision
+  vulnerability.
+
 The main hazard imposed by this proposal is that, if the specified registry
 is unreachable, it cannot be installed.  Packages may be published to the
 public registry that reference a registry only accessible to certain people
 or at certain times.  However, this is no worse than the current situation
-of supporting tarball and git URLs, and at least adds the support for
-version ranges and dist-tags in those cases, and avoids the hazard of
-fetching meta-dependencies from the wrong place.
+of supporting tarball and git URLs, while adding support for version ranges
+and dist-tags in those cases, and avoids the hazard of fetching
+meta-dependencies from the wrong place.
 
 ## Implementation
 
