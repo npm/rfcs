@@ -335,6 +335,65 @@ user to specify every path on the dependency graph where a module might
 be found.  Furthermore, it is arguably better in most cases to apply
 the override too broadly rather than too narrowly.
 
+### Impact on Deduplication
+
+Because the set of overrides that apply to a given node in the dependency
+graph will affect how its dependencies are resolved, a dependency _must
+not_ be deduplicated against another instance that is subject to different
+override rules.
+
+For example, consider the following dependency graph:
+
+```
+root -> (a@1, b@1)
+a@1 -> c@1
+b@1 -> c@1
+c@1 -> d@1
+```
+
+Without any overrides in place, the tree on disk might look like this, with
+the `c` and `d` dependencies deduplicated:
+
+```
+root
++-- a@1
++-- b@1
++-- c@1
++-- d@1
+```
+
+However, consider the following override rule applied at the root project
+level:
+
+```json
+{
+  "overrides": {
+    "b": {
+      "d": "2"
+    }
+  }
+}
+```
+
+The `b` package will still depend on `c@1`, just like `a`, but the `c@1`
+that it depends on will in turn depend on `d@2` rather than `d@1`.
+
+Thus, the `c` dependency cannot be deduplicated.  The tree on disk would
+look something like this:
+
+```
+root
++-- a@1
++-- b@1
+|   +-- c@1
+|   +-- d@2
++-- c@1
+```
+
+Because the dependency at `root > b > c` has a different set of overrides
+applied, it cannot be deduplicated against the dependency at `root > a >
+c`.
+
 ### No Way to Remove Overrides
 
 There is no way to _remove_ an override for a portion of the tree.  If an
