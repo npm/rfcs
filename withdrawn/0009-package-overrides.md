@@ -1,3 +1,12 @@
+# Withdrawal Amendment
+
+Overridden by
+[0036-overrides](https://github.com/npm/rfcs/blob/latest/accepted/0036-overrides.md).
+
+## Relevant Resources
+
+<https://github.com/npm/rfcs/pull/129>
+
 # Implement a package override option
 
 ## Summary
