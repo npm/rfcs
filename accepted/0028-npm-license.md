@@ -109,12 +109,7 @@ Open-source tooling:
 
 ## Unresolved Questions and Bikeshedding
 
-- command naming
 - property naming
 - package.json/audit.json/both
-- interactive triage
-  - should it exist?
-  - what's the DX?
-- log levels of different parts of the proposal
 
 {{THIS SECTION SHOULD BE REMOVED BEFORE RATIFICATION}}
