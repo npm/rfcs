@@ -32,6 +32,13 @@ Since this proposal moves `npm audit` into a wholistic auditing suite rather tha
   - `--no-audit-security` should block **only security auditing**
   - `--no-audit-license` should block **only license auditing**
 
+On action if a module doesn't have a compatible license:
+
+- the `npm audit fix` command *should* search for and implement a replacement if at all possible given the list of allowed/blocked licenses and semver ranges
+- the `npm audit fix --force` command *should* search for and force a replacement if at all possible given the list of allowed/blocked licenses and semver ranges
+- the `npm audit` command *should* report license failures and which versions would "fix" licenses that are blocked but have already been resolved.
+- the audit report on `npm install` should report how many modules do not comply with license requirements
+
 
 <!-- Old "Detailed Explanation" - saved for context while drafting.
 - It should be possible to get a full report of the licenses from all dependencies.
