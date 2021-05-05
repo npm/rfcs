@@ -14,6 +14,26 @@ Given that this is something that a non-trivial number of users care about _and_
 
 ## Detailed Explanation
 
+### Dependency implementation:  
+
+- Add a dependency on [licensee](https://www.npmjs.com/package/licensee)
+- Follow the licensee API, with some modifications
+  - CLI configuration and commands are aliased to `npm audit license <flags/arguments>` rather than the `licensee` command
+  - JSON configuration can either exist in `package.json` under the `audit` property (as an object) in a `licenses` property (as an object), with the same API **or** under the `licenses` (as an object) property in a file named `audit.json`
+    - one of the two should take precident over the other if duplication occurs. My preference would be package.json but I can understand why others would disagree and do not hold this opinion strongly.
+
+### Additional commands and flags:
+
+Since this proposal moves `npm audit` into a wholistic auditing suite rather than just focusing on security, there would need to be additional commands and flags to limit specific features of audit in addition to expanding the scope of the existing flags:
+
+  - `npm audit security` should be added for consistency. This would replicate the current `npm audit` behavior, auditing dependencies for known security vulnerabilities.
+  - `npm audit` would now run both `npm audit security` and `npm audit license`
+  - `--no-audit` now blocks `npm audit` which encompasses all audits
+  - `--no-audit-security` should block **only security auditing**
+  - `--no-audit-license` should block **only license auditing**
+
+
+<!-- Old "Detailed Explanation" - saved for context while drafting.
 - It should be possible to get a full report of the licenses from all dependencies.
   - This should be runnable from a single command: `npm audit licenses`
     - Offline (default)
@@ -44,6 +64,7 @@ Given that this is something that a non-trivial number of users care about _and_
       - This report should collect all licenses via the `license` properties from `package.json` files in `node_modules`, filtering out any licenses that are in `allow` and  `block` in addition to any licenses or modules in `ignore`, and provide the user the option to `allow`, `block`, or `ignore` the license, one by one.
     - Online (`--online`)
       - This report should collect all licenses via the `license` properties from `package.json` files from a resolved dependency tree without needing the modules on disk, filtering out any licenses that are in `allow` and  `block` in addition to any licenses or modules in `ignore`, and provide the user the option to `allow`, `block`, or `ignore` the license, one by one.
+-->
 
 ## Rationale and Alternatives
 
@@ -52,7 +73,7 @@ There are a wide array of tools in the ecosystem that have been built to paper o
 Alternatives considered:
 
 - Distinct command within the CLI, outside of audit (`npm license` or `npm compliance`).
-  - Discarded this as it would potentially create further fragmentation where it's potentially unnecessary.
+  - Discarded this as it would potentially create further fragmentation of the npm CLI's user-facing components where it's potentially unnecessary. Further, since this feature only _adds_ to `npm audit`, it should not detract from the experience of those already relying on `npm audit` for security functionality until they opt-in to using licensing functionality.
 - Leave it to the ecosystem.
   - This has been the state of the world for about a decade, and there's still been no excessively positive tooling that's come up and solved all the problems that exist in this space while achieving widespread adoption.
 
@@ -74,7 +95,6 @@ Paid tooling:
 Open-source tooling:
 
 - https://www.npmjs.com/package/license-checker - relatively widely used and similar-ish to what's proposed. Also a requirable module.
-- https://www.npmjs.com/package/licensee - similar-ish to what's proposed. Potentially already used by npm?
 - https://www.npmjs.com/package/license-report - similar-ish to what's proposed.
 - https://www.npmjs.com/package/nlf - similar-ish to what's proposed. Also a requirable module.
 - https://www.npmjs.com/package/npm-license - similar-ish to what's proposed.
