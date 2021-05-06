@@ -25,7 +25,7 @@ Another one would be not declaring common dependencies at all in `package.json`.
 
 ## Prior Art
 
-NPM 6
+npm@6
 
 ## Unresolved Questions and Bikeshedding
 
