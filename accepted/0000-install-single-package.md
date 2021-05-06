@@ -2,7 +2,7 @@
 
 ## Summary
 
-With NPM 6, it was possible to install a single package. [This is no longer the case with NPM 7](https://github.com/npm/cli/issues/3023).
+With npm@6, it was possible to install a single package. [This is no longer the case with npm@7](https://github.com/npm/cli/issues/3023).
 
 ## Motivation
 
