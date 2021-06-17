@@ -1,3 +1,15 @@
+# Withdrawal Amendment
+
+- Current **npm cli** team is unlikely to implement this
+- The proposed change is an undesired change of established semantics of semver and how prereleases are handled
+- **NOTE:** Users looking for this behavior should be steered into using the already existing `save-exact` config option
+
+## Relevant Resources
+
+Withdrawn consensus achieved during the [Wednesday, June 16, 2021 OpenRFC meeting](https://github.com/npm/rfcs/issues/399)
+- Meeting Notes: https://github.com/npm/rfcs/blob/515b8f310eb4605022c8b25849dfc9941f321885/meetings/2021-06-16.md
+- Video Recording: https://youtu.be/N6cEmHKPRfo
+
 # No Caret Ranges for Prerelease Installs
 
 ## Summary
