@@ -1,3 +1,16 @@
+# Withdrawal Amendment
+
+- Managing changelog is considered outside of the scope of the **npm cli**
+- Recently **npm-packlist** no longer force-includes changelog files by default, ref: https://github.com/npm/npm-packlist/commit/2b29fc274bb5096b337d649f1871f7cfee4f9449
+- Long inactive approved RFC
+- Current **npm cli** team is unlikely to implement this
+
+## Relevant Resources
+
+Withdrawn consensus achieved during the [Wednesday, June 16, 2021 OpenRFC meeting](https://github.com/npm/rfcs/issues/399)
+- Meeting Notes: https://github.com/npm/rfcs/blob/515b8f310eb4605022c8b25849dfc9941f321885/meetings/2021-06-16.md
+- Video Recording: https://youtu.be/N6cEmHKPRfo
+
 # Changelog
 
 ## Summary
