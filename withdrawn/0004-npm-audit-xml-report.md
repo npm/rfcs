@@ -1,3 +1,14 @@
+# Withdrawal Amendment
+
+- Current **npm cli** team is unlikely to implement this.
+- **NOTE:** The **npm cli** team would be happy to land this change in case it comes from a community contribution, this withdrawn was based on the fact that this is not remotely closed to being in the roadmap of the current team.
+
+## Relevant Resources
+
+Withdrawn consensus achieved during the [Wednesday, June 16, 2021 OpenRFC meeting](https://github.com/npm/rfcs/issues/399)
+- Meeting Notes: https://github.com/npm/rfcs/blob/515b8f310eb4605022c8b25849dfc9941f321885/meetings/2021-06-16.md
+- Video Recording: https://youtu.be/N6cEmHKPRfo
+
 # Creating a npm audit xml report
 
 ## Summary
