@@ -2,13 +2,13 @@
 
 ## Summary
 
-Add a `preunpack` life cycle script that runs before anything else.
+Add a `preunpack` life cycle script that runs before unpack.
 
 ## Motivation
 
 npm v7 introduced a new order of running the `preinstall` script, where it runs **after** dependencies are installed, breaking backward compatibility with packages expecting to run a script **before** dependencies are installed.
 
-By introducing a new life cycle script that will run first in the execution order, we can give a path forward to packages that require a script to run **before** dependencies are installed.
+By introducing a new life cycle script that will run first in the execution order on `unpack` events, we can give a path forward to packages that require a script to run **before** dependencies are installed.
 
 Use cases:
 
@@ -17,7 +17,9 @@ Use cases:
 
 ## Detailed Explanation
 
-A `preunpack` life cycle script that is **first** in execution order:
+A `preunpack` life cycle script that run **first** in execution order on installs (`unpack`).
+
+Examples of when `preunpack` would execute:
 
 * Runs on local `npm install` without any arguments
 * Runs on non-local `npm install` (from a package being unpacked)
