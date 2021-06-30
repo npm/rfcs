@@ -68,16 +68,18 @@ During `npm install`:
 - Fetch package versions satisfying the semver range
 - Get the current Node.js version (`process.version`). If there is an `engines.node` field in the root package, this overrides the value from `process.version`.
 - Find the highest which supports the current Node.js version.
-  - If there is none, fallbback to the current behaviour (install the highest available, or fail if `--engine-strict` is set).
+  - If there is none, fallback to the current behaviour (install the highest available, or fail if `--engine-strict` is set).
   - If there are valid versions for this Node.js version, install the highest of those.
 
 This will apply all the way down the tree.
+
+A package is defined as supporting a Node.js version if it does not define any `engines.node` constraint, or defines an `engines.node` constraint that is satisfied by that version.
 
 During `npm ci`, the current behaviour should be retained (install exactly from lockfile). The engine-aware behaviour will only be activated when using `npm install`.
 
 ## Prior Art
 
-- In the PHP world, Composer will not install any packages that have their `config.platform.php` set to a higher range than your PHP version.
+- In the PHP world, Composer does this—it will look for package versions with a declared `php` constraint that match your local version, or with no `php` constraints at all. You can override your "local version" with the `config.platform.php` field, similar to `engins.node`.
 
 ## Unresolved Questions and Bikeshedding
 
