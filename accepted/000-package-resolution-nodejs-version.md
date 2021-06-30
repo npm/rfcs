@@ -19,9 +19,13 @@ A good use case for this is to allow "progressive upgrades":
 
 Right now, npm always installs the highest available version of the package, even if it isn't supported on my Node.js version, making this hard.
 
+## Detailed Explanation
+
+npm should take the current Node.js version into consideration when determining valid package versions to install.
+
 For instance, Mocha v9 [dropped support for Node.js 10.x](https://github.com/mochajs/mocha/pull/4633) (using the `engines` field). However, in my library, Node.js 10.x is still supported for end users, so I'd like to use Mocha v8 to run tests on Node.js 10.x and v9 on 12.x. There are no major API changes, so this should be easy to do.
 
-However, specifying a semver range like `"mocha": "^8.0.0 || ^9.0.0"` doesn't work. npm happily installs v9 even on Node.js 10.x (although it outputs a warning):
+Currently, specifying a semver range like `"mocha": "^8.0.0 || ^9.0.0"` doesn't work. npm happily installs v9 even on Node.js 10.x (although it outputs a warning):
 
 ```
 ❯ npm i
@@ -48,9 +52,7 @@ npm ERR! notsup Required: {"node":">= 12.0.0"}
 npm ERR! notsup Actual:   {"npm":"7.17.0","node":"v10.24.1"}
 ```
 
-## Detailed Explanation
-
-npm should take the current Node.js version into consideration when determining valid package versions to install. In the example above, npm should install Mocha v8 when on Node.js 10.x, and Mocha v9 when on Node.js 12.x.
+The goal is to change this so that, on Node.js 10.x, version 8 is installed instead in both cases.
 
 ## Rationale and Alternatives
 
@@ -62,13 +64,14 @@ Both these options are clunky, as they involve either manual work or additional 
 
 ## Implementation
 
-During install:
+During `npm install`:
 - Fetch package versions satisfying the semver range
 - Get the current Node.js version (`process.version`). If there is an `engines.node` field in the root package, this overrides the value from `process.version`.
 - Find the highest which supports the current Node.js version.
   - If there is none, fallbback to the current behaviour (install the highest available, or fail if `--engine-strict` is set).
   - If there are valid versions for this Node.js version, install the highest of those.
 
+This will apply all the way down the tree.
 
 During `npm ci`, the current behaviour should be retained (install exactly from lockfile). The engine-aware behaviour will only be activated when using `npm install`.
 
