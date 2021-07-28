@@ -37,7 +37,7 @@ Further, this creates an additional cascading signal of _validity_ when the main
     - these should probably be sent to the server to be filtered server-side and enable smaller responses.
   - the UI should also display if an assertion has been made, and what that assertion is.
   - `--json` should include assertions, if any exist.
-- They adition of `npm audit assert` will require some kind of change to the server that serves the information that powers `npm audit`. Specifically, this information will need to be acceptted when `npm audit assert` is run, and returned with `npm audit` information. Additionally, depending on how this is implemented, this might reduce the number of requests made and data returned to end-users. Specifically, if the CLI assumes by default that users want to ignore vulnerabilities that have been marked as `--impactful=false` by transitive (or direct) dependencies **and** that is sent to the server, the server can return only what's needed rathter than the full set of data.
+- The addition of `npm audit assert` will require some kind of change to the server that serves the information that powers `npm audit`. Specifically, this information will need to be accepted when `npm audit assert` is run, and returned with `npm audit` information. Additionally, depending on how this is implemented, this might reduce the number of requests made and data returned to end-users. Specifically, if the CLI assumes by default that users want to ignore vulnerabilities that have been marked as `--impactful=false` by transitive (or direct) dependencies **and** that is sent to the server, the server can return only what's needed rather than the full set of data.
 
 ## Rationale and Alternatives
 
