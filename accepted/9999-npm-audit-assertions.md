@@ -5,7 +5,7 @@
 A mechanism for module maintainers to assert that their modules are not impacted by advisories.
 
 ```
-npm audit assert --module=<module-name> --id=<advisory identifier> --impactful=<boolean>
+npm audit assert --module=<module-name> --id=<advisory identifier> --impactful=<boolean> --comment=<string with reasoning>
 ```
 
 ## Motivation
@@ -21,13 +21,15 @@ Further, this creates an additional cascading signal of _validity_ when the main
 ## Detailed Explanation
 
 - `npm audit assert` will be added with the following arguments:
-  - `--module=<module-name>` where `<module-name>` is the name of the module having an assertion made. If I was a maintainer of `fastify` and wanted to make an assertion about it, I'd use `--module=fastify`.
-  - `--id=<advisory identifier>` is the identifier of the advisory that impacts my module that I'm making an assertion about. As a hypothetical maintainer of `fastify` wanting to make to make an assertion about the npm advisory `1726`, I'd use `--id=1726`. This also potentially allows for future expansion into other identifiers. For example, if I wanted to make an assertion about `CVE-2021-28562` advisory, I'd use `--id=CVE-2021-28562`. I'd love to see namespacing, like `npm-1726`, but I could understand why people might be against that.
-  - `--impactful=<boolean>` this should just be `true` or `false`. If it's `true`, then an assertion is made that the advisory is impactful to the module passed to `--module`. If it's `false`, then an assertion is made that the advisory is not impactful to the module passed to `--module`.
+  - `--module=<module-name>` **(required)** where `<module-name>` is the name of the module having an assertion made. If I was a maintainer of `fastify` and wanted to make an assertion about it, I'd use `--module=fastify`.
+  - `--id=<advisory identifier>` **(required)** is the identifier of the advisory that impacts my module that I'm making an assertion about. As a hypothetical maintainer of `fastify` wanting to make to make an assertion about the npm advisory `1726`, I'd use `--id=1726`. This also potentially allows for future expansion into other identifiers. For example, if I wanted to make an assertion about `CVE-2021-28562` advisory, I'd use `--id=CVE-2021-28562`. I'd love to see namespacing, like `npm-1726`, but I could understand why people might be against that.
+  - `--impactful=<boolean>` **(required)** this should just be `true` or `false`. If it's `true`, then an assertion is made that the advisory is impactful to the module passed to `--module`. If it's `false`, then an assertion is made that the advisory is not impactful to the module passed to `--module`.
+  - `--comment=<string>` **(required)** is a comment that, if false, explains why the vulnerability cannot be exploited and, if true, explains why the vulnerability can be exploited.
 - `npm audit` will need to be updated to both consume additional data and provide additional filters.
   - by default, `npm audit` should
     - surface advisories that have no assertions or `--impactful=true` assertions
     - ignore advisories that have `--impactful=false` assertions, **presuming** there are no alternative paths to the advisories that have no assertions or `--impactful=true` assertions
+    - display maintainer-provided comments when an assertion has been made.
   - the `--assertions` flag should be added
     - it should take the following values:
       - `only`: only show the advisories that have have assertions, `true` or `false`
