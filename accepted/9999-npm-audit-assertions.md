@@ -5,7 +5,7 @@
 A mechanism for module maintainers to assert that their modules are not impacted by advisories.
 
 ```
-npm auidit assert --module=<module-name> --id=<advisory identifier> --impactful=<boolean>
+npm audit assert --module=<module-name> --id=<advisory identifier> --impactful=<boolean>
 ```
 
 ## Motivation
