@@ -40,6 +40,7 @@ Further, this creates an additional cascading signal of _validity_ when the main
   - the UI should also display if an assertion has been made, and what that assertion is.
   - `--json` should include assertions, if any exist.
 - The addition of `npm audit assert` will require some kind of change to the server that serves the information that powers `npm audit`. Specifically, this information will need to be accepted when `npm audit assert` is run, and returned with `npm audit` information. Additionally, depending on how this is implemented, this might reduce the number of requests made and data returned to end-users. Specifically, if the CLI assumes by default that users want to ignore vulnerabilities that have been marked as `--impactful=false` by transitive (or direct) dependencies **and** that is sent to the server, the server can return only what's needed rather than the full set of data.
+  - This should hit a registry endpoint that is routed through the registry the user has defined. This should be done with both the explicit goal of allowing push/pull of _internal_ assertions, provided that the regsitry the user is talking to support this, and enabling third-party registries to cache the assertions on the public registry.
 
 ## Rationale and Alternatives
 
