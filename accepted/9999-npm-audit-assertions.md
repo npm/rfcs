@@ -64,3 +64,6 @@ I've not seen other tools doing this, but I would be surprised if there's not pr
 - The potential values for the `--assertions` filter on `npm audit` could probably be bikeshedded a bit. I'm unattached to the names.
 - UI in `npm audit` outpit could be bikeshedded as well.
 - It would be cool if there was the ability to have multiple maintainers run `npm audit assert` for a given `id` and surface that _multiple_ people signed off on the assertion as a way to begin combatting some forms of social engineering attacks we've seen in the past, but that might be too complex for now.
+- There's some need for granularity that is not presently defined by this RFC. Choosing how to address that is... likely necessary.
+  - semver ranges, dep type (direct, dev, optional, peer), binary impact vs. non-binary impact, and more.
+- There's been an expressed desire for trusting third-parties *outside* of direct maintainers to provide asssertions. This should be discussed.
