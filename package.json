@@ -1,0 +1,28 @@
+{
+  "name": "rfcs",
+  "version": "1.0.0",
+  "description": "npm CLI rfcs",
+  "main": "index.js",
+  "scripts": {
+    "create-agenda": "node ./scripts/create-agenda.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/npm/statusboard.git"
+  },
+  "keywords": [],
+  "author": "npm Inc. <support@npmjs.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/npm/rfcs/issues"
+  },
+  "homepage": "https://github.com/npm/rfcs#readme",
+  "dependencies": {
+    "@actions/github": "^4.0.0",
+    "@octokit/graphql": "^4.5.1",
+    "@octokit/rest": "^18.0.1",
+    "dotenv": "^8.2.0",
+    "handlebars": "^4.7.6",
+    "node-fetch": "^2.6.1"
+  }
+}
