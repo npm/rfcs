@@ -8,6 +8,8 @@ A mechanism for module maintainers to assert that their modules are not impacted
 npm audit assert --module=<module-name> --id=<advisory identifier> --impactful=<boolean> --comment=<string with reasoning>
 ```
 
+There are a number of previous, alternative, and related initiatives. Some of these initiatives are complentary, and others are entirely incompatible. It's worth taking a look at a few of them - most notably, [rfcs#18](https://github.com/npm/rfcs/pull/18), the proposed OASIS CSAF [VEX](https://github.com/tschmidtb51/csaf/blob/22ea042b47fdbe5ff3709d6f78249f216f51f7f7/csaf_2.0/prose/csaf-v2-editor-draft.md#55-profile-5-vex) format, the NTIA [vulnerability sharing doc](https://www.ntia.doc.gov/files/ntia/publications/draft_requirements_for_sharing_of_vulnerability_status_information_-_vex.pdf).
+
 ## Motivation
 
 It's relatively common that `npm audit` creates a painful experience for maintainers of transitive dependencies and for end-users, with a seemingly high likelihood to have a disproportionately large negative impact on beginners who don't actually know what's happening.
@@ -59,6 +61,12 @@ This solution both begins to address the problem that exists presently, doesn't 
 ## Prior Art
 
 I've not seen other tools doing this, but I would be surprised if there's not prior art. After some searching, I can't find anthing.
+
+There are, however, related proposals and "standards":
+
+- https://github.com/npm/rfcs/pull/18
+- https://github.com/tschmidtb51/csaf/blob/22ea042b47fdbe5ff3709d6f78249f216f51f7f7/csaf_2.0/prose/csaf-v2-editor-draft.md#55-profile-5-vex
+- https://www.ntia.doc.gov/files/ntia/publications/draft_requirements_for_sharing_of_vulnerability_status_information_-_vex.pdf
 
 ## Unresolved Questions and Bikeshedding
 
