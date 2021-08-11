@@ -8,6 +8,8 @@ A mechanism for module maintainers to assert that their modules are not impacted
 npm audit assert --module=<module-name> --id=<advisory identifier> --impactful=<boolean> --comment=<string with reasoning>
 ```
 
+The scope of this PR is *just* the addition of a new command (`npm audit assert`), updates to `npm audit`, and required registyry/platform changes.
+
 There are a number of previous, alternative, and related initiatives. Some of these initiatives are complentary, and others are entirely incompatible. It's worth taking a look at a few of them - most notably, [rfcs#18](https://github.com/npm/rfcs/pull/18), the proposed OASIS CSAF [VEX](https://github.com/tschmidtb51/csaf/blob/22ea042b47fdbe5ff3709d6f78249f216f51f7f7/csaf_2.0/prose/csaf-v2-editor-draft.md#55-profile-5-vex) format, the NTIA [vulnerability sharing doc](https://www.ntia.doc.gov/files/ntia/publications/draft_requirements_for_sharing_of_vulnerability_status_information_-_vex.pdf).
 
 ## Motivation
