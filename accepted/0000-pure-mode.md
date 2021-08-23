@@ -252,7 +252,7 @@ Since the hash of a package contain its dependencies, circular dependencies make
 
 ```
 
-#### Installation on diskof
+#### Installation on disk
 
 ```
   root /
@@ -341,4 +341,4 @@ Standard supported by [a few browsers](https://caniuse.com/import-maps) and [den
 
   - answer: junctions by default and symlinks as opt-in
 
-- How much community code will break when the system forbids access to undeclared dependencies? In other words, how much code needs to be fixed to work properly in strict mode?
+- How much community code will break when the system forbids access to undeclared dependencies? In other words, how much code needs to be fixed to work properly in pure mode?
