@@ -19,7 +19,7 @@ The installation mode proposed by this RFC would communicate accurately to Node.
 
 ## Naming
 
-The proposed name for this mode is `pure-mode`, meaning "pure" as in "no side effects". This name comes from the parallel with functional programming; in functional programming, functions don't have side effects, in `pure-mode` workspaces have no side effects.
+The proposed name for this mode is `pure-mode`, meaning "pure" as in "no side effects". This name comes from the parallel with functional programming; in functional programming, functions are called `pure` because they don't have side effects, in `pure-mode` workspaces have no side effects.
 
 To make the discussions more efficient, we could also name the current default installation mode of npm. We will call this mode `hoisted-mode` as packages are shared across workspaces by hoisting them to the root of the project.
 
