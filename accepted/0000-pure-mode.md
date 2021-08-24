@@ -94,14 +94,19 @@ In the package store:
 
 - The package store is a folder stored in the root level `node_modules` folder.
 - The package store is named `.npm`.
-- The package store contains folders, one for each dependencies installed. These dependencies can be direct workspace dependencies or transitive dependencies.
-- These folders have a name containing the name of the package, its version and a hash of its content and its dependencies.
+- The package store contains folders, one for each dependency installed. These dependencies can be direct workspace dependencies or transitive dependencies.
+- These folders have a name containing the name of the package, its version and a hash of its content plus the hash of its dependencies.
 - These folders contain a `node_modules` folder.
-- These `node_modules` folders contain a folder being named after the name of the package.
-- These folders contain the actual content of the package (the `package.json` and the JavaScript code).
+- These `node_modules` folders contain multiple folders, one for each dependency of that package and one for the package itself.
+- All these folders are named based on their respective package names.
+- The folder representing the package itself contains the code of that package. 
+- The folders representation the dependencies of the package are symlinks to the corresponding package in the store.
 - The dependencies of each packages are installed exactly the same way as workspaces' dependencies are installed.
 
-This structure may seem more complicated than necessary. The reason for this complication is to make it possible for a package to import itself using its own name. For example, the following code `require.resolve("foo");` in `node_modules/.npm/foo@1.0.0-1234/node_modules/foo/bar.js` will correctly return `node_modules/.npm/foo@1.0.0-1234/node_modules/foo/index.js`.
+This structure may seem more complicated than necessary. The reasons for this complexity are:
+
+- to make it possible for a package to import itself using its own name. For example, the following code `require.resolve("foo");` in `node_modules/.npm/foo@1.0.0-1234/node_modules/foo/bar.js` will correctly return `node_modules/.npm/foo@1.0.0-1234/node_modules/foo/index.js`.
+- to prevent creating circular symlinks, even when packages have circular dependencies.
 
 #### Peer dependencies
 
@@ -159,7 +164,7 @@ will be converted to the following:
 
 #### Circular dependencies
 
-Circular symlinks are allowed by the OS and _most_ tools work well with them. So this is not a major concern.
+Circular dependencies are supported.
 
 Since the hash of a package contain its dependencies, circular dependencies make the calculation of this hash more complicated. Here is [an article](https://www.fugue.co/blog/2016-05-18-cryptographic-hashes-and-dependency-cycles.html) explaining how to hash a graph with cycles.
 
@@ -200,9 +205,9 @@ Since the hash of a package contain its dependencies, circular dependencies make
   root /
    ┬
    │
-   ├─> node_modules / .npm / ─┬─> A@1.0.0-21f95f7 / node_modules / A / ─┬─> [content of package A]
-   │                          │                                         │
-   │                          │                                         └─> node_modules / B ( symlink to ../../../../B@1.0.0-0d98566/node_modules/B )
+   ├─> node_modules / .npm / ─┬─> A@1.0.0-21f95f7 / node_modules / ─┬─> A /  [content of package A]
+   │                          │                                     │
+   │                          │                                     └─> B ( symlink to ../../B@1.0.0-0d98566/node_modules/B )
    │                          │
    │                          └─> B@1.0.0-0d98566 / node_modules / B / ───> [content of package B]
    │
@@ -257,13 +262,13 @@ Since the hash of a package contain its dependencies, circular dependencies make
   root /
    ┬
    │
-   ├─> node_modules / .npm / ─┬─> A@1.0.0+B@1.0.0-21f95f7 / node_modules / A / ─┬─> [ content of package A ]
-   │                          │                                                 │
-   │                          │                                                 └─> node_modules / B ( symlink to ../../../../B@1.0.0-0d98ab/node_modules/B )
+   ├─> node_modules / .npm / ─┬─> A@1.0.0+B@1.0.0-21f95f7 / node_modules / ─┬─> A [ content of package A ]
+   │                          │                                             │
+   │                          │                                             └─> B ( symlink to ../../B@1.0.0-0d98ab/node_modules/B )
    │                          │
-   │                          ├─> A@1.0.0+B@2.0.0-66fe689 / node_modules / A / ─┬─> [ content of package A ]
-   │                          │                                                 │
-   │                          │                                                 └─> node_modules / B ( symlink to ../../../../B@2.0.0-a2ea56/node_modules/B )
+   │                          ├─> A@1.0.0+B@2.0.0-66fe689 / node_modules / ─┬─> A  [ content of package A ]
+   │                          │                                             │
+   │                          │                                             └─> B ( symlink to ../../B@2.0.0-a2ea56/node_modules/B )
    │                          │
    │                          ├─> B@1.0.0-0d98ab / node_modules / B / ───> [ content of package B (v1) ]
    │                          │
