@@ -64,7 +64,7 @@ There are already two competing solutions out there which implement a `pure-mode
 
 - _Works with current ecosystem_, the pnpm `pure-mode` does not require any modification to Node.js or to the various build tools.
 - _Battle tested_, Microsoft has successfully used pnpm to manage large monorepo for years.
-- _Recommended by Node.js_, this approach is actually the recommended approach by [the NodeJS documentation](https://nodejs.org/api/modules.html#modules_addenda_package_manager_tips).
+- _Recommended by Node.js_, this approach is actually the recommended approach by [the Node.js documentation](https://nodejs.org/api/modules.html#modules_addenda_package_manager_tips).
 
 # Implementation
 
