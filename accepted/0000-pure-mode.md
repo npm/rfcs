@@ -95,7 +95,7 @@ In the workspaces:
 
 In the package store:
 
-- The package store is a folder stored in the root level `node_modules` folder.
+- The package store is a folder stored in the root/project level `node_modules` folder.
 - The package store is named `.npm`.
 - The package store contains folders, one for each dependency installed. These dependencies can be direct workspace dependencies or transitive dependencies.
 - These folders have a name containing the name of the package, its version and a hash of its content plus the hash of its dependencies.
