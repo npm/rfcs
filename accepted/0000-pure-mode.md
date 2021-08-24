@@ -54,7 +54,7 @@ For example, the TypeScript compiler by default includes to its compilation _eve
 
 ## Rationale
 
-The [import-maps](https://github.com/WICG/import-maps) standard is a very good tool to communicate the dependency graph to NodeJS. But because this standard is not yet implemented in Node.js, npm needs an alternative way to solve the problems stated earlier.
+The [import-maps](https://github.com/WICG/import-maps) standard is a very good tool to communicate the dependency graph to Node.js. But because this standard is not yet implemented in Node.js, npm needs an alternative way to solve the problems stated earlier.
 
 The goal is to provide an accurate dependency graph to Node.js while still relying on Node.js current module resolution algorithm.
 
