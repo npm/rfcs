@@ -348,4 +348,9 @@ Standard supported by [a few browsers](https://caniuse.com/import-maps) and [den
 
   - answer: junctions by default and symlinks as opt-in
 
-- How much community code will break when the system forbids access to undeclared dependencies? In other words, how much code needs to be fixed to work properly in pure mode?
+- How much community code will break when the system forbids access to undeclared dependencies? In other words, how much code needs to be fixed to work properly in `pure-mode`?
+  - Regarding packages with missing dependencies in the package.json files. The vast majority of the package owners are happy to fix them and the rest simply need to know that this fix is necessary to make their package work great with npm. So the number of packages with missing dependencies is expected to drop fast after npm release `pure-mode`. We may want to add a feature to npm which allows users to locally declare dependencies on behalf of packages. This would allow everyone to use `pure-mode` regardless of which packages they depend on.
+  - There don't seem to be any package out there that depend on the way hoiting work as a feature. If this is the case, it would be easy to argue that these packages should only rely on the npm and the Node.js contracts/APIs and not on implementation details like hoisting.
+  - Some dev-environments don't support symlinks.
+    - AWS Lambdas
+    - React native
