@@ -313,7 +313,7 @@ When using `pure-mode` it will be recommended to properly configure the `engines
 
 ### Projects not using workspaces
 
-The `pure-mode` will also be available for projects not using the workspace feature. This is useful as a library author, using `pure-mode` gives me the guarantee that my library will work as intended when consumed by projects which use `pure-mode`.
+Non-workspace projects _will_ be able to use the `pure-mode` reification. This is useful as a library author, using `pure-mode` gives me the guarantee that my library will work as intended when consumed by projects which use `pure-mode`.
 
 ## Prior Art and Alternatives
 
