@@ -84,6 +84,30 @@ _would_ apply:
 }
 ```
 
+### Overridden Value Matching
+
+In order to prevent infinite regressions, and be able to properly interpret
+a tree that was reified in the context of overrides, an override rule will
+be considered a match if the specifier used as the override value for the
+package name would be satisfied by the dependency being considered for
+resolution.
+
+For example, consider an override rule set like this:
+
+```json
+{
+  "project@1.x": "2.0.0"
+}
+```
+
+In this case, a dependency node of `project@2.0.0` will be considered
+"matched" by the rule, since we cannot be sure in a deterministic and
+stateless fashion whether it was originally `project@2.0.0`, or was
+overridden to that version.
+
+This will become more relevant when considering nested object override
+rulesets, where the `"."` rule is in use.
+
 ### Overridden Dependencies Are Valid
 
 If a dependency is subject to an override that puts it outside of the
@@ -106,99 +130,41 @@ applied.
 
 ### String Overrides
 
-When the value of an override rule is a string, it is a replacement
-resolution target for resolutions matching the key.  String values _must_
-be a dependency specifier without a name.  (Aliases are supported using the
-`npm:` alias specifier.)
+When the value of an override rule is a string, it is treated as if it was
+an Object Override, with a `"."` value set to the string provided.
 
-String overrides within a given overrides object are applied in definition
-order, stopping at the _first_ rule to match.  For example:
-
-```js
-{
-  "overrides": {
-    "y@1": "1.2.3",
-    "y@1.2.3": "2.3.4" // <-- this will never match anything
-  }
-}
-```
-
-In this case, the `y@1.2.3 -> 2.3.4` rule will never be applied, because
-any `y@1` dependency will be written to `1.2.3`, and stop evaluating string
-override rules.
-
-This prevents infinite regresses and loops, and greatly simplifies the
-feature both from an implementation and user experience point of view.
-
-For example:
+For example, this override rule:
 
 ```json
 {
   "overrides": {
-    "foo@1.0.0": "2.0.0",
-    "foo@2.0.0": "3.0.0",
-    "foo@3.0.0": "1.0.0"
+    "x": "1.2.3"
   }
 }
 ```
 
-In this case, a package that depends on `foo@1.0.0` will instead be given
-`foo@2.0.0`.  A package that depends on `foo@2.0.0` will instead be given
-`foo@3.0.0`.  What it will _not_ do is apply the `foo@1.0.0` override to
-`foo@2.0.0`, and then consider whether any other overrides apply to it, and
-so on.  (In this case, it would create an infinite regress.)
-
-A more realistic and less contrived case where a cascade could be
-_desirable_ would be something like this:
-
-```js
-{
-  "overrides": {
-    "webpack@1.x": "2.x", // <-- maybe 2.7.0, maybe some other 2.x
-    "webpack@2.x": "2.7.0"
-  }
-}
-```
-
-In this case, we are saying that any `webpack@1` dependencies should be
-bumped up to `webpack@2`, and furthermore, that any `webpack@2`
-dependencies should be pinned to `webpack@2.7.0`.
-
-In practice, since rules are applied once and not stacked or cascaded, any
-webpack dependency that would resolve to a version matched by `2.x` will be
-overridden to `2.7.0`.  But, any dependency that resolves to a version
-matched by `1.x` will be set to whichever version happens to be the latest
-`2.x` at the time of installation.
-
-In order to produce the intended behavior described, the user would have to
-either specify it twice:
+is syntactic sugar for:
 
 ```json
 {
   "overrides": {
-    "webpack@1.x": "2.7.0",
-    "webpack@2.x": "2.7.0"
+    "x": {
+      ".": "1.2.3"
+    }
   }
 }
 ```
 
-Or make the dependency matching range wider:
-
-```json
-{
-  "overrides": {
-    "webpack@1.x || 2.x": "2.7.0"
-  }
-}
-```
+The behavior of the `"."` value in an overrides object is described in the
+next section.
 
 ### Object Overrides
 
 An object value in an overrides object defines a _child rule set_.
 
 If the first match for a given resolution is an object, then the object is
-a new rule set applied to all resolutions down that path in the dependency
-graph.
+a new rule set applied to all resolutions down the specified path in the
+dependency graph.
 
 For example, this override rule will set all versions of `bar`, but only
 those depended upon by `foo`.
@@ -206,27 +172,31 @@ those depended upon by `foo`.
 ```json
 {
   "foo": {
-    "bar": "1.2.3"
+    "bar": {
+      ".": "1.2.3"
+    }
   }
 }
 ```
 
-Like string overrides, object overrides are _only_ applied if they are the
-first rule in the set to match a given package.
+Overrides are _only_ applied if they are the first rule in the set to match
+a given package.
 
 ```js
 {
-  "foo": "1.2.3",
-  "foo@1.2.3": {
-    "bar": "2.3.4" // <-- this is never applied anywhere!
+  "foo": {
+    ".": "1.2.3"
+  },
+  "foo@1.2": {
+    "bar": "2.3.4" // <- this is never applied anywhere!
   }
 }
 ```
 
 In this case, because the `foo` rule will always match before the
-`foo@1.2.3` rule, it takes precedence.
+`foo@1.2` rule, it takes precedence.
 
-### `"."` Key Within Object Overrides
+### Special `"."` Key Within Object Overrides
 
 In order to both the package being targeted and its dependents, the special
 key `"."` can be used within an object override rule set.  For example, to
@@ -242,7 +212,7 @@ depended upon by `foo`, this ruleset could be used:
 }
 ```
 
-The `"."` key is not relevant in the root overrides rule set, as the root
+The `"."` key is not allowed in the root overrides rule set, as the root
 package is not ever subject to dependency resolution.
 
 Thus, these two override rulesets are equivalent:
@@ -267,13 +237,127 @@ resolutions.
 // ambiguous and invalid!
 {
   "foo": {
-    ".": { // <-- raises error, "." must be a string value
+    ".": { // <- raises error, "." must be a string value
       "bar": "1.0.0"
     },
     "bar": "2.0.0"
   }
 }
 ```
+
+### `"."` Value Is A Second Selector Key
+
+In order to maintain consistency and reasonably examine package trees on
+disk, without needing to re-resolve dependencies, the `"."` key's value in
+an overrides object is effectively combined with the named specifier key.
+
+Consider a project `package.json` containing the following:
+
+```json
+{
+  "dependencies": {
+    "foo": "1"
+  },
+  "overrides": {
+    "foo@1.0.0": {
+      ".": "1.0.1"
+    },
+    "foo@1.0.1": {
+      ".": "1.0.2"
+    }
+  }
+}
+```
+
+Consider what would happen if this constraint was not present.
+
+At install time, if `foo@1` resolves to `1.0.0`, then it would be
+overridden to `1.0.1`.  If it had resolved to `1.0.1`, then would be
+overridden to `1.0.2`.
+
+Some time later, the following `node_modules` tree is examined, without
+a lockfile or any other indicators as to how it got into this state.
+
+```
+project
++-- node_modules
+    +-- foo (1.0.1)
+```
+
+This results in ambiguity.  Is this (a) an instance of a dependency that
+resolved to `foo@1.0.0` and was overridden?  Or is it (b) an instance of a
+dependency that resolved to `foo@1.0.1` and _should_ have been overridden,
+but wasn't?
+
+If (a), this is a valid state.  If (b), it is invalid.
+
+Compounding the problem, we may have different sub-dependencies specified
+within the override ruleset.  For example:
+
+```json
+{
+  "dependencies": {
+    "foo": "1"
+  },
+  "overrides": {
+    "foo@1.0.0": {
+      ".": "1.0.1",
+      "bar": "1.0.0"
+    },
+    "foo@1.0.1": {
+      ".": "1.0.2",
+      "bar": "2.0.0"
+    }
+  }
+}
+```
+
+If we matched the first rule to get into this state, then we would expect
+to see `bar@1.0.0` in the tree, and anything else would be considered
+invalid.  However, if not, then we would expect to see `bar@2.0.0`.  This
+would introduce non-determinism and be impossible to reason about after
+install time.
+
+In order to avoid this class of problems, the following additional
+constraint is applied:
+
+**If a dependency matches the `key` in an overrides object _or_ it matches
+the `"."` value specifier, then the override ruleset will apply.**
+
+This combines with the "first match stops the process" rule to mean that in
+the override ruleset above, the second rule can never be applied anywhere.
+
+Thus, when considering a dependency `foo@1.0.1` against this override set,
+it matches the _first_ set, because it matches the `"."` value.  The second
+ruleset can never match anything, because `foo@1.0.1` will always be
+matched by the first rule set, and nodes can only be matched once.
+
+Thus, the correct state is clear both at install time and when examining
+the tree later.
+
+If feasible, the npm CLI _should_ log warnings when an override rule set
+would appear to match, but is being skipped because the dependency was
+subject to an earlier override rule.
+
+This constraint can result in confusion in cases like the following:
+
+```
+{
+  "dependencies": {
+    "foo": "1 || 2"
+  },
+  "overrides": {
+    "foo@1": {
+      ".": "2",
+      "bar": "1.2.3"
+    }
+  }
+}
+```
+
+In this situation, the `bar` dependencies of `foo` will be overridden to
+`bar@1.2.3` for versions of `foo` resolving to _either_ `foo@1` _or_
+`foo@2`.
 
 ### Rules in Nested Rule Sets Override Parent Rules
 
@@ -310,6 +394,19 @@ In this case,
    depended upon by `bar`) are set to `3.0.0`.
 6. All versions of `boo` in the tree are set to `1.0.0`, _except_ those
    depended upon by `foo`.
+
+A valid resolution might look like this:
+
+```
+project
++-- boo (1.0.0) (overridden)
++-- bar (2.3.4) (not overridden, depends on baz@4)
++-- baz (4.8.9) (not overridden, satisfies bar's dependency)
++-- foo (1.0.0) (overridden)
+    +-- bar (2.3.4) (overridden, cannot dedupe due to override)
+    |   +-- baz (3.0.0) (overridden)
+    +-- boo (3.0.0) (overridden)
+```
 
 ### Rules Apply To All Transitive Dependencies
 
@@ -388,6 +485,7 @@ root
 |   +-- c@1
 |   +-- d@2
 +-- c@1
++-- d@1
 ```
 
 Because the dependency at `root > b > c` has a different set of overrides
@@ -463,10 +561,10 @@ The resulting package tree looks like this:
 root
 +-- y@2 (inherits {"x":"1"} rule set)
 |   +-- x@1 (overridden by "y@2 > x" rule)
-|       (x@1 -> y@1 dep overridden by `"y@1": "2"` rule, and deduped above)
+|       (x@1 -> y@1 dep overridden by `"y": "2"` rule, and deduped above)
 +-- x@2 (inherits {"y": "1"} rule set)
     +-- y@1 (overridden by "x@2 > y" rule)
-        (y@1 -> x@1 dep overridden by `"x@1": "2"` rule, and deduped above)
+        (y@1 -> x@1 dep overridden by `"x": "2"` rule, and deduped above)
 ```
 
 Where previously there were 2 packages installed, now there are 4.
@@ -484,8 +582,8 @@ To replace all versions of `x` with a version `1.2.3` throughout the tree:
 ```
 
 If a bug is found in `x@1.2.3`, which is known to be fixed in `1.2.4`, then
-bump _only_ that dependency (but anything that resolves to `1.2.2` or
-`1.2.4` should be left alone.)
+bump _only_ that dependency (but anything that resolves to a version less
+than `1.2.3` or greater than `1.2.4` should be left alone.)
 
 ```json
 {
@@ -517,6 +615,9 @@ To replace all instances of `underscore` with `lodash`:
   }
 }
 ```
+
+Note that this only affects the name in `package.json`.  Dependent code
+will still use `require('underscore')` to load it.
 
 To force all versions of `react` to be `15.6.2`, _except_ when used by the
 dependencies of `tap` (which depends on `ink` and requires `react@16`):
@@ -573,8 +674,11 @@ the _first_ rule to match will have any effect.
 
 #### Swapping
 
-It is possible to "swap" versions.  This will not cause an infinite
-regress, because only the first rule will be applied.
+It is not possible to "swap" versions, because any match to the key _or_
+the string or `"."` value will be considered a match.
+
+Thus, in this example, `swap@2` will be the only version ever in use, and
+the second override rule wll never be applied.
 
 ```json
 {
@@ -584,10 +688,6 @@ regress, because only the first rule will be applied.
   }
 }
 ```
-
-In this case, any version matching `swap@1` will be overridden to `swap@2`.
-Any version initially matching `swap@2` will be overridden to `swap@1`.
-Because rules do not stack, there is no infinite regress.
 
 #### Combining String Value Overrides with Object Value Overrides
 
@@ -629,6 +729,10 @@ Within the `y` branch of the dependency graph, `x` will be overridden to
 
 Elsewhere within the dependency graph, `x` will be overridden to `1.2.3`,
 but `z` will not be overridden.
+
+Note that a version of `x` which is a dependency of `y` will not be able to
+be deduplicated against the version of `x` at the root level, because it
+will have a different set of override rules applied to it.
 
 ### Reasoning for Calling This `"overrides"`
 
