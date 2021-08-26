@@ -35,7 +35,7 @@ When converting the dependency graph to a folder structure, `hoisted-mode` loses
 
 When workspaces can successfully use code of a package without having a dependency on it, people forget to declare their dependencies. This lead to situations where updating the dependencies of one workspace breaks a seemingly unrelated workspace.
 
-It is worth noting that static code analysis tools can help significantly reduce the frequency of these mistakes.
+It is worth noting that static code analysis tools can help significantly reduce the frequency of these mistakes. While static code analysis tools are probably sufficent for small projects, they are not for large projects. "pure-mode" not only helps get the dependencies right but also _proves_ that the dependencies are correct. This proof is essential to build trustable build systems which use caching, scoped installations.
 
 ### Duplication
 
