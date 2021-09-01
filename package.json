@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "npm CLI rfcs",
   "main": "index.js",
+  "private": true,
   "scripts": {
     "create-agenda": "node ./scripts/create-agenda.js"
   },
