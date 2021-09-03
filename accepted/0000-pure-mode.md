@@ -4,26 +4,31 @@
 
 This RFC is a proposal to add a new opt-in installation mode.
 
-This mode would be the missing ingredient to make workspaces truly scalable.
+This mode aims at preventing workspaces to over-share their dependencies. With this mode, two workspaces will share a dependency only if both have declared it in their package.json.
+
+This RFC aims at improving projects with workspaces, but the suggested implementation will also happen to bring value to projects not using workspaces. Because `pure-mode` is valuable for any project, it will also be available for projects not using workspaces.
 
 ## Motivation
 
-The introduction of workspaces in npm v7 brought the ability to split large codebases into smaller pieces of code with declared dependencies between them.
+The introduction of workspaces in npm v7 brought the ability to split large code-bases into smaller pieces of code with declared dependencies between them.
 
-Several build tools took advantage of these declared dependencies to split the builds into multiple steps (one per workspace) which could be cached or run in parallel. This caching and parallelism usually improves significantly build performance.
-
-The current default installation strategy does not properly communicates to Node.js the information about the dependency graph. Node.js having an inaccurate view of the dependency graph leads the build systems to wrongly skip build operations, leading to risk of bugs slipping through.
-
-The installation mode proposed by this RFC would communicate accurately to Node.js the dependency graph, allowing build tools to correctly reason about it.
+Several build tools took advantage of these declared dependencies to split the builds into multiple steps (one per workspace). These build tools take advantage of the declared dependencies between workspaces to only rebuild the workspaces that have not changed since the last build. With the current way npm works, any dependency change to any workspace may affect any other workspace. This means that the build systems need to rebuild the entire project every time a single workspace modifies a dependency. This is inefficient and does not scale.
 
 ## Naming
 
-The proposed name for this mode is `pure-mode`, meaning "pure" as in "no side effects". This name comes from the parallel with functional programming; in functional programming, functions are called `pure` because they don't have side effects. In `pure-mode`, workspaces can be seen as pure function:
+The current version of the RFC calls this new mode `pure-mode`. This name is not final and will likely be changed before this RFC gets accepted.
 
-- The output/behavior of a workspace is fully determined by the inputs (code in the workspace and declared dependencies).
-- A workspace output/behavior only affects other workspaces which have a declared dependency to it.
+Here are the names that have been suggested so far:
 
-To make the discussions more efficient, we could also name the current default installation mode of npm. We will call this mode `hoisted-mode` as packages are shared across workspaces by hoisting them to the root of the project.
+- pure-mode
+- isolated-mode
+- non-flat-mode
+- strict-mode
+- predictable-mode
+- unhoisted-mode
+- symlink-mode
+
+To make the discussions more efficient, we could also name the current default installation mode of npm. We will call this mode `hoisted-mode` as packages are shared across workspaces by hoisting them to the root of the project. This term is already known by developers familiar with yarn or pnpm.
 
 ## More on the problem
 
@@ -33,9 +38,9 @@ When converting the dependency graph to a folder structure, `hoisted-mode` loses
 
 ### Forgetting to declare dependencies
 
-When workspaces can successfully use code of a package without having a dependency on it, people forget to declare their dependencies. This lead to situations where updating the dependencies of one workspace breaks a seemingly unrelated workspace.
+When workspaces can successfully use code of a package without having a dependency on it, people forget to declare their dependencies. This leads to situations where updating the dependencies of one workspace breaks a seemingly unrelated workspace.
 
-It is worth noting that static code analysis tools can help significantly reduce the frequency of these mistakes. While static code analysis tools are probably sufficent for small projects, they are not for large projects. "pure-mode" not only helps get the dependencies right but also _proves_ that the dependencies are correct. This proof is essential to build trustable build systems which use caching, scoped installations.
+It is worth noting that static code analysis tools can help significantly reduce the frequency of these mistakes. While static code analysis tools are probably sufficient for small projects, they are not for large projects. "pure-mode" not only helps get the dependencies right but also _proves_ that the dependencies are correct. This proof is essential to build trustable build systems which use caching, scoped installations.
 
 ### Duplication
 
@@ -44,7 +49,7 @@ The `hoisted-mode` is not always successful at sharing common dependencies. Conf
 These duplications come with the following cost:
 
 - Performance degradation of the installation phase
-- Inneficient disk usage
+- Inefficient disk usage
 - Performance and memory cost at runtime as Node.js sees duplicated modules as two different modules.
 
 ### Tools crawling the node_modules folders
@@ -169,7 +174,7 @@ will be converted to the following:
 
 Circular dependencies are supported.
 
-Since the hash of a package contain its dependencies, circular dependencies make the calculation of this hash more complicated. Here is [an article](https://www.fugue.co/blog/2016-05-18-cryptographic-hashes-and-dependency-cycles.html) explaining how to hash a graph with cycles.
+Since the hash of a package contains its dependencies, circular dependencies make the calculation of this hash more complicated. Here is [an article](https://www.fugue.co/blog/2016-05-18-cryptographic-hashes-and-dependency-cycles.html) explaining how to hash a graph with cycles.
 
 ### Simple example
 
@@ -303,13 +308,7 @@ The `pure-mode` is a project level setting, it does not make much sense to insta
 
 ### Different versions of npm
 
-As workspaces are supported only from npm version 7, there is no concern about making `pure-mode` compatible with versions olders than 7.0.0. 
-
-The tree structure will be serialized to the lockfile in a way that any version of npm 7.0.0 can understand. This means that any version of npm 7 will be able to install a project configured in `pure-mode`.
-
-Modifying a dependency in a `pure-mode` project with a version of npm not supporting `pure-mode` is likely going to leave the project in a broken state and should be avoided.
-
-When using `pure-mode` it will be recommended to properly configure the `engines` field of the `package.json` to make sure developers who want to modify the dependencies don't shoot themselves in the foot and put the project in an instable state.
+The `pure-mode` will use the same lockfile as `hoisted` mode. Developers can use either mode without changing the lockfile. This makes `pure-mode` backward compatible and easy to implement. The implementation of `pure-mode` will reside in the reification, it will take the ideal-tree and apply it on disk using symlink instead of hoisting.
 
 ### Projects not using workspaces
 
