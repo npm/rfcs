@@ -2,10 +2,10 @@
 
 ## Summary
 
-A mechanism for module maintainers to assert that their modules are not impacted by advisories.
+A mechanism for package maintainers to assert that their packages are not impacted by advisories.
 
 ```
-npm audit assert --module=<module-name> --id=<advisory identifier> --impactful=<boolean> --comment=<string with reasoning>
+npm audit assert --package=<package-name> --id=<advisory identifier> --impactful=<boolean> --comment=<string with reasoning>
 ```
 
 The scope of this PR is *just* the addition of a new command (`npm audit assert`), updates to `npm audit`, and required registyry/platform changes.
@@ -16,7 +16,7 @@ There are a number of previous, alternative, and related initiatives. Some of th
 
 It's relatively common that `npm audit` creates a painful experience for maintainers of transitive dependencies and for end-users, with a seemingly high likelihood to have a disproportionately large negative impact on beginners who don't actually know what's happening.
 
-Further, the amount of noise that `npm audit` generates from transitive dependencies that rely on a "vulnerable" module where there is no world in which the "vulnerability" can be exploited leads to people ignoring `npm audit` rather than leveraging it to actually address vulnerabilities.
+Further, the amount of noise that `npm audit` generates from transitive dependencies that rely on a "vulnerable" package where there is no world in which the "vulnerability" can be exploited leads to people ignoring `npm audit` rather than leveraging it to actually address vulnerabilities.
 
 Enabling maintainers of dependencies - most importantly, dependencies that are most often transitive - to assert that their dependencies are not impacted by known vulnerabilities is a way to dramatically reduce the amount of pain that `npm audit` creates.
 
@@ -25,9 +25,9 @@ Further, this creates an additional cascading signal of _validity_ when the main
 ## Detailed Explanation
 
 - `npm audit assert` will be added with the following arguments:
-  - `--module=<module-name>` **(required)** where `<module-name>` is the name of the module having an assertion made. If I was a maintainer of `fastify` and wanted to make an assertion about it, I'd use `--module=fastify`.
-  - `--id=<advisory identifier>` **(required)** is the identifier of the advisory that impacts my module that I'm making an assertion about. As a hypothetical maintainer of `fastify` wanting to make to make an assertion about the npm advisory `1726`, I'd use `--id=1726`. This also potentially allows for future expansion into other identifiers. For example, if I wanted to make an assertion about `CVE-2021-28562` advisory, I'd use `--id=CVE-2021-28562`. I'd love to see namespacing, like `npm-1726`, but I could understand why people might be against that.
-  - `--impactful=<boolean>` **(required)** this should just be `true` or `false`. If it's `true`, then an assertion is made that the advisory is impactful to the module passed to `--module`. If it's `false`, then an assertion is made that the advisory is not impactful to the module passed to `--module`.
+  - `--package=<package-name>` **(required)** where `<package-name>` is the name of the package having an assertion made. If I was a maintainer of `fastify` and wanted to make an assertion about it, I'd use `--package=fastify`.
+  - `--id=<advisory identifier>` **(required)** is the identifier of the advisory that impacts my package that I'm making an assertion about. As a hypothetical maintainer of `fastify` wanting to make to make an assertion about the npm advisory `1726`, I'd use `--id=1726`. This also potentially allows for future expansion into other identifiers. For example, if I wanted to make an assertion about `CVE-2021-28562` advisory, I'd use `--id=CVE-2021-28562`. I'd love to see namespacing, like `npm-1726`, but I could understand why people might be against that.
+  - `--impactful=<boolean>` **(required)** this should just be `true` or `false`. If it's `true`, then an assertion is made that the advisory is impactful to the package passed to `--package`. If it's `false`, then an assertion is made that the advisory is not impactful to the package passed to `--package`.
   - `--comment=<string>` **(required)** is a comment that, if false, explains why the vulnerability cannot be exploited and, if true, explains why the vulnerability can be exploited.
 - `npm audit` will need to be updated to both consume additional data and provide additional filters.
   - by default, `npm audit` should
@@ -49,7 +49,7 @@ Further, this creates an additional cascading signal of _validity_ when the main
 ## Rationale and Alternatives
 
 - Do nothing: The current state of the world that has caused [pain](https://overreacted.io/npm-audit-broken-by-design/).
-- Allow reporters to mark which modules are impacted: not really scalable, especially since reporters won't be experts in the same way that maintainers are.
+- Allow reporters to mark which packages are impacted: not really scalable, especially since reporters won't be experts in the same way that maintainers are.
 - Do something in a neutral space, run by an independent organization: There's no reason this couldn't eventually be implemented under this API. It is contingent on that work being done and being successfully adopted by others. That shouldn't necessarily prevent us from implementing this and mapping it over to that later.
 
 This solution both begins to address the problem that exists presently, doesn't exclude potential external solutions/patterns from being adopted in the future, and allows an implementation to be implemented with _relative_ haste.
