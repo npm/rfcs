@@ -1,8 +1,6 @@
-# {{TITLE: Add a `context` parameter for `npm config` and `npm exec` commands}}
-
 ## Summary
 
-Several commands in the npm CLI would benefit from the ability to specify `context` the command should act on. The two specific implementations I'd like to propose are:
+Several commands in the npm CLI would benefit from the ability to specify a `location` the command should act on. The two specific implementations I'd like to propose are:
 1. Telling `npm config` which config file you want to modify.
 2. Telling `npm exec` explicitly where it should look for binaries.
 
@@ -10,13 +8,13 @@ The `npm config set` command currently has the ability to modify the user-level 
 
 The `npm exec` command isn't reliably deterministic about exactly what bin script it will run, especially in the case of overlapping project and global installs as well as its use of an isolated cache. There is additional confusion in that, for example, `npx typescript` will never run a locally installed binary as the parameter must currently match a linked bin rather than a package name as it does for remote resolution.
 
-Adding an explicit `--context=<global|user|local|remote>` parameter would provide for this in a reliable and unsurprising way.
+Adding an explicit `--location=<global|user|local|remote>` parameter would provide for this in a reliable and unsurprising way.
 
 ## Motivation
 
-The `npm config set` command currently has the ability to modify the user-level npmrc as well as the global npmrc, but not a project level one. Adding an explicit `--context=<global|user|local>` parameter would provide for this in a reliable and unsurprising way.
+The `npm config set` command currently has the ability to modify the user-level npmrc as well as the global npmrc, but not a project level one. Adding an explicit `--location=<global|user|local>` parameter would provide for this in a reliable and unsurprising way.
 
-For `npm exec` there is currently a lot of ambiguity as to where a binary will be found, the `--context=<global|local|remote>` option would allow a user to specify exactly where we should look, eliminating the current fallback pattern and making the use of project shipped binaries more consistent.
+For `npm exec` there is currently a lot of ambiguity as to where a binary will be found, the `--location=<global|local|remote>` option would allow a user to specify exactly where we should look, eliminating the current fallback pattern and making the use of project shipped binaries more consistent.
 
 ## Detailed Explanation
 
@@ -31,7 +29,7 @@ Currently, there are 4 places we will read an `npmrc` config from.
 
 However, the `npm config` commands (with the exception of `npm config get` and `npm config list` which read from all locations simultaneously) currently only allow modifying either the User (default) or Global (pass `--global`) config. This can lead to unexpected behavior for users who want to edit their Project config as there is currently no way to do so with the CLI. (NOTE: Editing the Built-in config is not exposed either, but should remain that way)
 
-This change would allow a user to run, for example, `npm config set --context=local key=value` to inform the CLI of exactly which config to modify.
+This change would allow a user to run, for example, `npm config set --location=local key=value` to inform the CLI of exactly which config to modify.
 
 Other file modifying commands would gain the same explicit location behavior, while `npm config get` and `npm config list` would be given the ability to read only from the location the user explicitly asks for.
 
@@ -47,9 +45,9 @@ This can lead to ambiguous results for some common globally installed binaries, 
 
 This confusion can be even worse for modules where the installed binary does not match the name of the package. For example, `typescript` installs a bin named `tsc` so if you run `npx typescript` a locally or globally installed binary will not be found and we will go straight to the registry package.
 
-Providing a `--context=<local|global|remote>` parameter would allow a user to choose specifically where we should look for a binary.
+Providing a `--location=<local|global|remote>` parameter would allow a user to choose specifically where we should look for a binary.
 
-A user running `npm exec --context=local -- typescript` would be able to know for certain that we will either execute a binary installed by their project, or fail.
+A user running `npm exec --location=local -- typescript` would be able to know for certain that we will either execute a binary installed by their project, or fail.
 
 Along with this, we will apply the same binary resolution rules we use for remote packages. Rather than looking for `./node_modules/.bin/tsc`, we would load your actual installed package tree and prioritize by:
 
@@ -71,17 +69,17 @@ Having one flag that accepts multiple values gives us a far more deterministic w
 
 ## Implementation
 
-The first step will be to audit npm commands that define a local `context` variable and determine whether the new config variable is applicable, and if not rename the locally defined variable to reduce confusion.
+The first step will be to audit npm commands that define a local `location` variable and determine whether the new config variable is applicable, and if not rename the locally defined variable to reduce confusion.
 
-After that, we must audit npm dependencies that accept a `context` parameter and determine if it can be renamed to something more accurate.
+After that, we must audit npm dependencies that accept a `location` parameter and determine if it can be renamed to something more accurate.
 
-There do not appear to be many references to variables named `context` so these should be reasonably straight forward.
+There do not appear to be many references to variables named `location` so these should be reasonably straight forward.
 
 ### `npm config`
 
-Currently we create an implicit `where` variable in the implementation seen [here](https://github.com/npm/cli/blob/8806015fdd025f73ccf4001472370eafd3c5a856/lib/config.js#L122) with one of two values, dependent on the `global` flag. The implementation would involve creating `context` as a variable in the config, then modifying the flattener for `global` such that when set the `context` is changed to `'global'`, then using the `context` as the source of truth when determining which file to write.
+Currently we create an implicit `where` variable in the implementation seen [here](https://github.com/npm/cli/blob/8806015fdd025f73ccf4001472370eafd3c5a856/lib/config.js#L122) with one of two values, dependent on the `global` flag. The implementation would involve creating `location` as a variable in the config, then modifying the flattener for `global` such that when set the `location` is changed to `'global'`, then using the `location` as the source of truth when determining which file to write.
 
-By default `context` will have no value, this is how we will avoid a breaking change.
+By default `location` will have no value, this is how we will avoid a breaking change.
 
 The `adduser` and `logout` commands currently are hardcoded to use `'user'` instead of referencing a variable, which is behavior I believe should remain as-is in order to avoid users accidentally saving credentials into project-level config files.
 
@@ -91,17 +89,17 @@ Implementation here is somewhat more involved. The logic found [here](https://gi
 
 For project installed packages, if a bin is found, we would verify that the link and/or shim located in that location's bin directory points to the exact package we matched. If it does not, we would overwrite it with one that does, and then execute the freshly linked/shimmed bin.
 
-For the case of globally installed packages, there is no need to ensure the correct bin is linked as we will only link the bin of a directly installed global package. However, we would still apply the search logic here so that `npm exec --context=global -- typescript` will function as expected.
+For the case of globally installed packages, there is no need to ensure the correct bin is linked as we will only link the bin of a directly installed global package. However, we would still apply the search logic here so that `npm exec --location=global -- typescript` will function as expected.
 
 Remote package behavior would remain exactly as it is today.
 
-When the `context` config is unset (the default), we will maintain the existing behavior of searching locally installed packages, then globally installed packages, then remote packages. The only change would be that the bin we run will be overwritten to the shallowest match in the user's actual tree before executing it, eliminating the current race condition that exists in the case of a conflicting bin in your tree.
+When the `location` config is unset (the default), we will maintain the existing behavior of searching locally installed packages, then globally installed packages, then remote packages. The only change would be that the bin we run will be overwritten to the shallowest match in the user's actual tree before executing it, eliminating the current race condition that exists in the case of a conflicting bin in your tree.
 
 There is the potential that when run in interactive mode we can also display a list of everywhere we found something we _could_ run based on the user's request and prompt them to tell us which one.
 
 ## Unresolved Questions and Bikeshedding
 
-~Is `where` the best name for this config? What if there are too many conflicts in dependencies?~ EDIT: Document updated to use `context` instead of `where`.
+~Is `where` the best name for this config? What if there are too many conflicts in dependencies?~ EDIT: Document updated to use `location` instead of `where`.
 
 What would the shortcut be? `-c` is currently the short form of `--call`.
 
