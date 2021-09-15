@@ -302,7 +302,7 @@ Compared to the current npm installation strategy, this proposal reduces package
 
 ## Configuration
 
-The `pure-mode` is a project level setting, it does not make much sense to install some dependencies in `pure-mode` and others in `hoisted-mode`. For this reason, to configure a project in `pure-mode`, a setting has to be added to the `.npmrc` of the project and the lockfile has to be re-generated. A tool may be made available to convert `hoisted-mode` lockfiles to `pure-mode` lockfiles.
+The `mode` can be enabled by a CLI option when running `npm install` or by a setting in `.npmrc`.
 
 ## Compatibility
 
