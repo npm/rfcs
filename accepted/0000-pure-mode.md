@@ -345,7 +345,7 @@ Standard supported by [a few browsers](https://caniuse.com/import-maps) and [den
   - Junctions have to be representated by an absolute path, this means that junctions cannot be committed to git or packed into a package.
   - Symlinks can only be created in elevated shell [or when Windows is in "developer mode"](https://blogs.windows.com/windowsdeveloper/2016/12/02/symlinks-windows-10/#LCiVBWTgQF5s7fmL.97).
 
-  - answer: junctions by default and symlinks as opt-in
+  - answer: junctions by default. support for symlinks can be added later as an opt-in if we see value for it.
 
 - How much community code will break when the system forbids access to undeclared dependencies? In other words, how much code needs to be fixed to work properly in `pure-mode`?
   - Regarding packages with missing dependencies in the package.json files. The vast majority of the package owners are happy to fix them and the rest simply need to know that this fix is necessary to make their package work great with npm. So the number of packages with missing dependencies is expected to drop fast after npm release `pure-mode`. We may want to add a feature to npm which allows users to locally declare dependencies on behalf of packages. This would allow everyone to use `pure-mode` regardless of which packages they depend on.
