@@ -57,7 +57,7 @@ The [import-maps](https://github.com/WICG/import-maps) draft standard is a very 
 
 The goal is to provide an accurate dependency graph to Node.js while still relying on Node.js current module resolution algorithm.
 
-We deem valuable to invest the time implementing the `isolated-mode` now knowing that import-maps are coming because most of the implementation will be re-usable to implement a `import-maps-mode`.
+We deem it valuable to invest the time implementing `isolated-mode` now, knowing that import-maps are coming, because most of the implementation will be re-usable to implement an `import-maps-mode`.
 
 There are already two competing solutions out there which implement a `isolated-mode` ([pnpm](https://pnpm.io) and [yarn](https://yarnpkg.com)). We decided to choose the pnpm approach for the following reasons:
 
