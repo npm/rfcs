@@ -344,4 +344,4 @@ Standard supported by [a few browsers](https://caniuse.com/import-maps) and [den
   - Some dev-environments don't support symlinks.
     - AWS Lambdas -> a repository can a be installed with isolated mode locally and on CI but then deployed in hoisted mode.
     - React native -> There are plugins existing to make react-native work with symlinks
-  - If a package is missing a dependency, it can be temporarily fixed (while waiting for the package owner to fix this issue) by declaring this missing dependency as top level dependency of the repository.
+  - If a package is missing a dependency, it can be temporarily fixed (while waiting for the package owner to fix this issue, or if it’s working as designed) by declaring this missing dependency as top level dependency of the repository.
