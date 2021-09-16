@@ -1,12 +1,12 @@
-# Pure mode
+# Isolated mode
 
 ## Summary
 
 This RFC is a proposal to add a new opt-in installation mode.
 
-This mode aims at preventing workspaces to over-share their dependencies. With this mode, two workspaces will share a dependency only if both have declared it in their package.json.
+This mode aims at preventing workspaces from over-sharing their dependencies. With this mode, two workspaces will share a dependency only if both have declared it in their package.json.
 
-This RFC aims at improving projects with workspaces, but the suggested implementation will also happen to bring value to projects not using workspaces. Because `pure-mode` is valuable for any project, it will also be available for projects not using workspaces.
+This RFC aims at improving projects with workspaces, but the suggested implementation will also happen to bring value to projects not using workspaces. Because `isolated-mode` is valuable for any project, it will also be available for projects not using workspaces.
 
 ## Motivation
 
@@ -16,17 +16,8 @@ Several build tools took advantage of these declared dependencies to split the b
 
 ## Naming
 
-The current version of the RFC calls this new mode `pure-mode`. This name is not final and will likely be changed before this RFC gets accepted.
+This mode is called `isolated-mode` because it makes the boundaries between packages and workspaces stronger, making them more isolated. 
 
-Here are the names that have been suggested so far:
-
-- pure-mode
-- isolated-mode
-- non-flat-mode
-- strict-mode
-- predictable-mode
-- unhoisted-mode
-- symlink-mode
 
 To make the discussions more efficient, we could also name the current default installation mode of npm. We will call this mode `hoisted-mode` as packages are shared across workspaces by hoisting them to the root of the project. This term is already known by developers familiar with yarn or pnpm.
 
@@ -40,7 +31,7 @@ When converting the dependency graph to a folder structure, `hoisted-mode` loses
 
 When workspaces can successfully use code of a package without having a dependency on it, people forget to declare their dependencies. This leads to situations where updating the dependencies of one workspace breaks a seemingly unrelated workspace.
 
-It is worth noting that static code analysis tools can help significantly reduce the frequency of these mistakes. While static code analysis tools are probably sufficient for small projects, they are not for large projects. "pure-mode" not only helps get the dependencies right but also _proves_ that the dependencies are correct. This proof is essential to build trustable build systems which use caching, scoped installations.
+It is worth noting that static code analysis tools can help significantly reduce the frequency of these mistakes. While static code analysis tools are probably sufficient for small projects, they are not for large projects. "isolated-mode" not only helps get the dependencies right but also _proves_ that the dependencies are correct. This proof is essential to build trustable build systems which use caching, scoped installations.
 
 ### Duplication
 
@@ -66,11 +57,11 @@ The [import-maps](https://github.com/WICG/import-maps) standard is a very good t
 
 The goal is to provide an accurate dependency graph to Node.js while still relying on Node.js current module resolution algorithm.
 
-We deem valuable to invest the time implementing the `pure-mode` now knowing that import-maps are coming because most of the implementation will be re-usable to implement a `import-maps-mode`.
+We deem valuable to invest the time implementing the `isolated-mode` now knowing that import-maps are coming because most of the implementation will be re-usable to implement a `import-maps-mode`.
 
-There are already two competing solutions out there which implement a `pure-mode` ([pnpm](https://pnpm.io) and [yarn](https://yarnpkg.com)). We decided to choose the pnpm approach for the following reasons:
+There are already two competing solutions out there which implement a `isolated-mode` ([pnpm](https://pnpm.io) and [yarn](https://yarnpkg.com)). We decided to choose the pnpm approach for the following reasons:
 
-- _Works with current ecosystem_, the pnpm `pure-mode` does not require any modification to Node.js or to the various build tools.
+- _Works with current ecosystem_, the pnpm `isolated-mode` does not require any modification to Node.js or to the various build tools.
 - _Battle tested_, Microsoft has successfully used pnpm to manage large monorepo for years.
 - _Recommended by Node.js_, this approach is actually the recommended approach by [the Node.js documentation](https://nodejs.org/api/modules.html#modules_addenda_package_manager_tips).
 
@@ -308,22 +299,22 @@ The `mode` can be enabled by a CLI option when running `npm install` or by a set
 
 ### Different versions of npm
 
-The `pure-mode` will use the same lockfile as `hoisted` mode. Developers can use either mode without changing the lockfile. This makes `pure-mode` backward compatible and easy to implement. The implementation of `pure-mode` will reside in the reification, it will take the ideal-tree and apply it on disk using symlink instead of hoisting.
+The `isolated-mode` will use the same lockfile as `hoisted` mode. Developers can use either mode without changing the lockfile. This makes `isolated-mode` backward compatible and easy to implement. The implementation of `isolated-mode` will reside in the reification, it will take the ideal-tree and apply it on disk using symlink instead of hoisting.
 
 ### Projects not using workspaces
 
-Non-workspace projects _will_ be able to use the `pure-mode` reification. This is useful as a library author, using `pure-mode` gives me the guarantee that my library will work as intended when consumed by projects which use `pure-mode`.
+Non-workspace projects _will_ be able to use the `isolated-mode` reification. This is useful as a library author, using `isolated-mode` gives me the guarantee that my library will work as intended when consumed by projects which use `isolated-mode`.
 
 ## Prior Art and Alternatives
 
 ### [pnpm](https://github.com/pnpm/pnpm)
 
-Package manager with a `pure-mode`.
+Package manager with a `isolated-mode`.
 This RFC is mostly inspired by pnpm.
 
 ### [ied](https://github.com/alexanderGugel/ied)
 
-Package manager with a `pure-mode`.
+Package manager with a `isolated-mode`.
 Similar to pnpm but unmaintained.
 
 ### [nix](https://nixos.wiki/wiki/Nix)
@@ -332,11 +323,11 @@ Functional package manager. Can work with npm packages (eg. [node2nix](https://g
 
 ### [yarn](https://yarnpkg.com/)
 
-Package manager with a `pure-mode` and project manager.
+Package manager with a `isolated-mode` and project manager.
 
 ### [Import maps](https://github.com/WICG/import-maps)
 
-Standard supported by [a few browsers](https://caniuse.com/import-maps) and [deno](https://deno.land/) which makes it possible to implement `pure-mode`.
+Standard supported by [a few browsers](https://caniuse.com/import-maps) and [deno](https://deno.land/) which makes it possible to implement `isolated-mode`.
 
 ## Unresolved Questions and Bikeshedding
 
@@ -347,10 +338,10 @@ Standard supported by [a few browsers](https://caniuse.com/import-maps) and [den
 
   - answer: junctions by default. support for symlinks can be added later as an opt-in if we see value for it.
 
-- How much community code will break when the system forbids access to undeclared dependencies? In other words, how much code needs to be fixed to work properly in `pure-mode`?
-  - Regarding packages with missing dependencies in the `package.json` file. In many cases, package owners are willing to fix such issues. If there are a significant number of issues encountered around this, we can likely expect the of packages with missing dependencies is expected to drop fast after npm release `pure-mode`. We may want to later add a feature to npm which allows users to locally declare dependencies on behalf of packages as a stop-gap, if existing solutions to this are not enough.
+- How much community code will break when the system forbids access to undeclared dependencies? In other words, how much code needs to be fixed to work properly in `isolated-mode`?
+  - Regarding packages with missing dependencies in the `package.json` file. In many cases, package owners are willing to fix such issues. If there are a significant number of issues encountered around this, we can likely expect the of packages with missing dependencies is expected to drop fast after npm release `isolated-mode`. We may want to later add a feature to npm which allows users to locally declare dependencies on behalf of packages as a stop-gap, if existing solutions to this are not enough.
   - There don't seem to be any packages out there that depend on the way hoisting works as a feature. If this is the case, it would be easy to argue that these packages should only rely on the npm and the Node.js contracts/APIs and not on implementation details like hoisting.
   - Some dev-environments don't support symlinks.
-    - AWS Lambdas -> a repository can a be installed with pure mode locally and on CI but then deployed in hoisted mode.
+    - AWS Lambdas -> a repository can a be installed with isolated mode locally and on CI but then deployed in hoisted mode.
     - React native -> There are plugins existing to make react-native work with symlinks
-  - If a package is missing a dependency, it can be temporarily fixed (while waiting for the packag owner to fix this issue) by declaring this missing dependency as top level dependency of the repository.
+  - If a package is missing a dependency, it can be temporarily fixed (while waiting for the package owner to fix this issue) by declaring this missing dependency as top level dependency of the repository.
