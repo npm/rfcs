@@ -59,7 +59,7 @@ The goal is to provide an accurate dependency graph to Node.js while still relyi
 
 We deem it valuable to invest the time implementing `isolated-mode` now, knowing that import-maps are coming, because most of the implementation will be re-usable to implement an `import-maps-mode`.
 
-There are already two competing solutions out there which implement a `isolated-mode` ([pnpm](https://pnpm.io) and [yarn](https://yarnpkg.com)). We decided to choose the pnpm approach for the following reasons:
+There are already two competing solutions out there which implement an `isolated-mode`: ([pnpm](https://pnpm.io) and [yarn](https://yarnpkg.com)). We decided to choose the pnpm approach for the following reasons:
 
 - _Works with current ecosystem_, the pnpm `isolated-mode` does not require any modification to Node.js or to the various build tools.
 - _Battle tested_, Microsoft has successfully used pnpm to manage large monorepo for years.
