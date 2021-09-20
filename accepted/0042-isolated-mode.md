@@ -31,7 +31,7 @@ When converting the dependency graph to a folder structure, `hoisted-mode` loses
 
 When workspaces can successfully use code of a package without having a dependency on it, people forget to declare their dependencies. This leads to situations where updating the dependencies of one workspace breaks a seemingly unrelated workspace.
 
-It is worth noting that static code analysis tools can help significantly reduce the frequency of these mistakes. While static code analysis tools are probably sufficient for small projects, they are not for large projects. "isolated-mode" not only helps get the dependencies right but also _proves_ that the dependencies are correct. This proof is essential to build trustable build systems which use caching, scoped installations.
+It is worth noting that static code analysis tools can help significantly reduce the frequency of these mistakes. While static code analysis tools can help fix many issues regarding missing dependencies, there are several classes of issues that cannot be detected by static code analysis. "isolated-mode" not only helps get the dependencies right but also _proves_ that the dependencies are correct. This proof is essential to build trustable build systems which use caching, scoped installations.
 
 ### Duplication
 
