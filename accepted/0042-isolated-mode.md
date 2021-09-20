@@ -340,7 +340,7 @@ Standard supported by [a few browsers](https://caniuse.com/import-maps) and [den
 
 - How much community code will break when the system forbids access to undeclared dependencies? In other words, how much code needs to be fixed to work properly in `isolated-mode`?
   - Regarding packages with missing dependencies in the `package.json` file. In many cases, package owners are willing to fix such issues. If there are a significant number of issues encountered around this, we can likely expect the of packages with missing dependencies is expected to drop fast after npm release `isolated-mode`. We may want to later add a feature to npm which allows users to locally declare dependencies on behalf of packages as a stop-gap, if existing solutions to this are not enough.
-  - There don't seem to be any packages out there that depend on the way hoisting works as a feature. If this is the case, it would be easy to argue that these packages should only rely on the npm and the Node.js contracts/APIs and not on implementation details like hoisting.
+  - There are packages out there that depend on the way hoisting works as a feature. These packages can work in `isolated-mode` by simply adding whichever dependency is assumed to be hoisted as a dependency of the root's `package.json`.
   - Some dev-environments don't support symlinks.
     - AWS Lambdas -> a repository can a be installed with isolated mode locally and on CI but then deployed in hoisted mode.
     - React native -> There are plugins existing to make react-native work with symlinks
