@@ -6,11 +6,11 @@ This RFC is a proposal to add a new opt-in installation mode.
 
 This mode aims at preventing workspaces from over-sharing their dependencies. With this mode, two workspaces will share a dependency only if both have declared it in their package.json.
 
-This RFC aims at improving projects with workspaces, but the suggested implementation will also happen to bring value to projects not using workspaces. Because `isolated-mode` is valuable for any project, it will also be available for projects not using workspaces.
+While this RFC aims at improving projects with workspaces, isolated-mode could be valuable for any project, whether or not it uses workspaces.
 
 ## Motivation
 
-The introduction of workspaces in npm v7 brought the ability to split large code-bases into smaller pieces of code with declared dependencies between them.
+The introduction of workspaces in npm v7 brought the ability to split large code-bases into smaller pieces of code with declared dependencies between them. This pattern is sometimes referred to as a "monorepo."
 
 Several build tools took advantage of these declared dependencies to split the builds into multiple steps (one per workspace). These build tools take advantage of the declared dependencies between workspaces to only rebuild the workspaces that have not changed since the last build. With the current way npm works, any dependency change to any workspace may affect any other workspace. This means that the build systems need to rebuild the entire project every time a single workspace modifies a dependency. This is inefficient and does not scale.
 
@@ -67,7 +67,7 @@ There are already two competing solutions out there which implement an `isolated
 
 - _Works with current ecosystem_, the pnpm `isolated-mode` does not require any modification to Node.js or to the various build tools.
 - _Battle tested_, Microsoft has successfully used pnpm to manage large monorepo for years.
-- _Recommended by Node.js_, this approach is actually the recommended approach by [the Node.js documentation](https://nodejs.org/api/modules.html#modules_addenda_package_manager_tips).
+- _Recommended by Node.js_, this approach is actually the recommended approach by [the Node.js documentation](https://nodejs.org/api/modules.html#modules_package_manager_tips).
 
 # Implementation
 
@@ -335,17 +335,18 @@ Standard supported by [a few browsers](https://caniuse.com/import-maps) and [den
 
 ## Unresolved Questions and Bikeshedding
 
-- Should we use symlinks or junctions on Windows? Both of them have drawbacks:
+- **Should we use symlinks or junctions on Windows? Both of them have drawbacks**:
 
   - Junctions have to be representated by an absolute path, this means that junctions cannot be committed to git or packed into a package.
   - Symlinks can only be created in elevated shell [or when Windows is in "developer mode"](https://blogs.windows.com/windowsdeveloper/2016/12/02/symlinks-windows-10/#LCiVBWTgQF5s7fmL.97).
 
   - answer: junctions by default. support for symlinks can be added later as an opt-in if we see value for it.
-
-- How much community code will break when the system forbids access to undeclared dependencies? In other words, how much code needs to be fixed to work properly in `isolated-mode`?
+- **How much community code will break when the system forbids access to undeclared dependencies? In other words, how much code needs to be fixed to work properly in `isolated-mode`**?
   - Regarding packages with missing dependencies in the `package.json` file. In many cases, package owners are willing to fix such issues. If there are a significant number of issues encountered around this, we can likely expect the of packages with missing dependencies is expected to drop fast after npm release `isolated-mode`. We may want to later add a feature to npm which allows users to locally declare dependencies on behalf of packages as a stop-gap, if existing solutions to this are not enough.
   - There are packages out there that depend on the way hoisting works as a feature. These packages can work in `isolated-mode` by simply adding whichever dependency is assumed to be hoisted as a dependency of the root's `package.json`.
   - Some dev-environments don't support symlinks.
     - AWS Lambdas -> a repository can a be installed with isolated mode locally and on CI but then deployed in hoisted mode.
     - React native -> There are plugins existing to make react-native work with symlinks
   - If a package is missing a dependency, it can be temporarily fixed (while waiting for the package owner to fix this issue, or if it’s working as designed) by declaring this missing dependency as top level dependency of the repository.
+- **What should the opt-in option be for this mode?**
+  - Something like `--install-mode=isolated`. This would allow us to add other modes (like an `import-map` mode) in a similar way.
