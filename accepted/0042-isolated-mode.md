@@ -25,7 +25,11 @@ To make the discussions more efficient, we could also name the current default i
 
 Packages and workspaces declare their dependencies to npm by using special fields in their `package.json`. The Node.js runtime is unaware of these special fields, instead it uses a [module resolution algorithm](https://nodejs.org/api/modules.html) to determine the meaning of a module importing another module. npm bridges this gap by converting the declared dependency graph into a folder structure which makes sense to Node.js. This operation is call `reification`.
 
-When converting the dependency graph to a folder structure, `hoisted-mode` loses information. Multiple different dependency graphs can be converted to an identical folder structure. Since the folder structure is all that Node.js uses to resolve modules, Node.js misses some information about dependencies. This loss of information is most frequently visible through the fact that workspaces are able to successfully import the dependencies declared by other workspaces.
+When converting the dependency graph to a folder structure, `hoisted-mode` loses information. Multiple different dependency graphs can be converted to an identical folder structure. Since the folder structure is all that Node.js uses to resolve modules, Node.js misses some information about dependencies. This loss of information is most frequently visible through the fact that packages in the tree are able to successfully import packages that they have not explicitly declared as dependencies.
+
+When packages import dependencies that are not explicitly declared, they are do not take advantage of the dependency contracts enforced by npm.  Thus, when installed in a different environment, the dependency may be missing, or may be a version that they cannot use properly, causing errors at run time.
+
+In a monorepo project using workspaces, this means that a dependency of any workspace may be imported by all other workspaces, making it difficult to detect such errors at development time.
 
 ### Forgetting to declare dependencies
 
@@ -94,7 +98,7 @@ In the package store:
 - The package store is a folder stored in the root/project level `node_modules` folder.
 - The package store is named `.npm`.
 - The package store contains folders, one for each dependency installed. These dependencies can be direct workspace dependencies or transitive dependencies.
-- These folders have a name containing the name of the package, its version and a hash of its content plus the hash of its resolved peer-dependencies.
+- These folders have a name containing the name of the package, its version and a hash of its content plus the hash of its resolved peer dependency set.
 - These folders contain a `node_modules` folder.
 - These `node_modules` folders contain multiple folders, one for each dependency of that package and one for the package itself.
 - All these folders are named based on their respective package names.
@@ -303,7 +307,7 @@ The `isolated-mode` will use the same lockfile as `hoisted` mode. Developers can
 
 ### Projects not using workspaces
 
-Non-workspace projects _will_ be able to use the `isolated-mode` reification. This is useful as a library author, using `isolated-mode` gives me the guarantee that my library will work as intended when consumed by projects which use `isolated-mode`.
+Non-workspace projects _will_ be able to use the `isolated-mode` reification. This is useful as a library author, using `isolated-mode` gives me the guarantee that my library will work as intended, without unexpected run-time errors caused by undeclared dependencies.
 
 ## Prior Art and Alternatives
 
