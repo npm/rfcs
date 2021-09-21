@@ -350,3 +350,5 @@ Standard supported by [a few browsers](https://caniuse.com/import-maps) and [den
   - If a package is missing a dependency, it can be temporarily fixed (while waiting for the package owner to fix this issue, or if it’s working as designed) by declaring this missing dependency as top level dependency of the repository.
 - **What should the opt-in option be for this mode?**
   - Something like `--install-mode=isolated`. This would allow us to add other modes (like an `import-map` mode) in a similar way.
+- **Should the default hoisted mode be more aggressive with symlinks?**
+  - @isaacs has considered it in the past, and may revisit this.
