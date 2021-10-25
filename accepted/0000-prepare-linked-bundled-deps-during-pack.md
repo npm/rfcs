@@ -56,9 +56,11 @@ It's also possible to achieve the same end result by publishing the bundled depe
 
 ## Implementation
 
-{{Give a high-level overview of implementation requirements and concerns. Be specific about areas of code that need to change, and what their potential effects are. Discuss which repositories and sub-components will be affected, and what its overall code effect might be.}}
+Need help with this part.
 
-{{THIS SECTION IS REQUIRED FOR RATIFICATION -- you can skip it if you don't know the technical details when first submitting the proposal, but it must be there before it's accepted}}
+> {{Give a high-level overview of implementation requirements and concerns. Be specific about areas of code that need to change, and what their potential effects are. Discuss which repositories and sub-components will be affected, and what its overall code effect might be.}}
+>
+> {{THIS SECTION IS REQUIRED FOR RATIFICATION -- you can skip it if you don't know the technical details when first submitting the proposal, but it must be there before it's accepted}}
 
 ## Prior Art
 
@@ -67,6 +69,8 @@ It's also possible to achieve the same end result by publishing the bundled depe
 
 ## Unresolved Questions and Bikeshedding
 
-{{Write about any arbitrary decisions that need to be made (syntax, colors, formatting, minor UX decisions), and any questions for the proposal that have not been answered.}}
+I don't think there's anything here, but leaving it for now in case I've missed/forgotten something.
 
-{{THIS SECTION SHOULD BE REMOVED BEFORE RATIFICATION}}
+> {{Write about any arbitrary decisions that need to be made (syntax, colors, formatting, minor UX decisions), and any questions for the proposal that have not been answered.}}
+>
+> {{THIS SECTION SHOULD BE REMOVED BEFORE RATIFICATION}}
