@@ -2,7 +2,7 @@
 
 ## Summary
 
-Following discussion on #477 and previously on #463, workspaces that depend on sibling workspaces via the `file:` protocol (a.k.a. linked or symlinked dependencies) should run the sibling workspaces' `prepare` scripts as part of the depend-_ing_ workspace's `pack` operation when those sibling dependencies are also specified as bundle/d dependencies (e.g. their "built" output should make it into the packed workspace's tarball).
+Following discussion on [#477](https://github.com/npm/rfcs/issues/477) and previously on [#463](https://github.com/npm/rfcs/issues/463), workspaces that depend on sibling workspaces via the `file:` protocol (a.k.a. linked or symlinked dependencies) should run the sibling workspaces' `prepare` scripts as part of the depend-_ing_ workspace's `pack` operation when those sibling dependencies are also specified as bundle/d dependencies (e.g. their "built" output should make it into the packed workspace's tarball).
 
 ## Motivation
 
@@ -65,7 +65,7 @@ Need help with this part.
 ## Prior Art
 
 - Related to a forthcoming PR about workspace/dependency layout from @ljharb
-- Discussed at #478
+- Discussed at [#478](https://github.com/npm/rfcs/issues/478)
 
 ## Unresolved Questions and Bikeshedding
 
