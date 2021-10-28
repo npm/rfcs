@@ -45,6 +45,22 @@ When the owner of the workspace A calls webpack-cli (from within the A workspace
 
 This is not what the owner of workspace A expects, webpack-cli should use the webpack version defined by workspace A which is version 5.
 
+The following reification would solve this problem:
+
+```
+
++---> node_modules
+|          +--------> webpack@4.46.0
++---> A
+|     +------> node_modules
+|                   +------> webpack@5.60.0
+|                   +--------> webpack-cli@3.3.0
++---> B
+|
++---> C
+
+```
+
 ## Detailed Explanation
 
 {{Describe the expected changes in detail, }}
