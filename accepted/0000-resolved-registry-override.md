@@ -26,18 +26,16 @@ file is updated. This is a pain when users forget to run the script and lock
 files are left with references to the wrong repository.
 
 npm v7 seems to have changed the behavior of resolved in npm-shrinkwrap
-files[^1]. This caused errors on our CI servers with limited network access
+files npm/cli#3783. This caused errors on our CI servers with limited network access
 when installing aws-cdk packages that include registry.yarnpkg.com in their
 shrinkwrap. npm v6 would ignore the resolved key and install aws-cdk's
 dependencies from our allow-listed custom registry. npm v7 would read the
 resolved key and fail to install from the blocked yarnpkg registry. We've fixed
-this for new versions of aws-cdk[^2] but still cannot install old versions. 
+this for new versions of aws-cdk aws/aws-cdk#16607 but still cannot install old versions. 
 
 This RFC proposes an npm option that would enable generating and reading lock
 files without a resolved field.
 
-[^1]: npm/cli#3783
-[^2]: aws/aws-cdk#16607
 
 ## Detailed Explanation
 
