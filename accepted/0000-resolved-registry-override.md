@@ -31,7 +31,7 @@ when installing aws-cdk packages that include registry.yarnpkg.com in their
 shrinkwrap. npm v6 would ignore the resolved key and install aws-cdk's
 dependencies from our allow-listed custom registry. npm v7 would read the
 resolved key and fail to install from the blocked yarnpkg registry. We've fixed
-this for new versions of aws-cdk aws/[aws-cdk#16607] but still cannot install old versions. 
+this for new versions of aws-cdk [aws/aws-cdk#16607] but still cannot install old versions. 
 
 This RFC proposes an npm option that would enable generating and reading lock
 files without a resolved field.
