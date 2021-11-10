@@ -6,7 +6,32 @@ team](https://github.com/orgs/npm/teams/cli-team) and the wider community
 to have discussions about the features and direction of the package
 manager.
 
-## What's an RFC?
+## RFC Meetings
+
+### Why a meeting?
+In our ongoing efforts to better listen to & collaborate with the community, we've started a call that helps to move conversations on RFCs & initiatives forward. It is a secondary, synchronous forum which we use to engage with the community beyond the discussion/comment threads in issues & PRs.
+
+### When is the meeting?
+
+#### Wednesday's @ 2:00 PM EST
+
+**Cadence:**
+This meeting is scheduled to take place **weekly**. Previous meeting agendas & notes can be found [here](https://github.com/npm/rfcs/issues?q=is%3Aissue+sort%3Aupdated-desc+is%3Aclosed+label%3Ameeting)
+
+**Livestream:**
+You don't have to join the Zoom call to attend a meeting, you can watch our calls [live](https://youtube.com/channel/UCK71Wk0I45SLTSXQA23GdIw/live) or view [previous meetings](https://www.youtube.com/playlist?list=PLQso55XhxkgBKhtFahRx20wyWE488kKJJ) on YouTube.
+
+### How to join?
+
+**Add to your Calendar:**
+You can track all **npm** public events by adding/tracking our **public events calendar**:
+
+* gCal: [`https://calendar.google.com/calendar/embed?src=npmjs.com_oonluqt8oftrt0vmgrfbg6q6go%40group.calendar.google.com`](https://calendar.google.com/calendar/embed?src=npmjs.com_oonluqt8oftrt0vmgrfbg6q6go%40group.calendar.google.com)
+* iCal: [`https://calendar.google.com/calendar/ical/npmjs.com_oonluqt8oftrt0vmgrfbg6q6go%40group.calendar.google.com/public/basic.ics`](https://calendar.google.com/calendar/ical/npmjs.com_oonluqt8oftrt0vmgrfbg6q6go%40group.calendar.google.com/public/basic.ics)
+
+**Zoom Link:** You can join the livestreamed Zoom meeting/call [here](https://github.zoom.us/j/94543839461?pwd=S0lwYytLd2tlMVBxTlJGbE5QQlhGUT09)
+
+## What is an RFC?
 
 The name is a reference to the **IETF's Request For Comments** process, and
 involves a document or series of documents which are drafted, reviewed, and
