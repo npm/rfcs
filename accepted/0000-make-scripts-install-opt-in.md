@@ -15,10 +15,10 @@ From our calculations, only around 0.6% of packages on npm currently use this fe
 
 |     | Count | Percentage |
 | --- | --- | --- |
-| Packages with preinstall script | 2,826 | 0.14% |
-| Packages with install script | 2,138 | 0.11% |
-| Packages with postinstall script | 7,155 | 0.36% |
-| Packages with gyp | 2,769 | 0.14% |
+| Packages with preinstall script | 1,660 | 0.08% |
+| Packages with install script | 2,077 | 0.1% |
+| Packages with postinstall script | 6,989| 0.35% |
+| Packages with gyp | 2,744 | 0.14% |
 | Total Packages on npm | 1,996,434 | 100% |
 | **Total Packages with scripts on npm** | 12,035 | **0.6%** |
 
