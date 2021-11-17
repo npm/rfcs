@@ -20,7 +20,7 @@ From our calculations, only around 0.6% of packages on npm currently use this fe
 | Packages with postinstall script | 7,155 | 0.36% |
 | Packages with gyp | 2,769 | 0.14% |
 | Total Packages on npm | 1,996,434 | 100% |
-| **Total Packages with scripts on npm** | 13,406 | **0.6%** |
+| **Total Packages with scripts on npm** | 12,035 | **0.6%** |
 
 ## What Makes Install Scripts Special vs. Other Security Issues?
 
