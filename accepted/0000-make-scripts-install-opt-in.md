@@ -15,7 +15,6 @@ From our calculations, only around 0.6% of packages on npm currently use this fe
 
 |     | Count | Percentage |
 | --- | --- | --- |
-
 | Packages with preinstall script | 2,826 | 0.14% |
 | Packages with install script | 2,138 | 0.11% |
 | Packages with postinstall script | 7,155 | 0.36% |
