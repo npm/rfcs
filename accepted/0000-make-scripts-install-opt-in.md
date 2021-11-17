@@ -50,7 +50,7 @@ I propose the following flags and changes in behavior:
 3. The `--disallow-scripts` option should also be added that does the opposite of `--allow-scripts`. This is necessary since later I will discuss global settings for allowing packages to use install scripts, and so this lets you ignore that setting if you so choose.
 4. The `--allow-scripts-unsafe` option is added for more convenient, but more dangerous, handling of install scripts:
     - `npm install --allow-scripts-unsafe canvas`: Install the contents of `package.json`, allowing any version of `canvas` to run install scripts.
-    - `npm install --allow-scripts-unsafe "canvas@1.0.0-2.0.0"`: Install the contents of `package.json`, allowing any version of `canvas` in the semver range 1.0.0 to 2.0.0 to run install scripts. While strictly safer than the unranged version above, it still runs the risk of new vulnerable packages being snuck in in that range. For example, if an account is compromised, and a patch version is published to every major version that is present. 
+    - `npm install --allow-scripts-unsafe "canvas@1.0.0-2.0.0"`: Install the contents of `package.json`, allowing any version of `canvas` in the semver range 1.0.0 to 2.0.0 to run install scripts. While strictly safer than the unranged version above, it still runs the risk of new vulnerable packages being snuck in in that range. For example, if an account is compromised, and a patch version is published to every major version that is present.
     - `npm install canvas --allow-scripts-unsafe canvas`:  Installs the latest version of canvas to the current `package.json`, and allows it to run install scripts.
     - `npm install canvas --allow-scripts-unsafe canvas --allow-unsafe-scripts ramda`:  Installs the latest version of canvas to the current `package.json`, and allows it to run install scripts for canvas and any version of ramda it encounters.
 
@@ -72,5 +72,5 @@ I imagine this should hopefully not be harder than adding some if statements aro
 
 Two open questions for me:
 
-1. Having npm ship with a grandfathered list of "known safe" package versions. For example, every currently shipping version of canvas. That way, for important large packages, this is a "from now on" requirement. Alternatively, there could just be a transition period where npm just warns about script, and then afterward we make it actually refuse to run them without the proper flags. 
+1. Having npm ship with a legacy list of "known safe" package versions. For example, every currently shipping version of canvas. That way, for important large packages, this is a "from now on" requirement. Alternatively, there could just be a transition period where npm just warns about script, and then afterward we make it actually refuse to run them without the proper flags.
 2. I think the automatic node-gyp stuff should be under this umbrella as well. That is to say, node-gyp would only run when gypfiles are detected if the `allow-scripts` flag allows it, since you can also techncially put whatever you want in there I believe, and not doing this would simply mean that any malicious behavior would be transitioned there.
