@@ -69,8 +69,12 @@ PR to add this.
 * As mentioned previously 
   [`git diff --ignore-cr-at-eol`](https://github.com/git/git/commit/e9282f02b2f21118f3383608718e38efc3d967e1)
 
+* Gnu diffutils 
+  [`diff --strip-trailing-cr`](https://www.gnu.org/software/diffutils/manual/html_node/diff-Options.html#diff-Options)
+
 ## Unresolved Questions and Bikeshedding
 
-* Option/flag name? `diffIgnoreCRAtEOL`, `diffIgnoreLineEndings`, `diffIgnoreCr`?
+* Option/flag name? `diffIgnoreCRAtEOL`, `diffIgnoreLineEndings`, `diffIgnoreCr`, 
+  `diffStripTrailingCr`?
 * Should `ignoreAllSpace` ignore CR?
 * Should CR be ignored by default?
