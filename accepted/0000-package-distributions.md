@@ -2,7 +2,7 @@
 
 ## Summary
 
-Today, maintainers utilize various strategies to distribute platform-specific versions of their software under a singular package namespace. Often, these strategies rely on `install` scripts or `optionalDependencies` with some type of bootloader implementation (ex. [`esbuild`](https://npmjs.com/package/esbuild?activeTab=explore)); borth are not ideal. The `npm` CLI should support a first-class/standard way for maintainers to define conditions in which a package distribution is reified in place of the origin target. 
+Today, maintainers utilize various strategies to distribute platform-specific versions of their software under a singular package namespace. Often, these strategies rely on `install` scripts or `optionalDependencies` with some type of bootloader implementation (ex. [`esbuild`](https://npmjs.com/package/esbuild?activeTab=explore)); both are not ideal. The `npm` CLI should support a first-class/standard way for maintainers to define conditions in which a package distribution is reified in place of the origin target. 
 
 ## Motivation
 
