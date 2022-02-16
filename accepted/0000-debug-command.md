@@ -92,6 +92,8 @@ There are other development lifecycle commands like
 
 but none for debugging in particular.
 
+- `npx debug` would install [debug](https://npmjs.com/package/debug). Though, that package focuses on entering/providing a "debug mode" for scripts that may be run with node but not within a node debugger session.
+
 ## Unresolved Questions and Bikeshedding
 
 - Separating `argv` and `script-argv` with extra dashes was proposed for consistency with `npm run`, only. When debugging an executable package with script arguments, regularly, then this is more of an annoyance, though. Make `debug` a command *without* own arguments and *sensible defaults* instead and rather refer to a `debug` run-script for using `node --inspect-brk` with additional debugger arguments?
