@@ -32,15 +32,15 @@ This RFC proposes an `npm debug` command to simplify debugging scripts and packa
     - requires an editor or IDE
     - typically requires creating or configuring a tool-specific launch configuration
 
-An `npm debug` command could facilitate `npm's` `package.json` manifest to simplify launching a debug session for packaged JavaScripts.
+The `npm debug` command facilitates npm's `package.json` manifest to simplify launching a debug session for packaged JavaScripts.
 
 ## Implementation
 
-In general the `npm debug` CLI command should be as consistent as possible with existing commands like `npm run` or `npm test` in terms of arguments, script or package selection, current working directory etc. *where* applicable.
+In general the `npm debug` command should be as consistent as possible with existing commands like `npm run` or `npm test` in terms of shared arguments, script or package selection, current working directory etc. *where applicable*.
 
-For example, to remain consistent with `npm run` the new command's `argv` MAY be separated from the debugged script's `script-argv` using `' -- '` (dashes surrouned by spaces).
+For example, to remain consistent with `npm run` the new command's `argv` MAY be separated from the debugged script's `script-argv` using `' -- '` (dashes enclosed in spaces).
 
-The command should launch a debug session but break debugging until a remote debugger connects, similar to `node --inspect-brk`.
+The command should launch a debug session but halt debugging until a remote debugger connects, similar to `node --inspect-brk`.
 
 *Algorithm 1*
 
@@ -48,11 +48,11 @@ The command should launch a debug session but break debugging until a remote deb
 npm debug
 ~~~
 
-when being issued in a package directory should try running in this order and first-only
+when being issued in a package directory should try in this order and first-only
 
-1. the run-script referred to by some `script.debug` property when present in `package.json`
-1. the script referred to by the `bin` property when present in `package.json` using `node --inspect-brk <script>`
-1. the script referred to by the `main` property when present in `package.json` using `node --inspect-brk <script>`
+1. running the run-script referred to by some `script.debug` property when present in `package.json`
+1. launching a debug session for the script referred to by the `bin` property when present in `package.json` using `node --inspect-brk <bin-script>`
+1. launching a debug session for the script referred to by the `main` property when present in `package.json` using `node --inspect-brk <main-script>`
 1. fail with an `npm ERR!` otherwise.
 
 *Algorithm 2*
