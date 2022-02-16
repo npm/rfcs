@@ -36,11 +36,11 @@ The `npm debug` command facilitates npm's `package.json` manifest to simplify la
 
 ## Implementation
 
-In general the `npm debug` command should be as consistent as possible with existing commands like `npm run` or `npm test` in terms of shared arguments, script or package selection, current working directory etc. *where applicable*.
+In general the `npm debug` command should be as consistent as possible with existing commands like `npm run` or `npm test` in terms of shared arguments, script or package selection, current working directory etc. *where applicable*. For example, to remain consistent with `npm run` the new command's `argv` MAY be separated from the debugged script's `script-argv` using `' -- '` (dashes enclosed in spaces).
 
-For example, to remain consistent with `npm run` the new command's `argv` MAY be separated from the debugged script's `script-argv` using `' -- '` (dashes enclosed in spaces).
+The command launches a debug session but halts debugging until a remote debugger connects, similar to `node --inspect-brk`.
 
-The command should launch a debug session but halt debugging until a remote debugger connects, similar to `node --inspect-brk`.
+When being issued in a package directory subsequent commands should apply the given steps in the given order and *first-match-only*:
 
 *Algorithm 1*
 
@@ -48,11 +48,9 @@ The command should launch a debug session but halt debugging until a remote debu
 npm debug
 ~~~
 
-when being issued in a package directory should try in this order and first-only
-
-1. running the run-script referred to by some `script.debug` property when present in `package.json`
-1. launching a debug session for the script referred to by the `bin` property when present in `package.json` using `node --inspect-brk <bin-script>`
-1. launching a debug session for the script referred to by the `main` property when present in `package.json` using `node --inspect-brk <main-script>`
+1. run the run-script referred to by some `script.debug` property when present in `package.json`
+1. launch a debug session for the script referred to by the `bin` property when present in `package.json` using `node --inspect-brk <bin-script>`
+1. launch a debug session for the script referred to by the `main` property when present in `package.json` using `node --inspect-brk <main-script>`
 1. fail with an `npm ERR!` otherwise.
 
 *Algorithm 2*
@@ -61,8 +59,8 @@ when being issued in a package directory should try in this order and first-only
 npm debug <package>
 ~~~
 
-1. MAY search all `workspaces` for a target package `<package>` and apply *Algorithm 1* with the target package's `package.json`
-1. MUST search `node_modules` non-recursively for a target package `<package>` and apply *Algorithm 1* with the target package's `package.json`
+1. search all `workspaces` for a target package `<package>` and apply *Algorithm 1* with the target package's `package.json`
+1. search `node_modules` non-recursively for a target package `<package>` and apply *Algorithm 1* with the target package's `package.json`
 1. fail with an `npm ERR!` otherwise.
 
 *Algorithm 3*
@@ -71,7 +69,7 @@ npm debug <package>
 npm debug <package> --workspaces
 ~~~
 
-1. MUST search `workspaces`, only, for a target package `<package>` and apply *Algorithm 1* with the target package's `package.json`
+1. search `workspaces`, only, for a target package `<package>` and apply *Algorithm 1* with the target package's `package.json`
 1. fail with an `npm ERR!` otherwise.
 
 *Algorithm 4*
@@ -80,7 +78,7 @@ npm debug <package> --workspaces
 npm debug <package> --workspace=X
 ~~~
 
-1. MUST search only workspace `X` for target package `<package>` and apply *Algorithm 1* with the target package's `package.json`
+1. search only workspace `X` for target package `<package>` and apply *Algorithm 1* with the target package's `package.json`
 1. fail with an `npm ERR!` otherwise.
 
 ## Prior Art
