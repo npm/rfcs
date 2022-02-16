@@ -2,7 +2,7 @@
 
 ## Summary
 
-This RFC proposes an `npm debug` command to simplify debugging scripts and packages.
+This RFC proposes an `npm debug` command to simplify debugging npm packages.
 
 ## Motivation
 
@@ -13,15 +13,15 @@ When developing
 1. a tool configuration for an executable tool installed to `node_modules`
 1. a multi-package workspace project
 
-then without editor or IDE support there's only the `node --inspect` or `node --inspect-brk` command for starting a remote debug session for a JavaScript file. Since `node` has no inherent knowledge of an *npm package* its commands require typing a complete path to the JavaScript file that is meant to be debugged.
+then without editor or IDE support there's only the `node --inspect` or `node --inspect-brk` command for starting a debug session for a JavaScript file. Since `node` has no inherent knowledge of an *npm package* its commands require typing a complete path to the JavaScript file that is meant to be debugged.
 
 ## Detailed Explanation
 
-This RFC proposes an `npm debug` command to simplify debugging scripts and packages.
+This RFC proposes an `npm debug` command to simplify debugging npm packages.
 
 ## Rationale and Alternatives
 
-**Rationale:** Making debugging npm packages easier.
+**Rationale:** Make debugging npm packages easier.
 
 **Alternatives:**
 
