@@ -151,6 +151,26 @@ Which would be equivalent to the following JSON:
 
 Circular dependencies are not an issue for YAML since a node cannot be an anchor and an alias.
 
+## Ruby's Gemfile and .gemspec files
+
+Because Ruby's Gemfile and .gemspec files are Ruby scripts, specifying shared versions is simple. Take, for instance, the following `.gemspec` extract:
+
+```ruby=
+version = File.read(File.expand_path("RAILS_VERSION", __dir__)).strip
+
+Gem::Specification.new do |s|
+  s.platform    = Gem::Platform::RUBY
+  s.name        = "rails"
+  ...
+  s.add_dependency "activesupport", version
+  s.add_dependency "actionpack",    version
+  s.add_dependency "actionview",    version
+  ...
+end
+```
+
+Here, multiple dependencies are added with the same version loaded from a file.
+
 ## Unresolved Questions and Bikeshedding
 
 The following details need to be ratified:
