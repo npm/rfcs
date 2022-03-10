@@ -21,9 +21,16 @@ increasing the possible attack surface.
 ## Detailed Explanation
 
 Introduce a new CLI command `verify-signatures` that verifies the npm signature
-in a packages packument, using npm's public key, fetched from npmjs.com. It
-works on the current install (`node_modules`) for most arguments, and checks all
-direct and transitive dependencies.
+in a packages packument, using npm's public key, fetched from npmjs.org. It
+works on the current install (`node_modules`), and checks all direct and
+transitive dependencies.
+
+The aim is for this command to plug into users build workflows after `npm ci/npm
+install` and block builds with invalid signatures.
+
+This command is standalone but we could fold this behaviour into `npm install`
+or `audit` in the future once we're confident validation is performant and
+provides a good user experience with little to no noise.
 
 ### Detailed CLI examples
 
@@ -164,7 +171,7 @@ Please update the npm CLI to version x.x.x in order to support the new signature
 keys hosted on npmjs.com.
 ```
 
-### Signature key rotation
+### Moving signatures from PGP to ECDSA
 
 We plan to rotate the signing key as part of this effort. The CLI command will
 support a new (ECDSA) signature key, existing PGP signatures and verification
@@ -172,36 +179,35 @@ workflows will contine work during a deprecation period.
 
 The new ECDSA signatures are smaller in size (64 bytes), compared to the
 existing PGP signature (893 bytes). We can stop writing `npm-signature`s on new
-package releases once we the Keybase key has expired so new packages.
+package releases once we the Keybase key has expired.
 
-**Plan for switching to a new signature key:**
+**Rollout plan:**
 
 - 1. **Publish new public key on npmjs.com**: The npm cli will use this endpoint
-     to fetch the public key and cache this locally.
-- 2. **Add a new `signatures` field to the version packument**: We treat
-     existing release/version packuments as immutable and introduce a new
-     `signatures` array in the version packument. Each signature references a
-     `keyid` (sha256 hash of the public key).
+  to fetch the public key and cache this locally.
+- 2. **Add a new `signatures` field to the version packument**: We introduce a
+  new `signatures` array in the version packument. Each signature references a
+  `keyid` (sha256 hash of the public key).
 - 3. **Double sign during the deprecation period using both keys**: We will
   double-sign creating both a PGP signature and an ECDSA signature over the
   `package@version:integrity` string. The PGP signature will go in the existing
   `npm-signature` field and the ECDSA signature will go in the new `signatures`
   array in the version packument.
 - 4. **Generate signatures on existing package releases using the new key**: We
-     will backfill signatures for all existing releases/versions, generating a
-     signature using the new key and adding this to the version packuments
-     `signatures` array.
+  will backfill signatures for all existing releases/versions, generating a
+  signature using the new key and adding this to the version packuments
+  `signatures` array.
 - 5.  **Introduce new npm cli command: `validate-signatures`**:  The command
-will will only support new (ECDSA) signature keys and come pre-bundled with
-valid `keyid`s, warning users to update the cli if a new key has been found from
-npmjs.com.
+  will will only support new (ECDSA) signature keys and come pre-bundled with
+  valid `keyid`s, warning users to update the cli if a new key has been found
+  from npmjs.org.
 - 6. **Update the Keybase PGP key expiry**: We want to give folks with their own
   tooling as much notice as possible while deprecating the use of the existing
   PGP key. We will update the public Keybase key with a new expiration date (the
   current key expires 2034-03-30). We will communicate this expiration to match
   the deprecation timeframe (exact timing is TBD).
 - 7. **Stop generating PGP signatures once the key expires**: We will no longer
-     populate the packument field `dist.npm-signature` in new releases.
+  populate the packument field `dist.npm-signature` in new releases.
 
 #### Breaking changes
 
@@ -209,7 +215,7 @@ Existing workflows validating PGP signatures will break once the public Keybase
 PGP expires and we stop writing this signature to packages `npm-signature`
 field.
 
-**Packument example with new `signatures` field:**
+### Adding ECDSA signatures to packuments
 
 We will introduce a new `signatures` field in the version packument, e.g.
 [registry.npmjs.org/light-cycle/1.4.3](https://registry.npmjs.org/light-cycle/1.4.3):
@@ -234,7 +240,7 @@ We will introduce a new `signatures` field in the version packument, e.g.
    }
 ```
 
-The `keyid` will reference a public key hosted on `npmjs.com`.
+The `keyid` will map to a public key hosted on `https://registry.npmjs.org/.well-known/npm-signature-keys`.
 
 ## Rationale and Alternatives
 
@@ -285,7 +291,7 @@ packuments](https://github.com/npm/rfcs/pull/76) or user generated signatures
       it with help from core TUF maintainers. Although I gatheer this includes a
       lot of investment work to support large package repositories.
   - We think this piece is orthogonal and we're investigating using
-    [TUF](https://theupdateframework.io/).
+    [TUF](https://theupdateframework.io/) in the future.
 
 ## Implementation
 
@@ -308,16 +314,25 @@ verifier.end();
 const result = verifier.verify(publicKey, packument.dist['npm-signature'], "base64");
 ```
 
-The CLI command should return an error code if there is a signature but it's
-invalid and log an error if it's missing as this will be the default for any
-package hosted outside npmjs.org.
-
-The aim is for this command to plug into users build workflows after `npm ci/npm
-install` and block builds with invalid signatures.
+**Handle expired/rotated keys**:
 
 If the public key has an `expires` set, validate this against the version
 created at time, ensuring expired keys are only valid for packages released
 before this time.
+
+**Protect against missing signatures**:
+
+A potential attack scenario would be a malicious mirror/third-party registry
+omitting `signatures` from the packument and tricking validation into thinking
+no signature verification is needed.
+
+We can verify the signature is present for packages fetched from
+registry.npmjs.org. We could enforce this check for mirrors if the tarball is
+hosted on registry.npmjs.org.
+
+The npm CLI could warn users if they are validating packages that don't have
+signatures in the packument, and the registry/mirror doesn't have keys available at:
+`https://registry.host/.well-known/npm-signature-keys`.
 
 #### Fetching the public key
 
@@ -459,22 +474,6 @@ keytype = "ecdsa-sha2-nistp256"
 sigtype = "ecdsa-sha2-nistp256"
 key = "{{B64_PUBLIC_KEY}}"
 ```
-
-### A potential TUF future
-
-We're investigating evolving the mechanism for trusting new public signature
-keys using [TUF](https://theupdateframework.io/) (The Update Framework) in the
-future.
-
-TUF provides a whole host of attack mitigations against registry/mirror
-compromise. Crucially it provides a mechanism for clients to update currently
-trusted keys in verified way, with a great story for recovering from key
-compromise.
-
-Sigstore's [cosign tool curently supports bringing your own TUF root of
-trust](https://blog.sigstore.dev/sigstore-bring-your-own-stuf-with-tuf-40febfd2badd)
-and npm could investigate supporting a similar flow for trusting third-party
-registries.
 
 ## Out of scope
 
