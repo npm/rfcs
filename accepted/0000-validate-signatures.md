@@ -7,8 +7,7 @@ Add a new top-level CLI command to verify registry signatures.
 ## Motivation
 
 Signatures are only useful if people verify them. Signature verification is
-currently a [manual and complex process
-(https://docs.npmjs.com/verifying-the-pgp-signature-for-a-package-from-the-npm-public-registry),
+currently a [manual and complex process](https://docs.npmjs.com/verifying-the-pgp-signature-for-a-package-from-the-npm-public-registry),
 involving the Keybase CLI to fetch the npm public key.
 
 Our long-term goal for supply chain security is that all software is signed and
