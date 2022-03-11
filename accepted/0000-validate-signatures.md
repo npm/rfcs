@@ -155,7 +155,7 @@ Please report this issue: https://github.com/npm/cli/issues/new/choose
 #### Failure case: Signature keys/and or public npmjs.com keys are not known by the CLI
 
 If the known `keyid`s don't match the ones on https://npmjs.com/public-keys the
-`validate-signatures` command will error not attempting to validate any
+`verify-signatures` command will error not attempting to verify any
 signatures. Assume the client is out-of-date and needs to be updated but an
 attacker could also be tampering with returned package signatures.
 
@@ -197,7 +197,7 @@ package releases once we the Keybase key has expired.
   will backfill signatures for all existing releases/versions, generating a
   signature using the new key and adding this to the version packuments
   `signatures` array.
-- 5.  **Introduce new npm cli command: `validate-signatures`**:  The command
+- 5.  **Introduce new npm cli command: `verify-signatures`**:  The command
   will will only support new (ECDSA) signature keys and come pre-bundled with
   valid `keyid`s, warning users to update the cli if a new key has been found
   from npmjs.org.
@@ -316,9 +316,9 @@ const result = verifier.verify(publicKey, packument.dist['npm-signature'], "base
 
 **Handle expired/rotated keys**:
 
-If the public key has an `expires` set, validate this against the version
-created at time, ensuring expired keys are only valid for packages released
-before this time.
+If the public key has an `expires` set, check this against the version created
+at time, ensuring expired keys are only valid for packages released before this
+time.
 
 **Protect against missing signatures**:
 
@@ -366,7 +366,7 @@ GET https://registry.npmjs.org/.well-known/npm-signature-keys
 Adding this endpoint to the registry host allows the CLI to discover these keys
 for third-party registries.
 
-We'll bundle known `keyid`'s in the npm CLI. The `validate-signatures` CLI
+We'll bundle known `keyid`'s in the npm CLI. The `verify-signatures` CLI
 command will error when it encounters a new `keyid`, urging users to update the
 CLI version to handle the new key.
 
@@ -394,7 +394,7 @@ the `signatures` array
 - Stop signing new releases using the old key but keep the pubic key in the CLI
  and at the `registry.npmjs.org/.well-known/npm-signature-keys` URL
 
-The `validate-signatures` should validate that the version created time is
+The `verify-signatures` should check that the version created time is
 within the `expires` time set on the public key.
 
 ### Supporting third-party npm registries signing packages
@@ -404,7 +404,7 @@ way.
 
 We want to make it possible for third-party npm registries (e.g. GitHub
 Packages, Artifactory, Verdaccio etc) to start signing published packages and
-allow the CLI to validate these signatures with minimal user intervention.
+allow the CLI to verify these signatures with minimal user intervention.
 
 #### Setting up package signing on a third-party npm registry:
 
