@@ -2,7 +2,7 @@
 
 ## Summary
 
-Add a new top-level CLI command to verify registry signatures.
+Add a new top-level CLI command to verify registry signatures and update existing signatures from PGP to ESCDA.
 
 ## Motivation
 
@@ -20,17 +20,22 @@ increasing the possible attack surface.
 
 ## Detailed Explanation
 
-Introduce a new CLI command `verify-signatures` that verifies the npm signature
-in a packages packument, using npm's public key, fetched from npmjs.org. It
-works on the current install (`node_modules`), and checks all direct and
-transitive dependencies.
+npm [already signs each published version](https://blog.npmjs.org/post/172999548390/new-pgp-machinery.html) using a private PGP key, with the [public key hosted on Keybase](https://keybase.io/npmregistry).
+
+This RFC proposes improving existing registry signatures:
+- 1. Update the signing key to produce ECDSA signatures which are smaller and can be verified with node's `crypto` library
+- 2. Make signature verification easy using a new CLI command, dropping the requirement for 3rd party tools
+
+To make signature verification easy, we'll introduce a new CLI command `verify-signatures` that verifies the npm signature
+in a packages packument, using npm's public key, fetched from registry.npmjs.org. It
+works on the current install (`node_modules`), and checks all direct and transitive dependencies.
 
 The aim is for this command to plug into users build workflows after `npm ci/npm
 install` and block builds with invalid signatures.
 
 This command is standalone but we could fold this behaviour into `npm install`
 or `audit` in the future once we're confident validation is performant and
-provides a good user experience with little to no noise.
+provides a good user experience.
 
 ### Detailed CLI examples
 
@@ -69,7 +74,7 @@ NOTE: Signatures are missing for all packages hosted outside registry.npmjs.org
 ├─┬ abbrev@3.0.9
 │ ├── INVALID SIGNATURE bar@2.88.0
 
-Someone might have tampered with the package since it was hosted
+Someone might have tampered with the package since it was published
 on npmjs.org (monster-in-the-middle attack)!
 
 Please report this issue: https://github.com/npm/cli/issues/new/choose
@@ -87,7 +92,7 @@ $ npm verify-signatures once
 1 package has a invalid signature (direct):
 ├── INVALID SIGNATURE once@1.4.0
 
-Someone might have tampered with the package since it was hosted
+Someone might have tampered with the package since it was published
 on npmjs.org (monster-in-the-middle attack)!
 
 Please report this issue: https://github.com/npm/cli/issues/new/choose
@@ -108,7 +113,7 @@ project@1.0.0 $HOME/work/project
 ├─┬ lorem@0.4.0
 │ ├── INVALID SIGNATURE ipsum@2.0.0
 
-Someone might have tampered with the package since it was hosted
+Someone might have tampered with the package since it was published
 on npmjs.org (monster-in-the-middle attack)!
 
 Please report this issue: https://github.com/npm/cli/issues/new/choose
@@ -127,7 +132,7 @@ project@1.0.0 $HOME/work/project
 1 package has an invalid signature:
 ├── INVALID SIGNATURE once@1.4.0
 
-Someone might have tampered with the package since it was hosted
+Someone might have tampered with the package since it was published
 on npmjs.org (monster-in-the-middle attack)!
 
 Please report this issue: https://github.com/npm/cli/issues/new/choose
@@ -146,7 +151,7 @@ project@1.0.0 $HOME/work/project
 1 package has an invalid signature (direct):
 ├── INVALID SIGNATURE once@1.4.0
 
-Someone might have tampered with the package since it was hosted
+Someone might have tampered with the package since it was published
 on npmjs.org (man-in-the-middle attack)!
 
 Please report this issue: https://github.com/npm/cli/issues/new/choose
@@ -175,7 +180,7 @@ keys hosted on npmjs.com.
 
 We plan to rotate the signing key as part of this effort. The CLI command will
 support a new (ECDSA) signature key, existing PGP signatures and verification
-workflows will contine work during a deprecation period.
+workflows will contine work during a 6 month deprecation period.
 
 The new ECDSA signatures are smaller in size (64 bytes), compared to the
 existing PGP signature (893 bytes). We can stop writing `npm-signature`s on new
@@ -201,19 +206,13 @@ package releases once we the Keybase key has expired.
   will will only support new (ECDSA) signature keys and come pre-bundled with
   valid `keyid`s, warning users to update the cli if a new key has been found
   from npmjs.org.
-- 6. **Update the Keybase PGP key expiry**: We want to give folks with their own
-  tooling as much notice as possible while deprecating the use of the existing
-  PGP key. We will update the public Keybase key with a new expiration date (the
-  current key expires 2034-03-30). We will communicate this expiration to match
-  the deprecation timeframe (exact timing is TBD).
+- 6. **Update the [Keybase PGP key](https://keybase.io/npmregistry) expiry**: We will update the expiry to be 6 months from the launch of this CLI command and publish of announcement blog post. We want to give folks with their own tooling as much notice as possible while deprecating the use of the existing PGP key.
 - 7. **Stop generating PGP signatures once the key expires**: We will no longer
   populate the packument field `dist.npm-signature` in new releases.
 
 #### Breaking changes
 
-Existing workflows validating PGP signatures will break once the public Keybase
-PGP expires and we stop writing this signature to packages `npm-signature`
-field.
+Existing workflows validating PGP signatures will stop working once the public Keybase PGP expires and we stop writing this signature to packages `npm-signature` field.
 
 ### Adding ECDSA signatures to packuments
 
