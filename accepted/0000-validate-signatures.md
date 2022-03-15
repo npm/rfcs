@@ -2,7 +2,8 @@
 
 ## Summary
 
-Add a new top-level CLI command to verify registry signatures and update existing signatures from PGP to ESCDA.
+Add a new top-level CLI command to verify registry signatures and update
+existing signatures from PGP to ESCDA.
 
 ## Motivation
 
@@ -14,28 +15,63 @@ Our long-term goal for supply chain security is that all software is signed and
 verified in a transparent and user-friendly way.
 
 Signing and verifying published packages protects users against a malicious
-mirror or proxy intercepting and tamptering with the package response (MITM
-attack). Mirrors and proxyies are common in the npm ecosystem, significantly
-increasing the possible attack surface.
+mirror or proxy intercepting and tamptering with the tarball (MITM
+attack).
 
 ## Detailed Explanation
 
 npm [already signs each published version](https://blog.npmjs.org/post/172999548390/new-pgp-machinery.html) using a private PGP key, with the [public key hosted on Keybase](https://keybase.io/npmregistry).
 
 This RFC proposes improving existing registry signatures:
-- 1. Update the signing key to produce ECDSA signatures which are smaller and can be verified with node's `crypto` library
-- 2. Make signature verification easy using a new CLI command, dropping the requirement for 3rd party tools
+- 1. Update the signing key to produce ECDSA signatures which are smaller and
+     can be verified with node's `crypto` library
+- 2. Make signature verification easy using a new CLI command, dropping the
+     requirement for 3rd party tools (Keybase CLI)
 
-To make signature verification easy, we'll introduce a new CLI command `verify-signatures` that verifies the npm signature
-in a packages packument, using npm's public key, fetched from registry.npmjs.org. It
-works on the current install (`node_modules`), and checks all direct and transitive dependencies.
+To make signature verification easy, we'll introduce a new CLI command
+`verify-signatures` that verifies the npm signature in a packages packument,
+using npm's public key, fetched from registry.npmjs.org. It works on the current
+install (`node_modules`), and checks all direct and transitive dependencies.
 
 The aim is for this command to plug into users build workflows after `npm ci/npm
 install` and block builds with invalid signatures.
 
-This command is standalone but we could fold this behaviour into `npm install`
-or `audit` in the future once we're confident validation is performant and
-provides a good user experience.
+The proposed command is standalone but the behaviour could be folded into `npm
+install` or `audit` in the future, once we're confident validation is performant
+and provides a good user experience.
+
+### Threat Model
+The threat model assumes the following:
+
+- Attackers cannot compromise npm's signing key stored online
+- Attackers can respond to client requests (MITM or proxy/mirror compromise)
+
+An attacker is considered successful if it can cause a client to install
+a package tarball that is not the file that was uploaded to the npm registry.
+
+This threat model has a very narrow scope and we're planning follow up work to
+secure more parts of the download/uploade process.
+
+### Attack vector
+
+An attacker gains access to a npm proxy or mirror that's serving packages
+published to the official npm registry, either by MITM'ing the connection or
+compromising the server.
+
+We can mitigate against the served tarball being tampered with by verifying the
+signatures against npm's public key.
+
+This won't protect you against the public registry being MITM'd as we'd loose
+guarantees that we're getting the right public keys when we fetch them from
+`https://registry.npmjs.org/.well-known/npm-signature-keys`.
+
+There's also a case where the mirror or proxy serving signed packages modifies
+the packgument that's being serverd to the npm CLI and omits signatures. The
+best we can do for now in this case is warn users that some packages don't have
+signatres but this might cause a lot of noise that's ignored.
+
+We're planning follow up work to address the issue of a packument being
+modified, possibly looking at [signing the packument](https://github.com/npm/rfcs/pull/76).
 
 ### Detailed CLI examples
 
@@ -243,10 +279,8 @@ The `keyid` will map to a public key hosted on `https://registry.npmjs.org/.well
 
 ## Rationale and Alternatives
 
-We propose a pragmatic improvement to the existing signatures and verification
-flow. We're not proposing any support for [signed
-packuments](https://github.com/npm/rfcs/pull/76) or user generated signatures
-(e.g. bring your own GPG keys) as part of this work.
+This proposal lays out an incremental improvement to the existing registry
+signatures and verification to improve the user experience.
 
 ### Alternatives
 
@@ -325,9 +359,9 @@ A potential attack scenario would be a malicious mirror/third-party registry
 omitting `signatures` from the packument and tricking validation into thinking
 no signature verification is needed.
 
-We can verify the signature is present for packages fetched from
-registry.npmjs.org. We could enforce this check for mirrors if the tarball is
-hosted on registry.npmjs.org.
+Verify the signature is present for packages fetched from registry.npmjs.org.
+This could be enforced for mirrors if the tarball is hosted on
+registry.npmjs.org.
 
 The npm CLI could warn users if they are validating packages that don't have
 signatures in the packument, and the registry/mirror doesn't have keys available at:
@@ -335,8 +369,8 @@ signatures in the packument, and the registry/mirror doesn't have keys available
 
 #### Fetching the public key
 
-We propose adding a new json endpoint to registry.npmjs.org that returns public
-signature keys:
+Add a new json endpoint to registry.npmjs.org that returns public signature
+keys:
 
 ```
 GET https://registry.npmjs.org/.well-known/npm-signature-keys
@@ -365,7 +399,7 @@ GET https://registry.npmjs.org/.well-known/npm-signature-keys
 Adding this endpoint to the registry host allows the CLI to discover these keys
 for third-party registries.
 
-We'll bundle known `keyid`'s in the npm CLI. The `verify-signatures` CLI
+Known `keyid`'s will be bundled in the npm CLI. The `verify-signatures` CLI
 command will error when it encounters a new `keyid`, urging users to update the
 CLI version to handle the new key.
 
@@ -381,7 +415,7 @@ attacks](https://auth0.com/blog/critical-vulnerabilities-in-json-web-token-libra
 
 ### Key rotation
 
-We can rotate the signing key in future using the following steps:
+The signing key can be rotated in the future by following these steps:
 
 - Start double sigining all new packages with both keys during the deprecation
 window, meaning all versions created within the window have two signatures in
@@ -401,9 +435,9 @@ within the `expires` time set on the public key.
 Our long-term goal for all software to be signed and verified in a transparent
 way.
 
-We want to make it possible for third-party npm registries (e.g. GitHub
-Packages, Artifactory, Verdaccio etc) to start signing published packages and
-allow the CLI to verify these signatures with minimal user intervention.
+Third-party npm registries (e.g. GitHub Packages, Artifactory, Verdaccio etc)
+should be able to start signing published packages and allow the CLI to verify
+these signatures with minimal user intervention.
 
 #### Setting up package signing on a third-party npm registry:
 
@@ -439,11 +473,10 @@ global registry, for example:
 registry=https://fast-npm-mirror.tld
 ```
 
-This registry could be resigning packages it serves and serve it's own public
+This registry could be re-signing packages it serves and serve it's own public
 signing keys at: https://fast-npm-mirror.tld/.well-known/npm-signature-keys
 
-We want to make sure the response hasn't been tampered with (MITM attack) before
-trusting the new signing keys.
+Before trusting the new signing keys make sure the response hasn't been tampered with (MITM attack).
 
 The CLI will prompt a user to manually trust new signing keys when verifying a
 package that has a signature and untrusted `keyid`.
@@ -471,8 +504,9 @@ trusted-signature-keyid[]="{{SHA256_PUBLIC_KEY}}"
 ## Out of scope
 
 - Verify all packages on install (e.g. `npm install`)
-  - We could eventually fold in verification into the install command, and
-enable it by default, once we're confident it's performant and reliable.
+  - Signature verification could eventually be folded into the `install`
+    command, and enabled by default, once we're confident it's performant and
+    reliable.
 - Bundling a more secure crypto library with the npm CLI, e.g. [Sigstore
   `cosign`](https://github.com/sigstore/cosign/) or cross compiling go's
   `x/crypto` lib to wasm
