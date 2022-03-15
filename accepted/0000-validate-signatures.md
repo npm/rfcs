@@ -40,7 +40,7 @@ The proposed command is standalone but the behaviour could be folded into `npm
 install` or `audit` in the future, once we're confident validation is performant
 and provides a good user experience.
 
-### Threat Model
+### Threat model
 The threat model assumes the following:
 
 - Attackers cannot compromise npm's signing key stored online
