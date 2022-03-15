@@ -465,13 +465,7 @@ Are you sure you trust this host? (yes/no)
 Trusted keys are added to the `.npmrc`:
 
 ```
-[public-signature-key]
-registry = https://npm.pkg.github.com
-expires = "2023-12-17T23:57:40-05:00"
-keyid = "{{SHA256_PUBLIC_KEY}}"
-keytype = "ecdsa-sha2-nistp256"
-sigtype = "ecdsa-sha2-nistp256"
-key = "{{B64_PUBLIC_KEY}}"
+trusted-signature-keyid[]="{{SHA256_PUBLIC_KEY}}"
 ```
 
 ## Out of scope
