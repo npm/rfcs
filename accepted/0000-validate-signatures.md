@@ -498,7 +498,17 @@ Are you sure you trust this host? (yes/no)
 Trusted keys are added to the `.npmrc`:
 
 ```
-trusted-signature-keyid[]="{{SHA256_PUBLIC_KEY}}"
+[trusted-signature-keys.sha256:{{SHA256_PUBLIC_KEY}}]
+expires=2023-12-17T23:57:40-05:00
+keytype=ecdsa-sha2-nistp256
+sigtype=ecdsa-sha2-nistp256
+key=123
+
+[trusted-signature-keys.sha256:{{SHA256_PUBLIC_KEY}}]
+expires=2023-12-17T23:57:40-05:00
+keytype=ecdsa-sha2-nistp256
+sigtype=ecdsa-sha2-nistp256
+key=789
 ```
 
 ## Out of scope
