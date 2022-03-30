@@ -24,6 +24,7 @@ This RFC's spec & implementation should closely mimic the capabilities of existi
 ### Dependency Selector Syntax
 
 #### Overview:
+
 - there is no "type" or "tag" selectors (ex. `div, h1, a`) as a dependency/target is the only type of `Node` that can be queried
 - the term "dependencies" is in reference to any `Node` found in the `idealTree` returned by `Arborist`
 
