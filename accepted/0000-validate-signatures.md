@@ -193,25 +193,6 @@ on npmjs.org (man-in-the-middle attack)!
 Please report this issue: https://github.com/npm/cli/issues/new/choose
 ```
 
-#### Failure case: Signature keys/and or public npmjs.com keys are not known by the CLI
-
-If the known `keyid`s don't match the ones on https://npmjs.com/public-keys the
-`verify-signatures` command will error not attempting to verify any
-signatures. Assume the client is out-of-date and needs to be updated but an
-attacker could also be tampering with returned package signatures.
-
-```
-$ npm verify-signatures
-project@1.0.0 $HOME/work/project
-
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!!          WARNING: PUBLIC SIGNATURE KEYS ON NPMJS.COM HAVE CHANGED          !!
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-
-Please update the npm CLI to version x.x.x in order to support the new signature
-keys hosted on npmjs.com.
-```
-
 ### Moving signatures from PGP to ECDSA
 
 We plan to rotate the signing key as part of this effort. The CLI command will
@@ -239,9 +220,7 @@ package releases once we the Keybase key has expired.
   signature using the new key and adding this to the version packuments
   `signatures` array.
 - 5.  **Introduce new npm cli command: `verify-signatures`**:  The command
-  will will only support new (ECDSA) signature keys and come pre-bundled with
-  valid `keyid`s, warning users to update the cli if a new key has been found
-  from npmjs.org.
+  will will only support new (ECDSA) signature and fetch public keys from registry.npmjs.org.
 - 6. **Update the [Keybase PGP key](https://keybase.io/npmregistry) expiry**: We will update the expiry to be 6 months from the launch of this CLI command and publish of announcement blog post. We want to give folks with their own tooling as much notice as possible while deprecating the use of the existing PGP key.
 - 7. **Stop generating PGP signatures once the key expires**: We will no longer
   populate the packument field `dist.npm-signature` in new releases.
@@ -399,15 +378,11 @@ GET https://registry.npmjs.org/.well-known/npm-signature-keys
 Adding this endpoint to the registry host allows the CLI to discover these keys
 for third-party registries.
 
-Known `keyid`'s will be bundled in the npm CLI. The `verify-signatures` CLI
-command will error when it encounters a new `keyid`, urging users to update the
-CLI version to handle the new key.
-
 The API endpoint should return a HTTP `Cache-Control` header and instruct
-clients to cache the response for up to 1 month before attempting to refetch:
+clients to cache the response for up to 1 week before attempting to refetch:
 
 ```
-Cache-Control: max-age=2592000
+Cache-Control: max-age=604800
 ```
 
 Pairing the `sigtype` with the public key helps prevent [[algorithm
@@ -420,10 +395,8 @@ The signing key can be rotated in the future by following these steps:
 - Start double sigining all new packages with both keys during the deprecation
 window, meaning all versions created within the window have two signatures in
 the `signatures` array
-- Update the npm CLI to be aware of the new signing `keyid`
 - Update the expiry on the old public key in
-  `registry.npmjs.org/.well-known/npm-signature-keys`, 3 months might make sense
-  to allow clients time to update
+  `registry.npmjs.org/.well-known/npm-signature-keys` to 1-3 months from now
 - Stop signing new releases using the old key but keep the pubic key in the CLI
  and at the `registry.npmjs.org/.well-known/npm-signature-keys` URL
 
