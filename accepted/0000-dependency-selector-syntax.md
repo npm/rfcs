@@ -195,7 +195,7 @@ There are several known attributes that are normalized & queryable living in `No
     "vulnerabilities": [],
     "cwe": []
   },
-  ...
+  …
 ```
 
 #### Usage
