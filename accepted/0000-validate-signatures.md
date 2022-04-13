@@ -29,12 +29,12 @@ This RFC proposes improving existing registry signatures:
      requirement for 3rd party tools (Keybase CLI)
 
 To make signature verification easy, we'll introduce a new CLI command
-`verify-signatures` that verifies the npm signature in a packages packument,
+`audit signatures` that verifies the npm signature in a packages packument,
 using npm's public key, fetched from registry.npmjs.org. It works on the current
 install (`node_modules`), and checks all direct and transitive dependencies.
 
 The aim is for this command to plug into users build workflows after `npm ci/npm
-install` and block builds with invalid signatures.
+install` and block builds with invalid registry signatures.
 
 The proposed command is standalone but the behaviour could be folded into `npm
 install` or `audit` in the future, once we're confident validation is performant
@@ -58,17 +58,17 @@ An attacker gains access to a npm proxy or mirror that's serving packages
 published to the official npm registry, either by MITM'ing the connection or
 compromising the server.
 
-We can mitigate against the served tarball being tampered with by verifying the
+We can mitigate against tarballs that been tampered with by verifying the
 signatures against npm's public key.
 
 This won't protect you against the public registry being MITM'd as we'd loose
 guarantees that we're getting the right public keys when we fetch them from
-`https://registry.npmjs.org/.well-known/npm-signature-keys`.
+`https://registry.npmjs.org/-/npm/v1/keys`.
 
 There's also a case where the mirror or proxy serving signed packages modifies
 the packgument that's being serverd to the npm CLI and omits signatures. The
 best we can do for now in this case is warn users that some packages don't have
-signatres but this might cause a lot of noise that's ignored.
+signatres. This might cause a lot of noise that's ignored.
 
 We're planning follow up work to address the issue of a packument being
 modified, possibly looking at [signing the packument](https://github.com/npm/rfcs/pull/76).
@@ -82,33 +82,33 @@ $ npm ls
 project@1.0.0 $HOME/work/project
 ├── foo@0.4.0
 ├─┬ lorem@0.4.0
-│ └── ipsum@2.0.0 invalid signatures
+│ └── ipsum@2.0.0 invalid registry signatures
 ├─┬ abbrev@3.0.9
-│ └── bar@2.88.0 invalid signatures
-└── once@1.4.0 invalid signatures
+│ └── bar@2.88.0 invalid registry signatures
+└── once@1.4.0 invalid registry signatures
 ```
 
 #### Verifies all dependencies in the current install, e.g:
 
 ```
-$ npm verify-signatures
+$ npm audit signatures
 project@1.0.0 $HOME/work/project
 
-1 package has a missing signature (direct):
-├── MISSING SIGNATURE foo@0.4.0
+1 package has a missing registry signature (direct):
+├── MISSING REGISTRY SIGNATURE foo@0.4.0
 
 NOTE: Signatures are missing for all packages hosted outside registry.npmjs.org
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!!  WARNING: SOME PACKAGES DOWNLOADED FROM NPMJS.ORG HAVE INVALID SIGNATURES  !!
+!!          WARNING: SOME PACKAGES HAVE INVALID REGISTRY SIGNATURES           !!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-3 packages have invalid signatures (1 direct, 2 transitive):
-├── INVALID SIGNATURE once@1.4.0
+3 packages have invalid registry signatures (1 direct, 2 transitive):
+├── INVALID REGISTRY SIGNATURE once@1.4.0
 ├─┬ lorem@0.4.0
-│ ├── INVALID SIGNATURE ipsum@2.0.0
+│ ├── INVALID REGISTRY SIGNATURE ipsum@2.0.0
 ├─┬ abbrev@3.0.9
-│ ├── INVALID SIGNATURE bar@2.88.0
+│ ├── INVALID REGISTRY SIGNATURE bar@2.88.0
 
 Someone might have tampered with the package since it was published
 on npmjs.org (monster-in-the-middle attack)!
@@ -119,14 +119,14 @@ Please report this issue: https://github.com/npm/cli/issues/new/choose
 #### Verify a given package from the current install when using package name only, e.g:
 
 ```
-$ npm verify-signatures once
+$ npm audit signatures once
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!!  WARNING: SOME PACKAGES DOWNLOADED FROM NPMJS.ORG HAVE INVALID SIGNATURES  !!
+!!          WARNING: SOME PACKAGES HAVE INVALID REGISTRY SIGNATURES           !!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 1 package has a invalid signature (direct):
-├── INVALID SIGNATURE once@1.4.0
+├── INVALID REGISTRY SIGNATURE once@1.4.0
 
 Someone might have tampered with the package since it was published
 on npmjs.org (monster-in-the-middle attack)!
@@ -137,17 +137,17 @@ Please report this issue: https://github.com/npm/cli/issues/new/choose
 #### Support multiple positional arguments:
 
 ```
-$ npm verify-signatures once ipsum
+$ npm audit signatures once ipsum
 project@1.0.0 $HOME/work/project
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!!  WARNING: SOME PACKAGES DOWNLOADED FROM NPMJS.ORG HAVE INVALID SIGNATURES  !!
+!!          WARNING: SOME PACKAGES HAVE INVALID REGISTRY SIGNATURES           !!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-2 packages have invalid signatures (1 direct, 1 transitive):
-├── INVALID SIGNATURE once@1.4.0
+2 packages have invalid registry signatures (1 direct, 1 transitive):
+├── INVALID REGISTRY SIGNATURE once@1.4.0
 ├─┬ lorem@0.4.0
-│ ├── INVALID SIGNATURE ipsum@2.0.0
+│ ├── INVALID REGISTRY SIGNATURE ipsum@2.0.0
 
 Someone might have tampered with the package since it was published
 on npmjs.org (monster-in-the-middle attack)!
@@ -158,15 +158,15 @@ Please report this issue: https://github.com/npm/cli/issues/new/choose
 #### Support qualified spec as positional argument for the current install e.g:
 
 ```
-$ npm verify-signatures once@1.4.0
+$ npm audit signatures once@1.4.0
 project@1.0.0 $HOME/work/project
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!!  WARNING: SOME PACKAGES DOWNLOADED FROM NPMJS.ORG HAVE INVALID SIGNATURES  !!
+!!          WARNING: SOME PACKAGES HAVE INVALID REGISTRY SIGNATURES           !!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 1 package has an invalid signature:
-├── INVALID SIGNATURE once@1.4.0
+├── INVALID REGISTRY SIGNATURE once@1.4.0
 
 Someone might have tampered with the package since it was published
 on npmjs.org (monster-in-the-middle attack)!
@@ -177,15 +177,15 @@ Please report this issue: https://github.com/npm/cli/issues/new/choose
 #### Support other common arborist options, e.g:
 
 ```
-$ npm verify-signatures --only=prod
+$ npm audit signatures --only=prod
 project@1.0.0 $HOME/work/project
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!!  WARNING: SOME PACKAGES DOWNLOADED FROM NPMJS.ORG HAVE INVALID SIGNATURES  !!
+!!          WARNING: SOME PACKAGES HAVE INVALID REGISTRY SIGNATURES           !!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 1 package has an invalid signature (direct):
-├── INVALID SIGNATURE once@1.4.0
+├── INVALID REGISTRY SIGNATURE once@1.4.0
 
 Someone might have tampered with the package since it was published
 on npmjs.org (man-in-the-middle attack)!
@@ -219,7 +219,7 @@ package releases once we the Keybase key has expired.
   will backfill signatures for all existing releases/versions, generating a
   signature using the new key and adding this to the version packuments
   `signatures` array.
-- 5.  **Introduce new npm cli command: `verify-signatures`**:  The command
+- 5.  **Introduce new npm cli command: `audit signatures`**:  The command
   will will only support new (ECDSA) signature and fetch public keys from registry.npmjs.org.
 - 6. **Update the [Keybase PGP key](https://keybase.io/npmregistry) expiry**: We will update the expiry to be 6 months from the launch of this CLI command and publish of announcement blog post. We want to give folks with their own tooling as much notice as possible while deprecating the use of the existing PGP key.
 - 7. **Stop generating PGP signatures once the key expires**: We will no longer
@@ -254,7 +254,7 @@ We will introduce a new `signatures` field in the version packument, e.g.
    }
 ```
 
-The `keyid` will map to a public key hosted on `https://registry.npmjs.org/.well-known/npm-signature-keys`.
+The `keyid` will map to a public key hosted on `https://registry.npmjs.org/-/npm/v1/keys`.
 
 ## Rationale and Alternatives
 
@@ -332,7 +332,7 @@ If the public key has an `expires` set, check this against the version created
 at time, ensuring expired keys are only valid for packages released before this
 time.
 
-**Protect against missing signatures**:
+**Protect against missing registry signatures**:
 
 A potential attack scenario would be a malicious mirror/third-party registry
 omitting `signatures` from the packument and tricking validation into thinking
@@ -344,7 +344,7 @@ registry.npmjs.org.
 
 The npm CLI could warn users if they are validating packages that don't have
 signatures in the packument, and the registry/mirror doesn't have keys available at:
-`https://registry.host/.well-known/npm-signature-keys`.
+`https://registry.host/-/npm/v1/keys`.
 
 #### Fetching the public key
 
@@ -352,7 +352,7 @@ Add a new json endpoint to registry.npmjs.org that returns public signature
 keys:
 
 ```
-GET https://registry.npmjs.org/.well-known/npm-signature-keys
+GET https://registry.npmjs.org/-/npm/v1/keys
 ```
 
 ```json
@@ -361,7 +361,7 @@ GET https://registry.npmjs.org/.well-known/npm-signature-keys
     "expires": "2023-12-17T23:57:40-05:00",
     "keyid": "SHA256:{{SHA256_PUBLIC_KEY}}",
     "keytype": "ecdsa-sha2-nistp256",
-    "sigtype": "ecdsa-sha2-nistp256",
+    "scheme": "ecdsa-sha2-nistp256",
     "key": "{{B64_PUBLIC_KEY}}"
   }]
 }
@@ -372,7 +372,7 @@ GET https://registry.npmjs.org/.well-known/npm-signature-keys
 - `expires`: null or complete ISO 8601 datetime
 - `keydid`: sha256 of public key
 - `keytype`: only `ecdsa-sha2-nistp256` is currently supported
-- `sigtype`: only `ecdsa-sha2-nistp256` is currently supported
+- `scheme`: only `ecdsa-sha2-nistp256` is currently supported
 - `key`: base64 encoded public key
 
 Adding this endpoint to the registry host allows the CLI to discover these keys
@@ -385,7 +385,7 @@ clients to cache the response for up to 1 week before attempting to refetch:
 Cache-Control: max-age=604800
 ```
 
-Pairing the `sigtype` with the public key helps prevent [[algorithm
+Pairing the `scheme` with the public key helps prevent [[algorithm
 attacks](https://auth0.com/blog/critical-vulnerabilities-in-json-web-token-libraries/).
 
 ### Key rotation
@@ -396,11 +396,11 @@ The signing key can be rotated in the future by following these steps:
 window, meaning all versions created within the window have two signatures in
 the `signatures` array
 - Update the expiry on the old public key in
-  `registry.npmjs.org/.well-known/npm-signature-keys` to 1-3 months from now
+  `registry.npmjs.org/-/npm/v1/keys` to 1-3 months from now
 - Stop signing new releases using the old key but keep the pubic key in the CLI
- and at the `registry.npmjs.org/.well-known/npm-signature-keys` URL
+ and at the `registry.npmjs.org/-/npm/v1/keys` URL
 
-The `verify-signatures` should check that the version created time is
+The `audit signatures` should check that the version created time is
 within the `expires` time set on the public key.
 
 ### Supporting third-party npm registries signing packages
@@ -417,7 +417,7 @@ these signatures with minimal user intervention.
 - Set up a secure signing key, preferrably using HSM-backed key in a cloud KMS
 (e.g. AWS KMS, Azure Vault, GCP KMS etc)
 - Add a new API endpoint to the registry host:
-  `https://registry.host/.well-known/npm-signature-keys`
+  `https://registry.host/-/npm/v1/keys`
 - Configure the endpoint to return the public key and key metadata (see payload
   example under "Fetching the public key")
 - Start signing package versions on publish, adding the signature (`sig`) and
@@ -447,7 +447,7 @@ registry=https://fast-npm-mirror.tld
 ```
 
 This registry could be re-signing packages it serves and serve it's own public
-signing keys at: https://fast-npm-mirror.tld/.well-known/npm-signature-keys
+signing keys at: https://fast-npm-mirror.tld/-/npm/v1/keys
 
 Before trusting the new signing keys make sure the response hasn't been tampered with (MITM attack).
 
@@ -455,14 +455,14 @@ The CLI will prompt a user to manually trust new signing keys when verifying a
 package that has a signature and untrusted `keyid`.
 
 ```
-$ npm verify-signatures
+$ npm audit signatures
 project@1.0.0 $HOME/work/project
 
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 !!                  WARNING: FOUND UNTRUSTED SIGNATURE KEYS                   !!
 !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
-Found untrusted signature keys at https://fast-npm-mirror.tld/.well-known/npm-signature-keys
+Found untrusted signature keys at https://fast-npm-mirror.tld/-/npm/v1/keys
 
 Are you sure you trust this host? (yes/no)
 > no
@@ -474,13 +474,13 @@ Trusted keys are added to the `.npmrc`:
 [trusted-signature-keys.sha256:{{SHA256_PUBLIC_KEY}}]
 expires=2023-12-17T23:57:40-05:00
 keytype=ecdsa-sha2-nistp256
-sigtype=ecdsa-sha2-nistp256
+scheme=ecdsa-sha2-nistp256
 key=123
 
 [trusted-signature-keys.sha256:{{SHA256_PUBLIC_KEY}}]
 expires=2023-12-17T23:57:40-05:00
 keytype=ecdsa-sha2-nistp256
-sigtype=ecdsa-sha2-nistp256
+scheme=ecdsa-sha2-nistp256
 key=789
 ```
 
