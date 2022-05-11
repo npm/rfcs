@@ -7,8 +7,8 @@ Introduce a new `npm query` commmand which exposes a new dependency selector syn
 ## Motivation
 
 - Standardize the shape of, & querying of, dependency graphs with a robust object model, metadata & selector syntax
-- Leverage existing, known language syntax & operators from CSS to make disperate package information broadly accessible
-- Unlock the ability to anwser complex, multi-faceted questions about dependencies, their relationships & associative metadata
+- Leverage existing, known language syntax & operators from CSS to make disparate package information broadly accessible
+- Unlock the ability to answer complex, multi-faceted questions about dependencies, their relationships & associative metadata
 - Consolidate redundant logic of similar query commands in `npm` (ex. `npm fund`, `npm ls`, `npm outdated`, `npm audit` ...)
 
 ## Detailed Explanation
@@ -39,15 +39,6 @@ This RFC's spec & implementation should closely mimic the capabilities of existi
 - `>` direct decendent/child selector
 - `~` sibling selector
 
-#### [Attribute Selectors](https://developer.mozilla.org/en-US/docs/Web/CSS/Attribute_selectors)
-- `[]` attribute selector (ie. existence of attribute)
-- `[attribute=value]` attribute value is equivalant...
-- `[attribute~=value]` attribute value contains word...
-- `[attribute*=value]` attribute value contains string...
-- `[attribute|=value]` attribute value is equal to or starts with...
-- `[attribute^=value]` attribute value begins with...
-- `[attribute$=value]` attribute value ends with...
-
 #### Pseudo Selectors
 - [`:not(<selector>)`](https://developer.mozilla.org/en-US/docs/Web/CSS/:not)
 - [`:has(<selector>)`](https://developer.mozilla.org/en-US/docs/Web/CSS/:has)
@@ -60,7 +51,9 @@ This RFC's spec & implementation should closely mimic the capabilities of existi
 - `:link` when a dependency is linked
 - `:deduped` when a dependency has been deduped
 - `:override` when a dependency is an override
-- `:extraneous` when a dependency could be but is not deduped
+- `:extraneous` when a dependency exists but is not defined as a dependency of any node
+- `:invalid` when a dependency version is out of its ancestors specified range
+- `:missing` when a dependency is not found on disk
 - `:outdated` when a dependency is not `latest`
 - `:vulnerable` when a dependency has a `CVE` 
 - `:semver(<spec>)` matching a valid [`node-semver`](https://github.com/npm/node-semver) spec
@@ -68,40 +61,52 @@ This RFC's spec & implementation should closely mimic the capabilities of existi
 - `:realpath(<path>)` [glob](https://www.npmjs.com/package/glob) matching based on dependencies realpath
 - `:type(<type>)` [based on currently recognized types](https://github.com/npm/npm-package-arg#result-object)
 
-#### Generic Pseudo Selectors:
+#### [Attribute Selectors](https://developer.mozilla.org/en-US/docs/Web/CSS/Attribute_selectors)
 
-A standardized pseudo selector pattern will be used for `Object`s, `Array`s or `Arrays` of `Object`s accessible via `Arborist`'s `Node.package` metadata. Pseudo classes generated in this way will allow for iterative attribute selection.
+The attribute selector evaluates the key/value pairs in `package.json` if they are `String`s.
 
-`Array`s specifically use a special `value` keyword in place of a typical attribute name. `Arrays` also support exact `valu`e matching when a `String` is passed to the selector. See examples below:
+- `[]` attribute selector (ie. existence of attribute)
+- `[attribute=value]` attribute value is equivalant...
+- `[attribute~=value]` attribute value contains word...
+- `[attribute*=value]` attribute value contains string...
+- `[attribute|=value]` attribute value is equal to or starts with...
+- `[attribute^=value]` attribute value begins with...
+- `[attribute$=value]` attribute value ends with...
+
+#### `Array` & `Object` Attribute Selectors
+
+The generic `:attr()` pseudo selector standardizes a pattern which can be used for attribute selection of `Object`s, `Array`s or `Arrays` of `Object`s accessible via `Arborist`'s `Node.package` metadata. This allows for iterative attribute selection beyond top-level `String` evaluation.
+
+`Array`s specifically use a special `item` keyword in place of a typical attribute name. `Arrays` also support exact `valu`e matching when a `String` is passed to the selector. See examples below:
 
 #### Example of an `Object`: 
 ```css
 /* return dependencies that have a `scripts.test` containing `"tap"` */
-*:scripts([test~=tap])
+*:attr(:scripts([test~=tap]))
 ```
 
 #### Example of an `Array` Attribute Selection:
 ```css
 /* return dependencies that have a keyword that begins with "react" */
-*:keywords([value^="react"])
+*:attr(:keywords([item^="react"]))
 ```
 
 #### Example of an `Array` matching directly to a value:
 ```css
 /* return dependencies that have the exact keyword "react" */
 /* this is equivalent to `*:keywords([value="react"])` */
-*:keywords("react")
+*:attr(:keywords("react"))
 ```
 
 #### Example of an `Array` of `Object`s: 
 ```css
 /* returns */
-*:contributors([email="ruyadorno@github.com"])`
+*:attr(:contributors([email="ruyadorno@github.com"]))
 ```
 
 ### Classes
 
-Given that `Arborist` will control our understanding of the DOM (Dependency Object Model), claseses are predefined by their relationships to their ancestors & are specific to their dependency type. Dependencies may have, & are allowed to have, multiple classifications (ex. a `workspace` may also be a `dev` dependency).
+Classes are defined by the package relationships to their ancestors (ie. the dependency types that are defined in `package.json`). This approach is user-centric as the ecosystem has been taught to think about dependencies in these classifications first-and-foremost. Dependencies are allowed to have multiple classifications (ex. a `workspace` may also be a `dev` dependency & may also be `bundled` - a selector for that type of dependency would look like: `*.workspace.dev.bundled`).
 
 - `.prod`
 - `.dev`
@@ -109,39 +114,6 @@ Given that `Arborist` will control our understanding of the DOM (Dependency Obje
 - `.peer`
 - `.bundled`
 - `.workspace`
-
-### Attributes
-
-There are several known attributes that are normalized & queryable living in `Node.package` (aka. `package.json`).
-
-- `[name]`
-- `[version]`
-- `[description]`
-- `[homepage]`
-- `[bugs]`
-- `[author]`
-- `[license]`
-- `[funding]`
-- `[files]`
-- `[main]`
-- `[browser]`
-- `[bin]`
-- `[man]`
-- `[directories]`
-- `[repository]`
-- `[scripts]`
-- `[config]`
-- `[workspaces]`
-- `[dependencies]`
-- `[devDependencies]`
-- `[optionalDependencies]`
-- `[bundledDependencies]`
-- `[peerDependencies]`
-- `[peerDependenciesMeta]`
-- `[engines]`
-- `[os]`
-- `[cpu]`
-- `[keywords]`
 
 ### Command
 
@@ -153,7 +125,7 @@ There are several known attributes that are normalized & queryable living in `No
   - Default: `json`
   - Type: `json`, `list`, `explain`, `outdated`, `funding`, `audit`, `duplicates`, `file`
 
-#### Response Output
+#### Example Response Output
 
 - an array of dependency objects is returned which can contain multiple copies of the same package which may or may not have been linked or deduped
 
@@ -194,6 +166,7 @@ There are several known attributes that are normalized & queryable living in `No
     "parent": "",
     "vulnerabilities": [],
     "cwe": []
+    ...
   },
   …
 ```
@@ -286,7 +259,7 @@ npm query ":root > .workspace > *"  # get all workspace direct deps
 *[license="MIT"], *[license="ISC"]
 
 // find all packages that have @ruyadorno as a contributor
-*:contributors([email=ruyadorno@github.com])
+*:attr(:contributors([email=ruyadorno@github.com]))
 ```
 
 ## Next Steps
