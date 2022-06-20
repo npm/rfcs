@@ -7,11 +7,11 @@ relates to #581
 
 ## Summary
 
-When installing dependencies, the npm CLI should have a mechanism for communicating (and optionally failing on) dependencies that do not come from a registry, like a [git URL](https://docs.npmjs.com/cli/v7/configuring-npm/package-json#git-urls-as-dependencies).
+When auditing dependencies with `npm audit`, the npm CLI should have a mechanism for communicating (and optionally failing on) dependencies that do not come from a registry, like a [git URL](https://docs.npmjs.com/cli/v7/configuring-npm/package-json#git-urls-as-dependencies).
 
 ## Motivation
 
-In an effort to give users of npm more insight and transparency into the packages they are installing, knowing that a package is _not_ coming from a registry, and thus is susceptible to mutability and related supply chain attacks from that vector, seems like a meaningful heuristic missing from the package manager.
+In an effort to give users of npm more insight and transparency into the packages they are installing, knowing that a package is _not_ coming from a registry and thus is susceptible to mutability and related supply chain attacks from that vector, seems like a meaningful heuristic missing from the package manager.
 
 Thus, npm should afford various levels of messaging and erroring through a flag to accommodate users of npm looking to gain this insight from their dependency graph.
 
@@ -27,63 +27,101 @@ For example a _package.json_ like this
 }
 ```
 
-Would trigger a message  to the console for **eslint** if the `warn` value was passed.
+Would trigger a message to the console for **eslint** if the `warn` value was passed when running `npm audit`.
 
 ```sh
-$ npm install --only-registry-tarballs=warn
-```
+$ npm audit --only-non-remote-deps=warn
 
-## Rationale and Alternatives
-
-It could be argued that a user could write a script themselves that does all the look-ups and resolution from a given _package.json_ to vet their dependencies that way, potentially reusing arborist in a similar manner to how the CLI uses it.
-
-However, when this issue was raised no other alternatives were suggested at the time, even the one above, so it seems that most feel (implicitly at least) that the package manager is in the best position to vet the location of dependencies before they can be installed, and communicate that information to the user.
-
-## Implementation
-
-As npm is building up the dependency graph, it should check if _any_ dependency in the tree is not using a valid [semver range](https://docs.npmjs.com/cli/v7/configuring-npm/package-json#dependencies) and emit a message to the user in the terminal.
-
-The flag would allow three values that the user could be provided based on the outcome of messaging / behavior the user was looking for:
-```sh
-$ npm install --only-registry-tarballs=silent|warn|fail
-```
-
-### Silent (default)
-Same behavior as it is now in the CLI, which is effectively that there is no consideration made for the location of a dependency.  This would be the default value of the flag as far as the npm CLI is concerned, or if the user used the flag but and did not pass any value.
-
-```sh
-# both would behave the same way
-$ npm install --only-registry-tarballs
-$ npm install --only-registry-tarballs=silent
-```
-
-### Warn
-Emits a `console.log` to the terminal indicating that a dependency is installing via a non-registry URL.
-
-```sh
-$ npm install --only-registry-tarballs=warn 
-npm WARN deprecated coffee-script@1.12.7: CoffeeScript on NPM has moved to "coffeescript" (no hyphen)
-npm WARN eslint NOT installed from a registry, using tarball URL <URL>
-
-added xxx packages, and audited xxx packages in 8s
+found 1 vulnerabilities
 
 ...
 ```
 
-### Fail
-Emits a `console.error` to the terminal indicating that a dependency is installing via a non-registry URL AND then exits the process with an exit code.
+## Rationale and Alternatives
 
+It could be argued that a user could write a script themselves that does all the look-ups and resolution from a given _package.json_ or _package-lock.json_ to vet their dependencies that way, potentially reusing arborist in a similar manner to how the CLI uses it.
+
+However, when this issue was raised no other alternatives were suggested at the time, even the one above, so it seems that most feel (implicitly at least) that the package manager is in the best position to vet the source of dependencies before they can be installed, and communicate that information to the user.
+
+## Implementation
+
+When running `npm audit`, the user should be informed if _any_ dependency in the tree is not using a valid [semver range](https://docs.npmjs.com/cli/v7/configuring-npm/package-json#dependencies) and emit a message to the terminal communicating that information.
+
+The flag would allow three values that the user could use to influence the level of messaging and command line behavior:
 ```sh
-$ npm install --only-registry-tarballs=error
-npm WARN deprecated coffee-script@1.12.7: CoffeeScript on NPM has moved to "coffeescript" (no hyphen)
-npm ERROR eslint NOT installed from a registry, using tarball URL <URL>
+$ npm audit --only-non-remote-deps=silent|warn|fail
 
-process exited with code ....
+found N vulnerabilities
+
+...
 ```
 
-----
+### Options
 
-Additionally, this behavior should probably captured in relevant area(s) of the documentation, likely in the dependencies section of the docs, where non semver range versions are discussed.
+#### Silent
+Same behavior as it is now in the CLI effectively, in that there is no messaging in regards to the source of a dependency.
+
+```sh
+$ npm audit --only-non-remote-deps=silent
+```
+
+#### Warn (default)
+Emits a log message to the terminal indicating that a dependency is referencing a non-registry URL.  
+```sh
+$ npm audit --only-non-remote-deps=warn
+
+found 1 vulnerabilities
+
+npm WARN eslint is not installed from a trusted source; using tarball URL <URL>.  Please read more about our guidelines at https://docs.npmjs.com/cli/....
+```
+
+This would be the default value for the command with or without a value passed to the flag.
+```sh
+# both would behave the same way
+$ npm audit --only-non-remote-deps
+$ npm audit --only-non-remote-deps=warn
+```
+
+#### Fail
+Emits an error level log to the terminal indicating that a dependency has a non-registry URL AND exits the process with an exit code.
+
+```sh
+$ npm audit --only-non-remote-deps=fail
+
+found 1 vulnerabilities
+
+npm ERROR eslint is not installed from a trusted source; using tarball URL <URL>.  Please read more about our guidelines at https://docs.npmjs.com/cli/....
+```
+
+### Messaging
+
+In addition to calling out these types of specifiers numerically, it would be good to have the messaging include information about the dependency graph, similar to the `npm why` or `npm explain`.  This is important as users will want to be able to use `overrides` for those cases which they don't have direct control over and / or report upstream.
+
+For example, using the above **eslint** example, a more complete output might look like this:
+```sh
+$ npm audit --only-non-remote-deps=warn
+
+found 1 vulnerabilities
+
+npm WARN eslint is not installed from a trusted source; using tarball URL <URL>.  Please read more about our guidelines at https://docs.npmjs.com/cli/....
+
+eslint@6.8.0 dev
+node_modules/eslint
+  dev eslint@"^6.8.0" from the root project
+
+...
+```
+
+### Install
+It is understood that `npm install` leverages `npm audit` but I believe the output of `npm audit` does not directly influence the behavior of `npm install`, say in the case using the `fail` option here.
+
+If possible, it would be great for `npm install` to fail if `npm audit` fails.
+```sh
+$ npm install --fail-on-audit
+```
+
+### Documentation
+In addition to being added to the `npm audit` docs, this behavior should probably be called out or referenced in other relevant area(s) of the CLI documentation, specifically in the [dependencies section of the docs](https://docs.npmjs.com/cli/v7/configuring-npm/package-json#git-urls-as-dependencies), where non semver range versions like git URLs are discussed.
 
 ## Prior Art
 
@@ -98,10 +136,21 @@ This seems like a worthwhile area for npm to be the first mover.
 ### Default Behavior
 As proposed, the default behavior would be the `silent` option.  As part of a semver-major change, the default behavior could be changed to that of the `warn` option instead.
 
+> _Decided that `warn` would be the appropriate initial default._
+
 ### Dependency Distinctions
 A point raised was if different dependency types should have different rules applied to them, or if this flag should apply equally across direct and transitive dependencies alike.  ex.
 - warn by default for direct dependencies
 - hide by default for transitive dependencies
+- etc
+
+> _Decided that the upcoming `npm query` RFC would be the appropriate way to overlay more granular filtering and preferences.  Through this, `npm audit` could become over more powerful by elevating this RFC to signal other potential risks like for:_
+>  - CVEs (default)
+>  - Signatures
+>  - Engines
+>  - Peer Deps, et al
 
 ### Naming
 Currently the flag is `--only-registry-tarballs` which while explicit, is a bit verbose.  I think the final flag name is less consequential / material to the ultimate objective of this RFC, as long as it gets clearly captured in relevant areas of the documentation.
+
+> _Decided on a name of `--only-non-remote-deps` to account for local linking of packages done by a user intentionally._
