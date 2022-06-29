@@ -23,7 +23,7 @@ Currently npm supports those two ways of saving dependency into `package.json`:
 2. [x] Running `npm install antd@conch --save-exact` should save the exact version into package.json, hence `4.20.7` shall be saved.
 
 We want a new flag to save dependency below:
-1. [ ] Running `npm install antd@conch --force` should save the dist-tag into package.json, hence `conch` shall be saved;
+1. [ ] Running `npm install antd@conch --save-tag` should save the dist-tag into package.json, hence `conch` shall be saved;
 
 
 ## Rationale and Alternatives
@@ -31,7 +31,7 @@ We want a new flag to save dependency below:
 
 ## Implementation
 
-Add a new flag `--force` to save user specific semantic version or dist-tag when installing a dependency.
+Add a new flag `--save-tag` to save user specific dist-tag when installing a dependency.
 
 ## Prior Art
 
