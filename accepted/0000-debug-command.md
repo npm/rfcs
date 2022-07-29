@@ -47,9 +47,7 @@ For example, it may share a similar synopsis like `npm exec`. Further to remain 
 
 ### Expected Behavior
 
-An `npm debug` command is supposed to launch a debug session which halts debugging until a remote debugger connects. It may call `node --inspect-brk` internally.
-
-Subject to discussion, the following algorithms are being proposed when `npm debug` is *issued within a package directory*. Each step is supposed to be applied in the order given.
+An `npm debug` command is supposed to launch a debug session which halts debugging until a remote debugger connects using `node --inspect-brk`. Subject to discussion, the following algorithms are being proposed when `npm debug` is *issued within a package directory*. Each step is supposed to be applied in the order given until `END.`.
 
 *Algorithm 1*
 
