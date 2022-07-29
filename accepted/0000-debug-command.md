@@ -97,7 +97,7 @@ npm debug <package> --workspaces
 npm debug <package> --workspace=X
 ~~~
 
-1. GIVNE a search in workspace `X`, only, finds a package `<package>`
+1. GIVEN a search in workspace `X`, only, finds a package `<package>`
    - THEN apply *Algorithm 1* with the target package's `package.json`. END.
    - ELSE continue
 1. EXIT with an `npm ERR!`. END.
