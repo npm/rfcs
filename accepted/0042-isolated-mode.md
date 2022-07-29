@@ -385,7 +385,7 @@ explaining how to hash a graph with cycles.
 ### Implementation Within `npm` and `@npmcli/arborist`
 
 In order to support the design goals of (a) providing a project
-`package-lock.json` file which is interoperable between `hosted-mode` and
+`package-lock.json` file which is interoperable between `hoisted-mode` and
 `isolated-mode` projects, (b) allowing developers to freely switch between
 modes, and (c) minimizing the changes in existing package dependency
 contracts, the following implementation approach will be used when reifying
@@ -395,7 +395,7 @@ the package tree.
    from the `package-lock.json`, applying user requests to add and remove
    packages, searching for updates, and so on.  That is, no changes to
    this step.  Thus any dependency graph which is unresolvable in
-   hosted-mode will fail at this step, as it currently does, _even if
+   hoisted-mode will fail at this step, as it currently does, _even if
    isolated-mode could potentially satisfy it_.
 2. Capture the `idealTree` lockfile metadata prior to any modifications to
    the tree.
