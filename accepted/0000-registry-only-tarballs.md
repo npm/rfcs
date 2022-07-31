@@ -9,6 +9,8 @@ relates to #581
 
 When auditing dependencies with `npm audit`, the npm CLI should have a mechanism for communicating (and optionally failing on) dependencies that do not come from a registry, like a [git URL](https://docs.npmjs.com/cli/v7/configuring-npm/package-json#git-urls-as-dependencies).
 
+> _**Note**: this RFC has a hard dependency on [`npm query`](https://github.com/npm/cli/pull/5000) landing to support its implementation._
+
 ## Motivation
 
 In an effort to give users of npm more insight and transparency into the packages they are installing, knowing that a package is _not_ coming from a registry and thus is susceptible to mutability and related supply chain attacks from that vector, seems like a meaningful heuristic missing from the package manager.
@@ -45,7 +47,7 @@ However, when this issue was raised no other alternatives were suggested at the 
 
 ## Implementation
 
-When running `npm audit`, the user should be informed if _any_ dependency in the tree is not using a valid [semver range](https://docs.npmjs.com/cli/v7/configuring-npm/package-json#dependencies) and emit a message to the terminal communicating that information.
+When running `npm audit`, the user should be informed if _any_ dependency in the tree is not using a valid [semver range](https://docs.npmjs.com/cli/v7/configuring-npm/package-json#dependencies) and emit a message to the terminal communicating that information.  Effectively, the audit messaging should get raised if any of the dependencies qualify as a [`type` of **git** or **remote* dependency per this document](https://github.com/npm/npm-package-arg#result-object).
 
 The flag would allow three values that the user could use to influence the level of messaging and command line behavior:
 ```sh
@@ -54,6 +56,11 @@ $ npm audit --only-non-remote-deps=silent|warn|fail
 found N vulnerabilities
 
 ...
+```
+
+From a CLI perspective, this could easily (ideally) be delegated to the `npm query` command.
+```sh
+$ npm query ":root > *:is(:type(git,remote))"
 ```
 
 ### Options
@@ -130,6 +137,8 @@ As far as I know, while other package managers allow installing from URLs and gi
 - **pnpm**: [`add`](https://pnpm.io/cli/add#install-from-git-repository), [`install`](https://pnpm.io/cli/install)
 
 This seems like a worthwhile area for npm to be the first mover.
+
+To demonstrate, if you see [this demo repo](https://github.com/thescientist13/npm-query-registry-only-deps-rfc-demo) and follow the steps to `npm link` with a version that has `npm query`, you will see output for **eslint** but not **babel**, which is the desired outcome in this situation given that _package.json_ has eslint as a `git` dependency.
 
 ## Unresolved Questions and Bikeshedding
 
