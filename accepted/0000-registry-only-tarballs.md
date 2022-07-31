@@ -3,11 +3,11 @@ relates to #581
 
 ----
 
-# Registry Only Tarballs
+# Registry Only Dependencies
 
 ## Summary
 
-When auditing dependencies with `npm audit`, the npm CLI should have a mechanism for communicating (and optionally failing on) dependencies that do not come from a registry, like a [git URL](https://docs.npmjs.com/cli/v7/configuring-npm/package-json#git-urls-as-dependencies).
+When auditing dependencies with `npm audit`, the npm CLI should have a mechanism for communicating (and optionally failing on) dependencies that _do not_ come from a registry, like a [git URL](https://docs.npmjs.com/cli/v7/configuring-npm/package-json#git-urls-as-dependencies).
 
 > _**Note**: this RFC has a hard dependency on [`npm query`](https://github.com/npm/cli/pull/5000) landing to support its implementation._
 
@@ -32,7 +32,7 @@ For example a _package.json_ like this
 Would trigger a message to the console for **eslint** if the `warn` value was passed when running `npm audit`.
 
 ```sh
-$ npm audit --only-non-remote-deps=warn
+$ npm audit --only-registry-deps=warn
 
 found 1 vulnerabilities
 
@@ -51,7 +51,7 @@ When running `npm audit`, the user should be informed if _any_ dependency in the
 
 The flag would allow three values that the user could use to influence the level of messaging and command line behavior:
 ```sh
-$ npm audit --only-non-remote-deps=silent|warn|fail
+$ npm audit --only-registry-deps=silent|warn|fail
 
 found N vulnerabilities
 
@@ -69,13 +69,13 @@ $ npm query ":root > *:is(:type(git,remote))"
 Same behavior as it is now in the CLI effectively, in that there is no messaging in regards to the source of a dependency.
 
 ```sh
-$ npm audit --only-non-remote-deps=silent
+$ npm audit --only-registry-deps=silent
 ```
 
 #### Warn (default)
 Emits a log message to the terminal indicating that a dependency is referencing a non-registry URL.  
 ```sh
-$ npm audit --only-non-remote-deps=warn
+$ npm audit --only-registry-deps=warn
 
 found 1 vulnerabilities
 
@@ -85,15 +85,15 @@ npm WARN eslint is not installed from a trusted source; using tarball URL <URL>.
 This would be the default value for the command with or without a value passed to the flag.
 ```sh
 # both would behave the same way
-$ npm audit --only-non-remote-deps
-$ npm audit --only-non-remote-deps=warn
+$ npm audit --only-registry-deps
+$ npm audit --only-registry-deps=warn
 ```
 
 #### Fail
 Emits an error level log to the terminal indicating that a dependency has a non-registry URL AND exits the process with an exit code.
 
 ```sh
-$ npm audit --only-non-remote-deps=fail
+$ npm audit --only-registry-deps=fail
 
 found 1 vulnerabilities
 
@@ -106,7 +106,7 @@ In addition to calling out these types of specifiers numerically, it would be go
 
 For example, using the above **eslint** example, a more complete output might look like this:
 ```sh
-$ npm audit --only-non-remote-deps=warn
+$ npm audit --only-registry-deps=warn
 
 found 1 vulnerabilities
 
@@ -163,3 +163,5 @@ A point raised was if different dependency types should have different rules app
 Currently the flag is `--only-registry-tarballs` which while explicit, is a bit verbose.  I think the final flag name is less consequential / material to the ultimate objective of this RFC, as long as it gets clearly captured in relevant areas of the documentation.
 
 > _Decided on a name of `--only-non-remote-deps` to account for local linking of packages done by a user intentionally._
+>
+> _Another name change made to call the flag `--only-registry-deps`._
