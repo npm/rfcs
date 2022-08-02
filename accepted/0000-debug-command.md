@@ -62,7 +62,7 @@ npm debug
    - THEN launch a debug session for the script referred to by the `bin` property using `node --inspect-brk <bin-script> <script-argv>`. END.
    - ELSE continue
 1. GIVEN a `main` property is present in `package.json`
-   - THEN launch a debug session for the script referred to by the `bin` property using `node --inspect-brk <main-script> <script-argv>`. END.
+   - THEN launch a debug session for the script referred to by the `main` property using `node --inspect-brk <main-script> <script-argv>`. END.
    - ELSE continue
 1. EXIT with an `npm ERR!`. END.
 
