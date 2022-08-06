@@ -77,37 +77,40 @@ Subject to discussion, the following algorithms are being proposed when `npm deb
 npm debug
 ~~~
 
-1. GIVEN a `script.debug` property is present in `package.json`
-   - THEN run the run-script similar to how `npm start` would run `script.start`. END.
-   - ELSE continue
-1. GIVEN a [`bin`][packagejson-bin] property is present in `package.json`
-   - THEN apply *Algorithm: Debug Executables*
-   - ELSE continue
-1. GIVEN a [`main`][packagejson-main] property is present in `package.json`
+1. GIVEN a key `--bin` in `argv` of `npm debug`
+   - EXPECT [`bin`][packagejson-main] property in `package.json` is present
+   - THEN apply *Algorithm: Debug Executables*. END.
+1. ELSE GIVEN a key `--main` in `argv` of `npm debug`
+   - EXPECT [`main`][packagejson-main] property in `package.json` is a non-empty string
    - THEN launch a debug session for the script referred to by `main`. END.
-   - ELSE continue
+1. ELSE GIVEN a `script.debug` property is present in `package.json`
+   - THEN run the run-script similar to how `npm start` would run `script.start`. END.
+1. ELSE GIVEN a [`bin`][packagejson-bin] property is present in `package.json`
+   - THEN apply *Algorithm: Debug Executables* END.
+1. ELSE GIVEN a [`main`][packagejson-main] property is present in `package.json`
+   - THEN launch a debug session for the script referred to by `main`. END.
 1. EXIT with an `npm ERR!`. END.
 
 *Algorithm: Debug Executables*
 
-1. GIVEN the value of [`bin`][packagejson-bin] in `package.json` is a string
+~~~
+npm debug [--bin [<name>]]
+~~~
+
+1. GIVEN the value of [`bin`][packagejson-bin] in `package.json` is a non-empty string
    - THEN launch a debug session for the script referred to by `bin`. END.
-   - ELSE continue
-2. GIVEN the value of [`bin`][packagejson-bin] in `package.json`  is an object
+2. ELSE GIVEN the value of [`bin`][packagejson-bin] in `package.json`  is an object
    1. GIVEN [`bin`][packagejson-bin] has multiple object properties
       - EXPECT a pair `--bin <name>` in `argv` of `npm debug`
       - EXPECT the value of `bin[name]` in `package.json` to be a non-empty string
       - THEN launch a debug session for the script referred to by `bin[name]`. END.
-      - ELSE EXIT with `npm ERR`. END.
-   2. GIVEN [`bin`][packagejson-bin] has a single object property
+   2. ELSE GIVEN [`bin`][packagejson-bin] has a single object property
       1. GIVEN a pair `--bin <name>` in `argv` of `npm debug`
          - EXPECT the value of `bin[name]` in `package.json` to be a non-empty string
          - THEN launch a debug session for the script referred to by `bin[name]`. END.
-         - EXIT with `npm ERR`. END.
-      1. GIVEN a pair `--bin <name>` in `argv` of `npm debug` is missing
+      1. ELSE GIVEN `--bin` OR NOT GIVEN `--bin` in `argv` of `npm debug`
          - EXPECT the value of `Object.keys(bin)[0]` to be a non-empty string
          - THEN launch a debug session for the script referred to by `Object.keys(bin)[0]` END.
-         - ELSE continue.
 3. EXIT with `npm ERR`. END.
 
 
@@ -119,10 +122,8 @@ npm debug <package>
 
 1. GIVEN a search in all `workspaces` finds a target package `<package>`
    - THEN apply *Algorithm 1* with the target package's `package.json`. END.
-   - ELSE continue
-1. GIVEN a non-recursive search in `node_modules` finds a target package `<package>`
+1. ELSE GIVEN a non-recursive search in `node_modules` finds a target package `<package>`
    - THEN apply *Algorithm 1* with the target package's `package.json`. END.
-   - ELSE continue
 1. EXIT with an `npm ERR!`. END.
 
 *Algorithm 3*
@@ -133,7 +134,6 @@ npm debug <package> --workspaces
 
 1. GIVEN a search limited to `workspaces` finds a target package `<package>`
    - THEN apply *Algorithm 1* with the target package's `package.json`. END.
-   - ELSE continue
 1. EXIT with an `npm ERR!`. END.
 
 *Algorithm 4*
@@ -144,7 +144,6 @@ npm debug <package> --workspace=X
 
 1. GIVEN a search in workspace `X`, only, finds a package `<package>`
    - THEN apply *Algorithm 1* with the target package's `package.json`. END.
-   - ELSE continue
 1. EXIT with an `npm ERR!`. END.
 
 ## Prior Art
