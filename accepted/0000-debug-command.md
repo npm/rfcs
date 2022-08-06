@@ -25,31 +25,52 @@ This RFC proposes an `npm debug` command to simplify debugging npm packages.
 
 **Alternatives:**
 
-1. `node --inspect` or `node --inspect-brk`
-    - operates on a single JavaScript file and often requires lengthy command lines to specify the path of the target script file
-    - can not use NPM package metadata
-2.  editor or IDE support
+1. `node`
+   ~~~
+   node --inspect <path>
+   node --inspect-brk <path>
+   NODE_OPTIONS=--inspect-brk node <path>
+   ~~~
+
+   - requires a lengthy command line to specify the path of the target script file, esp. when the package to debug is a *third-party* package in `node_modules`
+   - can not use knowledge of NPM package metadata
+1. `npm run debug`
+
+   - requires a package author to add a `debug` script to its `package.json`. The author then may choose to debug its own package using a `node` command line.
+   - while possible it feels wrong for debugging third-party packages installed into `node_modules`
+
+1.  editor or IDE support
+
     - requires an editor or IDE
     - typically requires creating or configuring a tool-specific launch configuration
 
-The `npm debug` command facilitates npm's `package.json` manifest to simplify launching a debug session for packaged JavaScripts.
+1. `npx debug` is *not* an alternative. Rather it would install [debug](https://npmjs.com/package/debug) which is a decorator for `console.log` to write debug statements when running a `node` script in a "debug mode". It is not running in a debugger session.
+
 
 ## Implementation
 
-When applicable an `npm debug` command should be as consistent as possible with existing commands like `npm run`, `npm exec` or `npm test` in terms of
+### Synopsis
 
-- naming of arguments the commands share,
-- script or package selection,
-- current working directory
-- etc.
+~~~
+npm debug [package] [<argv>] [-- <script-argv>]
 
-For example, it may share a similar synopsis like `npm exec`. Further to remain consistent the new command's `argv` MAY be separated from the debugged script's `script-argv` using `' -- '` (dashes enclosed in spaces).
+argv:
+--bin [<name>]    // Debug the `bin` script or a particular `bin` script
+--workspaces      // Search [package] in workspaces only (exclude node_modules)
+--workspace=<ws>  // Search [package] in a particular package only
+~~~
+
+Synopsis and behavior should be as consistent as possible with existing commands like `npm run`, `npm exec` or `npm test`.For example, to remain consistent the new command's `argv` will be separated from the debugged script's `script-argv` using `' -- '` (dashes enclosed in spaces).
 
 ### Expected Behavior
 
-An `npm debug` command is supposed to launch a debug session which halts debugging until a remote debugger connects using `node --inspect-brk`. Subject to discussion, the following algorithms are being proposed when `npm debug` is *issued within a package directory*. Each step is supposed to be applied in the order given until `END.`.
+Subject to discussion, the following algorithms are being proposed when `npm debug` is *issued within a package directory*. Each step is supposed to be applied in the order given until `END.`
+
 
 *Algorithm 1*
+
+[packagejson-bin]: https://github.com/npm/cli/blob/latest/docs/content/configuring-npm/package-json.md#bin
+[packagejson-main]: https://github.com/npm/cli/blob/latest/docs/content/configuring-npm/package-json.md#main
 
 ~~~
 npm debug
@@ -58,13 +79,36 @@ npm debug
 1. GIVEN a `script.debug` property is present in `package.json`
    - THEN run the run-script similar to how `npm start` would run `script.start`. END.
    - ELSE continue
-1. GIVEN a `bin` property is present in `package.json`
-   - THEN launch a debug session for the script referred to by the `bin` property using `node --inspect-brk <bin-script> <script-argv>`. END.
+1. GIVEN a [`bin`][packagejson-bin] property is present in `package.json`
+   - THEN apply *Algorithm: Debug Executables*
    - ELSE continue
-1. GIVEN a `main` property is present in `package.json`
+1. GIVEN a main property is present in `package.json`
    - THEN launch a debug session for the script referred to by the `main` property using `node --inspect-brk <main-script> <script-argv>`. END.
    - ELSE continue
 1. EXIT with an `npm ERR!`. END.
+
+*Algorithm: Debug Executables*
+
+1. GIVEN the value of [`bin`][packagejson-bin] in `package.json` is a string
+   - THEN launch a debug session for the script referred to by `bin`. END.
+   - ELSE continue
+2. GIVEN the value of [`bin`][packagejson-bin] in `package.json`  is an object
+   1. GIVEN [`bin`][packagejson-bin] has multiple object properties
+      - EXPECT a pair `--bin <name>` in `argv` of `npm debug`
+      - EXPECT the value of `bin[name]` in `package.json` to be a non-empty string
+      - THEN launch a debug session for `bin[name]`. END.
+      - ELSE EXIT with `npm ERR`. END.
+   2. GIVEN [`bin`][packagejson-bin] has a single object property
+      1. GIVEN a pair `--bin <name>` in `argv` of `npm debug`
+         - EXPECT the value of `bin[name]` in `package.json` to be a non-empty string
+         - THEN launch a debug session for `bin[name]`. END.
+         - EXIT with `npm ERR`. END.
+      1. GIVEN a pair `--bin <name>` in `argv` of `npm debug` is missing
+         - EXPECT the value of `Object.keys(bin)[0]` to be a non-empty string
+         - THEN launch a debug session for `Object.keys(bin)[0]` END.
+         - ELSE continue.
+3. EXIT with `npm ERR`. END.
+
 
 *Algorithm 2*
 
@@ -86,7 +130,7 @@ npm debug <package>
 npm debug <package> --workspaces
 ~~~
 
-1. GIVEN a search in `workspaces`, only, finds a target package `<package>`
+1. GIVEN a search limited to `workspaces` finds a target package `<package>`
    - THEN apply *Algorithm 1* with the target package's `package.json`. END.
    - ELSE continue
 1. EXIT with an `npm ERR!`. END.
@@ -111,9 +155,7 @@ There are other development lifecycle commands like
 - `npm publish`
 - `npm run`
 
-but none for debugging in particular.
-
-- `npx debug` would install [debug](https://npmjs.com/package/debug). Though, that package focuses on entering/providing a "debug mode" for scripts that may be run with node but not within a node debugger session.
+but not a command for debugging in particular.
 
 ## Unresolved Questions and Bikeshedding
 
