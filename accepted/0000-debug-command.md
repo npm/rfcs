@@ -55,6 +55,7 @@ This RFC proposes an `npm debug` command to simplify debugging npm packages.
 npm debug [package] [<argv>] [-- <script-argv>]
 
 argv:
+--main            // Debug the `main` script
 --bin [<name>]    // Debug the `bin` script or a particular `bin` script
 --workspaces      // Search [package] in workspaces only (exclude node_modules)
 --workspace=<ws>  // Search [package] in a particular package only
@@ -82,8 +83,8 @@ npm debug
 1. GIVEN a [`bin`][packagejson-bin] property is present in `package.json`
    - THEN apply *Algorithm: Debug Executables*
    - ELSE continue
-1. GIVEN a main property is present in `package.json`
-   - THEN launch a debug session for the script referred to by the `main` property using `node --inspect-brk <main-script> <script-argv>`. END.
+1. GIVEN a [`main`][packagejson-main] property is present in `package.json`
+   - THEN launch a debug session for the script referred to by `main`. END.
    - ELSE continue
 1. EXIT with an `npm ERR!`. END.
 
@@ -96,16 +97,16 @@ npm debug
    1. GIVEN [`bin`][packagejson-bin] has multiple object properties
       - EXPECT a pair `--bin <name>` in `argv` of `npm debug`
       - EXPECT the value of `bin[name]` in `package.json` to be a non-empty string
-      - THEN launch a debug session for `bin[name]`. END.
+      - THEN launch a debug session for the script referred to by `bin[name]`. END.
       - ELSE EXIT with `npm ERR`. END.
    2. GIVEN [`bin`][packagejson-bin] has a single object property
       1. GIVEN a pair `--bin <name>` in `argv` of `npm debug`
          - EXPECT the value of `bin[name]` in `package.json` to be a non-empty string
-         - THEN launch a debug session for `bin[name]`. END.
+         - THEN launch a debug session for the script referred to by `bin[name]`. END.
          - EXIT with `npm ERR`. END.
       1. GIVEN a pair `--bin <name>` in `argv` of `npm debug` is missing
          - EXPECT the value of `Object.keys(bin)[0]` to be a non-empty string
-         - THEN launch a debug session for `Object.keys(bin)[0]` END.
+         - THEN launch a debug session for the script referred to by `Object.keys(bin)[0]` END.
          - ELSE continue.
 3. EXIT with `npm ERR`. END.
 
