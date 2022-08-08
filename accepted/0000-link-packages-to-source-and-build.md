@@ -244,7 +244,7 @@ Today only GitHub Actions is fully supported by Fulcio. We’d like to see suppo
 
 As of today, Google Cloud Build supports custom claims but neither GitLab Pipelines nor CircleCI offers this. [GitLab](https://gitlab.com/gitlab-org/gitlab/-/issues/356986) is planning to add support for a custom audience.
 
-The plan is to start with direct vendor support in Fulcio. Fulcio will need to be patched to produce certs containing custom claims data from Circle CI, GitLab and Google Cloud Build.
+The plan is to start with direct vendor support in Fulcio. Fulcio will need to be patched to produce certificates containing custom claims data from Circle CI, GitLab and Google Cloud Build.
 
 We will also work with OpenSSF and other package ecosystems adopting [Sigstore](https://www.sigstore.dev/) on an official claims set that any provider can implement. Once we have this each vendor could be added to Fulcio by simply specifying the standard OIDC client configuration.
 
