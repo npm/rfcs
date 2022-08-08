@@ -76,7 +76,7 @@ Sigstore infrastructure and tooling are currently not considered production read
 As such, there are several risks of adopting Sigstore for npm that are worth calling out:
 - No buy-in from the broader open source npm community.
 - Sigstore's public and free-to-use infrastructure is not able to meet our uptime requirements (>99.9%).
-- Sigstore is not able to secure the funding required to run the infrastructure with production-grade support, SLOs and on-call rotation.
+- Sigstore is not able to secure the funding required to run the infrastructure with production-grade support, SLOs, and on-call rotation.
 
 To mitigate some of these risks, GitHub is planning to work directly with Sigstore to define and support robust production-grade SLOs for uptime and reliability that meet the requirements for npm. This will involve being on-call and wearing the pager for production services.
 
