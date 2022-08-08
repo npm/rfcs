@@ -12,9 +12,9 @@ So far our supply chain security offerings have focused on remediation - patchin
 
 In November of last year alone, we saw three supply chain attacks against popular npm packages ([UAParser.js](https://www.esentire.com/security-advisories/npm-library-supply-chain-attack), [Command-Option-Argument](https://www.esentire.com/security-advisories/coa-npm-supply-chain-attack), and [rc](https://www.esentire.com/security-advisories/rc-npm-supply-chain-attack)), each with millions of downloads per month.
 
-The following chart illustrates several attack vectors facing the supply chain:
+The following chart illustrates several attack vectors facing the supply chain (src: [SLSA](https://slsa.dev/)):
 
-![supply-chain-threats](https://user-images.githubusercontent.com/20165/174750708-2be483ac-7e41-4bc3-8ee9-440ef33d9423.svg)
+![SLSA: Supply-chain-threats](https://user-images.githubusercontent.com/20165/174750708-2be483ac-7e41-4bc3-8ee9-440ef33d9423.svg)
 
 Our focus is on mitigating package hijacking attacks where packages are built from a modified source (C) in the above diagram. This is where a malicious version of an existing open source package gets uploaded to the registry. These maliciously crafted versions are rarely reflected in the canonical source code repository and uploaded directly from an attacker's machine.
 
@@ -30,7 +30,7 @@ Once a package includes provenance information (where and how it was built) we c
 
 Developers consuming open source packages should get the benefit of this without any changes to their workflows. To begin with, the package integrity should be verified when running the  `npm audit signatures` command and eventually transparently integrated into `npm install` and enabled by default.
 
-Open source maintainers should be able to add build provenance information to their packages with near-zero initial and ongoing overhead.
+Open source maintainers must be able to add build provenance information to their packages with near-zero initial and ongoing overhead.
 
 ## Goals
 - Establishes a verifiable link between a public npm package and the source repository and build it originated from.
@@ -81,7 +81,7 @@ As such, there are several risks of adopting Sigstore for npm that are worth cal
 To mitigate some of these risks, GitHub is planning to work directly with Sigstore to define and support robust production-grade SLOs for uptime and reliability that meet the requirements for npm. This will involve being on-call and wearing the pager for production services.
 
 In addition, GitHub is planning to support Sigstore by:
-- Running the signed timestamp authority for Rekor as well as a Certificate Transparency monitor for Fulcio. This will help spread the trust outside the four walls of Sigstore.
+- Running a signed timestamp authority for Rekor as well as a Certificate Transparency monitor for Fulcio. This will help spread the trust outside the four walls of Sigstore.
 - Maintaining the Sigstore trust root and having a root key holder as part of the group of Sigstore root key holders.
 
 We also remain open to an alternative solution if Sigstore is not able to meet npm's requirements for uptime and support.
@@ -92,7 +92,7 @@ Package signing is a mitigation for package hijacking attacks. If maintainers si
 
 [Sigstore](https://www.sigstore.dev/) is a promising alternative: it allows signing artifacts with short-lived “disposable/ephemeral keys” notarized against log-ins with [OpenID Connect](https://openid.net/connect/) (OIDC) identities (e.g., Google or GitHub accounts).
 
-Several package ecosystems have announced interest in adopting Sigstore as a way for maintainers to sign packages (e.g., PyPI, RubyGems, Maven Central). [OpenSSF](https://blog.chainguard.dev/sigstore-statement-for-openssf-call/) is also working to standardize on Sigstore for signing software.
+Several package ecosystems have announced interest in adopting Sigstore as a way for maintainers to sign packages (e.g., [PyPI](https://pypi.org/project/sigstore/), [RubyGems](https://github.com/rubygems/rfcs/pull/37), [Maven Central](https://blog.sonatype.com/maven-central-and-sigstore)). [OpenSSF](https://blog.chainguard.dev/sigstore-statement-for-openssf-call/) is also working to standardize on Sigstore for signing software.
 
 However, adopting something like Sigstore raises several major questions (beyond the risks detailed above):
 - What security benefits does Sigstore provide?
@@ -186,9 +186,9 @@ An attacker could forge what goes in the provenance information if the CI/CD pro
 
 An attacker could bypass verification if the npm registry, npm user or the network was compromised by not providing provenance information or removing it in transit.
 
-The long-term solution to bypassing verification is enforcing or requiring that all packages have this information set during install time in the npm CLI. It might take years to get to the point where a large portion of npm packages have this information set so we'll need to find ways to get there gradually.
+The long-term solution to bypassing verification is enforcing or requiring that all packages have provenance information set during install time in the npm CLI. It might take years to get to the point where a large portion of npm packages have this information set so we'll need to find ways to get there gradually.
 
-We could make it harder to remove provenance information once it's been set by a maintainer. For example, preventing publishes that don't include it if the current latest version does include it. Requiring user 2FA to remove it once it's set.
+We could make it harder to remove provenance information once it's been set by a maintainer. For example, blocking a npm publish that doesn't include it if the current latest version does include it. Requiring user 2FA to remove it once it's set.
 
 Maintainers and developers consuming packages could also opt-in to requiring all their dependencies to include provenance information once their dependencies include this.
 
@@ -209,7 +209,7 @@ Long-lived X.509 certificates are in widespread use to secure web pages, but the
 
 Long-lived certificates have the advantage of being able to chain up to a certificate authority that has intrinsic trust, so beyond authenticating that the artifact signed by the certificate is valid, a consumer can validate that the artifact is from an author that they trust.
 
-Like other author-managed keys, the developer must keep and secure the private certificate throughout the lifetime of the certificate. Long-lived certificates may also encounter issues with needing to manage revocation in the event of a private certificate leak. While a centralized certificate authority could issue long-lived X.509 certificates to developers as Let's Encrypt has done for web pages, the need to manage revocation across software artifacts in the registry is a problem.
+Like other author-managed keys, the developer must keep and secure the private key throughout the lifetime of the certificate. Long-lived certificates may also encounter issues with needing to manage revocation in the event of a private key leak. While a centralized certificate authority could issue long-lived X.509 certificates to developers as Let's Encrypt has done for web pages, the need to manage revocation across software artifacts in the registry is a problem.
 
 Nuget, for example, supports [CA-issued code signing certificates](https://docs.microsoft.com/en-us/nuget/create-packages/sign-a-package). Its seen low adoption among the open source community due to several reported [problems](https://haacked.com/archive/2019/04/03/nuget-package-signing/).
 
@@ -234,7 +234,7 @@ While inclusion in the registry is proof that the package was published by an au
 
 As part of authorizing publishing of the package, the registry should sign a statement (release attestation) about accepting the package release and publish it to Rekor (public ledger).
 
-Website CAs currently use a similar approach when they publish all issued certificates to a [transparency log](https://certificate.transparency.dev/).
+WebPKI CAs currently use a similar approach when they publish all issued certificates to a [transparency log](https://certificate.transparency.dev/).
 
 ### CI/CD OIDC provider support
 Today only GitHub Actions is fully supported by Fulcio. We’d like to see support added for any public CI/CD service that can meet these requirements:
@@ -483,7 +483,7 @@ The release attestation will contain the following claims, linking the build to 
 
 ## Prior Art
 ### Sigstore cosign CLI
-The [cosign](https://github.com/sigstore/cosign) CLI tool supports signing arbitrary blogs and could be used to sign the package tarball manually but requires significant setup from maintainers and offers no simple way for consumers to verify signatures unless you know you to query for the package signature on Rekor.
+The [cosign](https://github.com/sigstore/cosign) CLI tool supports signing arbitrary blobs and could be used to sign the package tarball manually but requires significant setup from maintainers and offers no simple way for consumers to verify signatures unless you know you to query for the package signature on Rekor.
 
 ### SLSA Provenance Generator
 Google is working on a language agnostic reusable Actions workflow that can generate build provenance claims using Sigstore: [slsa-github-generator](https://github.com/slsa-framework/slsa-github-generator)
@@ -507,7 +507,7 @@ The definitions are not exhaustive and only cover how it's been used in this doc
 - **OpenID Connect ([OIDC](https://openid.net/specs/openid-connect-core-1_0.html)) identity provider**:  Authenticates users and issues verifiable id tokens that includes identity information, e.g. email. Examples include Google or GitHub.
 - **Package hijacking attack**: Where a malicious version of an existing open source package gets uploaded to the registry. The [eslint-scope](https://eslint.org/blog/2018/07/postmortem-for-malicious-package-publishes) attack was a notable example of this kind of attack, and it frequently occurs due to compromised npm credentials but can also happen due to compromised builds or CI/CD.
 - **[Rekor](https://docs.sigstore.dev/rekor/overview)**: Public immutable tamper-resistant ledger of signed software artifacts. Verifies that the Fulcio certificate was valid at the time of signing.
-- **Release attestation**: Verifiable metadata stating that a new package release has been published on the npm registry
+- **Release attestation**: Verifiable metadata stating that a new package release has been published on the npm registry.
 - **[Sigstore](https://www.sigstore.dev/)**: Public good infrastructure and standard for signing and verifying artifacts using short-lived “disposable keys”.
 - **[SLSA](https://slsa.dev/)**: Comprehensive checklists of best practices for securing the software supply chain. SLSA levels specify how secure the different components are.
 - **Software supply chain**: The series of actions performed to create a software product. These steps usually begin with users committing to a version control system and end with the software product's installation on a client's system.
