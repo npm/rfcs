@@ -164,7 +164,7 @@ Today this means only commercial CI/CD providers will be supported. This is far 
 ### Threat model
 Our threat model focuses on package hijacking attacks: where a developer with good intentions, writing secure code (i.e. no accidental vulnerabilities) publishes this package to the npm registry.
 
-The attacker might then gain access to the maintainers login credentials and upload a modified version of the package to the registry causing end-developers who depend on this package to consume malicious code. This maliciously crafted package is often not reflected in the package's source code repository and uploaded directly from the attacker's machine.
+The attacker might then gain access to the maintainers login credentials and upload a modified version of the package to the registry under a different, in-range version number causing end-developers who depend on this package to consume malicious code. This maliciously crafted package is often not reflected in the package's source code repository and uploaded directly from the attacker's machine.
 
 This proposal does not mitigate against compromised npm login credentials. The aim is to make it harder to execute these types of attacks by creating a public audit trail for where, how and who published a package. Over time the presence of this information can be enforced.
 
