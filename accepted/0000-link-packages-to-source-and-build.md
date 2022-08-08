@@ -10,7 +10,7 @@ Check out the [glossary](#glossary) for an overview of the different tools, term
 ## Motivation
 So far our supply chain security offerings have focused on remediation - patching known vulnerabilities in dependencies (e.g. `npm audit`). The majority of vulnerabilities are accidental, so that was the right place to start. Now we need to turn our attention to deliberate supply chain attacks. In 2021, we saw these types of attacks increase by a terrifying [650%](https://www.sonatype.com/resources/state-of-the-software-supply-chain-2021).
 
-In November of last year alone, we saw three supply chain attacks against popular npm packages ([UA-Parser-JS](https://www.esentire.com/security-advisories/npm-library-supply-chain-attack), [COA](https://www.esentire.com/security-advisories/coa-npm-supply-chain-attack), and [RC](https://www.esentire.com/security-advisories/rc-npm-supply-chain-attack)), each with millions of downloads per month.
+In November of last year alone, we saw three supply chain attacks against popular npm packages ([UAParser.js](https://www.esentire.com/security-advisories/npm-library-supply-chain-attack), [Command-Option-Argument](https://www.esentire.com/security-advisories/coa-npm-supply-chain-attack), and [rc](https://www.esentire.com/security-advisories/rc-npm-supply-chain-attack)), each with millions of downloads per month.
 
 The following chart illustrates several attack vectors facing the supply chain:
 
