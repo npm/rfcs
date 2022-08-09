@@ -297,10 +297,11 @@ The npm CLI will rely on the Sigstore JS client library to generate the provenan
 
 The Sigstore client library will include direct vendor support for requesting an OIDC id token from supported CI/CD systems, similar to the existing client libraries. It will also include all the required functionality to interact with Fulcio and Rekor, as well as verify the [Sigstore root keys](https://github.com/sigstore/root-signing) using a [TUF](https://theupdateframework.github.io/) client.
 
-#### Fetching Sigstore hosts from npmjs.org
-The npm CLI will fetch Sigstore config from npmjs.org that contains the public Fulcio and Rekor hosts by default:
+#### Fetching Sigstore hosts from the configured npm registry
+The npm CLI will fetch Sigstore config from the configured npm registry that contains the public Fulcio and Rekor hosts by default:
+
 ```
-GET https://registry.npmjs.org/-/npm/v1/sigstore-config
+GET https://registry-host.tld/-/npm/v1/sigstore-config
 
 {
   "sigstoreConfig": {
