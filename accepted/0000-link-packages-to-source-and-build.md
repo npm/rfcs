@@ -324,7 +324,7 @@ Only public npm packages will be signed and published to the public [rekor.sigst
 
 Privately scoped packages, or packages from private repositories, will not be signed or published to the public ledger. This will be determined by interrogating the npm registry at publish time. Users will be able to override this similar to the `cosign --force` command by passing an argument to `npm publish`, e.g. `--force-build-provenance`.
 
-The entry will be stored and retrieved using the shasum of the package tarball. This will make sure we don't find any signatures for a  deleted package that has been resurrected with the same name and version.
+The entry will be stored and retrieved using the shasum of the package tarball. This will make sure we don't find any signatures for a deleted package that has been resurrected with the same name and version.
 
 There will be no way of deleting an entry if this was published unintentionally to the ledger as it's immutable by design to prevent tampering. The practical consequence of publishing to the ledger is that information about your package (name, version), repository (commit, branch, owner) and workflow (name, id) are uploaded to the public ledger. A possible workaround would be to rename the leaked repo, make it private and delete the old one.
 
