@@ -278,7 +278,7 @@ The following claims are required to fully support generating build provenance f
 | Actor           | The account that initiated the build.                                     | actor            | user_login or user_email                | Need to parse subject claim.                                   |
 | Actor id        | The ID of the account that initiated the build.                           | actor_id         | user_id                                 | See above comment on “Actor”                                   |
 | Build name      | The name of the build.                                                    | workflow         | pipeline_id (i.e no name, only numeric) | N/A                                                            |
-| Build id        | The ID of the build.                                                      | run_id           |                                         |                                                                |
+| Build id        | The ID of the build.                                                      | run_id + run_attempt           |                                         |                                                                |
 | Build reference | Ref to an external workflow if one is being used, e.g. a trusted builder. | job_workflow_ref | N/A                                     | N/A                                                            |
 
 ## Implementation details
