@@ -30,13 +30,13 @@ Once a package includes provenance information (where and how it was built) we c
 
 Developers consuming open source packages should get the benefit of this without any changes to their workflows. To begin with, the package integrity should be verified when running the  `npm audit signatures` command and eventually transparently integrated into `npm install` and enabled by default.
 
-Open source maintainers must be able to add build provenance information to their packages with near-zero initial and ongoing overhead.
+Open source maintainers must be able to link their packages to the source and build it originated from with near-zero initial and ongoing overhead.
 
 ## Goals
 - Establishes a verifiable link between a public npm package and the source repository and build it originated from.
 - Does not expose any Personally identifiable information (PII) about maintainers, e.g. emails.
 - Avoids developer-managed keys (as there's no good way to offer trust to the community given the challenges of distributing public keys). This, along with opt-in signing, adds near-zero initial and ongoing overhead for open source maintainers.
-- Maintainers can opt-in to including build provenance information (where the code lives and how it was built) when publishing using `npm publish` for public packages.
+- Maintainers can opt-in to linking their packages to the source and build it originated from when publishing using `npm publish` for public packages.
 - Incentivizes maintainers to build in the open because of the strong guarantees that this offers.
 - Verification happens transparently on `npm install` without the need to obtain or manage additional tools or keys.
 - Verification should have a negligible performance impact on `npm install`.
