@@ -370,6 +370,8 @@ This will be staged rollout over several npm CLI releases as changing the defaul
 
 Signature verification needs to be performant and have a negligible impact on `npm install`. We believe the main bottleneck here will be the network, downloading the signatures to verify. The crypto operations involved in verification are negligible on modern hardware. We propose the CLI makes a bulk API request to the npm registry, similar to how advisories are fetched, for all provenance attestations for a given install.
 
+A performance benchmark should be added to the CLI test suite to detect any regressions to verification performance.
+
 ##### Detailed steps to verify
 1. npm CLI downloads the provenance and release attestations for each installed package (the download will be done in bulk for all installed packages)
     1. Verify the build provenance attestation is signed by a certificate created for the builder/actions run.
