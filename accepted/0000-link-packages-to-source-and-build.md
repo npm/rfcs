@@ -285,7 +285,7 @@ The following claims are required to fully support generating build provenance f
 ### Sigstore integration in the npm CLI
 Generating build provenance during publish will be opt-in using a command line flag and only run in supported CI/CD systems.
 
-When enabled on publish, the npm CLI will interact with Sigstore through a reverse proxy on npmjs.org: certifying the authenticity of the CD/CD workflow identity token ([fulcio.sigstore.dev](https://docs.sigstore.dev/fulcio/overview/)) and verifying that signing happened during the time the id certificate was valid ([rekor.sigstore.dev](https://docs.sigstore.dev/rekor/overview/)).
+When enabled on publish, the npm CLI will interact with Sigstore directly (after fetching the configured endpoints from the registry): certifying the authenticity of the CD/CD workflow identity token ([fulcio.sigstore.dev](https://docs.sigstore.dev/fulcio/overview/)) and verifying that signing happened during the time the id certificate was valid ([rekor.sigstore.dev](https://docs.sigstore.dev/rekor/overview/)).
 
 The signature will be placed on the public Rekor ledger for transparency but a detached copy will be uploaded to the npm registry and used for verification. The detached copy includes proof that it was verified and included by Rekor so we don't need to query it again during verification.
 
