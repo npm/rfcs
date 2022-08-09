@@ -457,18 +457,18 @@ In GHA this information is available via environment variables as well as the OI
 #### Environment variables needed during provenance generation
 The environment variables below are needed to create the materials section, `configSource` and the build invocation id in the provenance attestation. Some variables listed below are also available as claims in the OIDC id token (JWT), reading those values from the JWT is preferable as it's authenticated.
 
-| What              | GitHub                     |
-|-------------------|----------------------------|
-| Run id            | GITHUB_CONTEXT.run_id      |
-| Run attempt       | GITHUB_CONTEXT.run_attempt |
-| Workflow name     | GITHUB_CONTEXT.workflow    |
-| Server URL        | GITHUB_CONTEXT.server_url  |
-| Repository        | GITHUB_CONTEXT.repository  |
-| Ref               | GITHUB_CONTEXT.ref         |
-| Git SHA           | GITHUB_CONTEXT.sha         |
-| OS image          | ImageOS                    |
-| OS image version  | ImageVersion               |
-| Host architecture | RUNNER_ARCH                |
+| What              | GitHub                     | GitLab Pipelines | CircleCI |
+|-------------------|----------------------------|------------------|----------|
+| Run id            | GITHUB_CONTEXT.run_id      | ??               | ??       |
+| Run attempt       | GITHUB_CONTEXT.run_attempt | ??               | ??       |
+| Workflow name      | GITHUB_CONTEXT.workflow     | ??               | ??       |
+| Server URL        | GITHUB_CONTEXT.server_url  | ??               | ??       |
+| Repository        | GITHUB_CONTEXT.repository  | ??               | ??       |
+| Ref               | GITHUB_CONTEXT.ref         | ??               | ??       |
+| Git SHA           | GITHUB_CONTEXT.sha         | ??               | ??       |
+| OS image          | ImageOS                    | ??               | ??       |
+| OS image version  | ImageVersion               | ??               | ??       |
+| Host architecture | RUNNER_ARCH                | ??               | ??       |
 
 #### Signature envelope
 The signed build provenance attestation must be stored and transferred together with its signature. The envelope carries this functionality. We plan to support [DSSE envelopes](https://github.com/secure-systems-lab/dsse), and preferably [COSE envelopes](https://datatracker.ietf.org/doc/html/rfc8152) as well.
