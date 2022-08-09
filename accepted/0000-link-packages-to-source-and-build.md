@@ -334,10 +334,12 @@ Interaction between the npm CLI tool running in CI, the npm registry, and the Si
 ```mermaid
   sequenceDiagram
     participant npm_cli
+    participant ci_cd
     participant fulcio
     participant rekor
     participant npm_registry
-    npm_cli->>fulcio: Request signing certificate
+    npm_cli->>ci_cd: Request workflow identity (OIDC ID token)
+    npm_cli->>fulcio: Exchange ID token for signing certificate
     fulcio->>npm_cli: Signing certificate
     npm_cli->>rekor: Upload signed build provenance attestation
     rekor->>npm_cli: Rekor entry
