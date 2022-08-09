@@ -305,7 +305,9 @@ GET https://registry.npmjs.org/-/npm/v1/sigstore-config
 {
   "sigstoreConfig": {
     "fulcioUrl": "https://fulcio.sigstore.dev",
-    "rekorUrl": "https://rekor.sigstore.dev"
+    "rekorUrl": "https://rekor.sigstore.dev",
+    "tufRepository": "https://sigstore-tuf-root.storage.googleapis.com",
+    "tufRoot": "root.json"
   }
 }
 ```
