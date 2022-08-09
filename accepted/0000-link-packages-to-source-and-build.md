@@ -389,7 +389,7 @@ There are two obvious failure scenarios we need to handle when verifying:
 ### Supporting third-party npm clients
 Third-party npm clients, e.g. `yarn` and `pnpm`, should be able to implement build provenance generation using the [sigstore-js](https://github.com/sigstore/sigstore-js) client library. This library will contain all the functionality required to extract build provenance information, generate the OIDC id token on supported CI/CD systems, authenticate it against Fulcio, generate the signature and upload it to the public Rekor ledger.
 
-We're planning on providing detailed documentation on how to wire up the Sigstore client library in any npm client.
+We're planning on providing detailed documentation on how to wire up the Sigstore client library in any JavaScript package manager.
 
 ### Supporting third-party npm registries
 At a high level, third-party registries will need to support the following:
