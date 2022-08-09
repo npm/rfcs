@@ -154,7 +154,7 @@ For instance, Github Actions (supported by Sigstore today) or any other CI/CD sy
 - Friction: Requires publishing from supported CI/CD providers.
 - CI/CD providers will need to operate an IdP and get it integrated with Sigstore.
 
-Using workload identities along with short-lived x.509 certificates is currently the only solution that meets our key requirements:
+Using workload identities along with short-lived X.509 certificates is currently the only solution that meets our key requirements:
 - Linking packages to the source and build.
 - Doesn't expose any personal identifiable information about maintainers.
 - Avoids developer-managed keys by placing trust in the CI/CD identity provider.
@@ -218,6 +218,8 @@ Short-lived X.509 certificates eliminate the need to manage keys across a long l
 
 Combined with a trusted certificate authority that can create short-lived certificates and log the signatures that took place on them, we can validate any artifacts that were signed by that certificate, and protect against repudiation by maintaining an immutable log of the signing activities.
 
+The immutable log can also enforce that the signing certificate was valid when the signature was created by verifying the signed certificate timestamp (SCT) created by the certificate authority.
+
 Compared to other options, this one reduces the friction for developers to sign their artifacts.
 
 ## Design considerations
@@ -260,6 +262,7 @@ We will also work with OpenSSF and other package ecosystems adopting [Sigstore](
 | TravisCI           | no           | -               | Is it used for OSS?                                                                                                                                                    |
 | AWS Cloud Build    | ?            | ?               | Is it used for OSS?                                                                                                                                                               |
 | Azure DevOps          | ?          | ?              | Is it used for OSS?                                                                                                                                                    |
+| Jenkins          | yes (plugin)     | yes            | It would have to be a hosted public and stable version. Is it used for OSS?                                                                                                                                                    |
 
 #### Comparison of provided and required ID token claims
 
