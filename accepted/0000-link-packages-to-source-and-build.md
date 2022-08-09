@@ -291,7 +291,7 @@ The signature will be placed on the public Rekor ledger for transparency but a d
 
 Signature verification will happen transparently during `npm install` and `npm audit signatures` so needs to meet strict performance and reliability uptime requirements as it will be performed for every single npm install. The provenance attestations/signatures will be fetched in bulk from the registry, similar to how advisories are fetched in bulk for all dependencies in the current install. This means verification will not rely on any Sigstore infrastructure to work.
 
-The signing and verification logic will be implemented in a [sigstore-js](https://github.com/sigstore/sigstore-js) client library using Node’s crypto library. Similar clients exist in [Go](https://github.com/sigstore/cosign), [Python](https://github.com/sigstore/sigstore-python) and [Java](http://github.com/sigstore/sigstore-java) and we plan to follow their lead on implementation details.
+The signing and verification logic will be implemented in a [sigstore-js](https://github.com/sigstore/sigstore-js) client library using Node.js's crypto library. Similar clients exist in [Go](https://github.com/sigstore/cosign), [Python](https://github.com/sigstore/sigstore-python) and [Java](http://github.com/sigstore/sigstore-java) and we plan to follow their lead on implementation details.
 
 The npm CLI will rely on the Sigstore JS client library to generate the provenance attestation on publish and to verify the detached signature bundle that's downloaded from the registry.
 
