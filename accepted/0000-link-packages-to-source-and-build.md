@@ -84,6 +84,8 @@ In addition, GitHub is planning to support Sigstore by:
 - Running a signed timestamp authority for Rekor as well as a Certificate Transparency monitor for Fulcio. This will help spread the trust outside the four walls of Sigstore.
 - Maintaining the Sigstore trust root and having a root key holder as part of the group of Sigstore root key holders.
 
+The details around these commitments are still in process of being solidified. The current plan is to commit to this for the foreseeable future as long as npm and/or GitHub is relying on Sigstore services. GitHub would be communicating any changes to these commitments.
+
 We also remain open to an alternative solution if Sigstore is not able to meet npm's requirements for uptime and support.
 
 ## Detailed Explanation
