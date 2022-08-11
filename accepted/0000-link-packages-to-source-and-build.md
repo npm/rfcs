@@ -560,6 +560,32 @@ The release attestation will contain the following claims, linking the build to 
 - Registry signature
 - Tarball shasum
 
+### Logging additional events on the Rekor transparency log
+
+The current proposal only suggests publishing two events to the public Rekor log: sign during build and release/publish.
+
+Publishing a richer set of events to the log could help create a safe and independent history of sensitive events. This could provide the possibility of detection when the registry DB or blob bucket are compromised, because it would be out of sync with the transparency log.
+
+There's interest from OpenSSF's Securing Software Repos WG to standardize on a set of events to easy interoperability between different package registries.
+
+Possible events that could be recorded in the transparency log:
+
+- User registration
+- Sign during build
+- Push
+- Publish or release
+- Yank or delete
+- Owner added
+- Owner removed
+- Owner changed email address
+- Owner enabled MFA
+- Owner disabled MFA
+- Endorsement by non-owner
+- Ownership call
+- Ownership request
+- Ownership transfer
+- Resurrection of name
+
 ## Prior Art
 ### Sigstore cosign CLI
 The [cosign](https://github.com/sigstore/cosign) CLI tool supports signing arbitrary blobs and could be used to sign the package tarball manually but requires significant setup from maintainers and offers no simple way for consumers to verify signatures unless you know you to query for the package signature on Rekor.
