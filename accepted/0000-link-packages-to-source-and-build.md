@@ -206,6 +206,13 @@ The most common existing solution to signing software involves maintainer-manage
 
 Distributing author-managed public keys (PKI) remains a challenge as well as guaranteeing secure handling of private key material. Leaked credentials are a widespread problem among existing PKI implementations, as evidenced by the large number of SSH keys that both [independent researchers](https://www.ndss-symposium.org/wp-content/uploads/2019/02/ndss2019_04B-3_Meli_paper.pdf) and GitHub’s internal secret scanning program have found over the years.
 
+#### Long-lived CI/CD managed keys
+The CI/CD system could sign the provenance attestation with its own private key(s). This is something [Google Cloud Build](https://cloud.google.com/build/docs/securing-builds/view-build-provenance) supports today.
+
+One approach would be to use one key per CI/CD system, which would ease key distribution but make it challenging to contain partial key compromises. Another approach would be to use one key-pair per source code repository or project. This limits the blast-radius for each pair but makes key distribution and revocation challenging.
+
+While there is some precedent for this in GCP, there's no paved path or standard for key distribution across CI/CD systems that would scale to the needs of large code repositories like GitLab and GitHub.
+
 #### Long-lived X.509 certificates
 Long-lived X.509 certificates are in widespread use to secure web pages, but they are still cumbersome to manage.
 
