@@ -382,6 +382,8 @@ Interaction between the npm CLI tool running in CI, the npm registry, and the Si
 #### Verifying
 The package integrity captured by the provenance attestation will be verified by the npm CLI. To begin with, the package integrity should be verified when running the  `npm audit signatures` command and eventually transparently integrated into `npm install` and enabled by default.
 
+There should be a way to only verify existing registry signatures or build signatures using the audit command: `npm audit signatures --type=registry|build`.
+
 This will be staged rollout over several npm CLI releases as changing the default behavior of `npm install` is a breaking change:
 
 1. The existing `npm audit signatures` command will start verifying build signatures, possibly adding an opt-in flag to audit these signatures during `npm install`, e.g. `--audit=build-signatures`
