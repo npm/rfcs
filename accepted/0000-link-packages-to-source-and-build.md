@@ -291,6 +291,17 @@ The following claims are required to fully support generating build provenance f
 | Build reference | Ref to an external workflow if one is being used, e.g. a trusted builder. | job_workflow_ref | N/A                                     | N/A                                                            |
 
 ## Implementation details
+
+There will be two different ways to include provenance information during publish: running the CLI directly on a supported CI/CD system or using the optional but recommended "trusted builder to publish.
+
+- "Sigstore integration in the npm CLI"
+  - The npm CLI will include the capability to extract provenance information out-of-the-box on supported CI/CD systems.
+  - The provenance information will be extracted from the ENV and ID token provided by the CI/CD system when running `npm publish`.
+- "Non-falsifiable provenance using a trusted builder"
+  - A reusable workflow or "trusted builder" can be used to invoke the npm CLI, extracting provenance, running install, build and publish in isolated steps, preventing malicious dependencies or build script from tampering with the provenance information.
+  - The trusted builder will for example checkout the repo that's in the ID token as well as extract ENV information before any other user supplied commands are executed, passing this information to `npm publish` for signing.
+  - Using the trusted builder is recommended but it might not support all possible publish workflows so will be optional.
+
 ### Sigstore integration in the npm CLI
 Generating build provenance during publish will be opt-in using a command line flag and only run in supported CI/CD systems.
 
