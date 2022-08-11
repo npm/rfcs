@@ -444,9 +444,13 @@ The [slsa-github-generator](https://github.com/slsa-framework/slsa-github-genera
 ### Provenance attestations
 The process of creating a provenance attestation is dependent on the current CI/CD system being used as there's currently no standardized way of retrieving this information. Different methods and variables will need to be used to gather information about the current branch, commit version, job id, actor etc.
 
-Existing tools like [witness](https://github.com/testifysec/witness) and Sigstore's [cosign](https://github.com/sigstore/cosign) CLI implement direct support for various CI/CD systems, so the [sigstore-js](https://github.com/sigstore/sigstore-js) client used in the npm CLI should follow that pattern and be able to figure out in which environment it’s running in.
+Existing tools like [witness](https://github.com/testifysec/witness) and Sigstore's [cosign](https://github.com/sigstore/cosign) CLI implement direct support for various CI/CD systems.
 
-This means that it's not required to run the trusted builder to include build provenance on publish. This would also allow users to use private instances of Fulcio and Rekor.
+The [sigstore-js](https://github.com/sigstore/sigstore-js) client used in the npm CLI should follow the same pattern and be able to figure out in which environment it’s running in and extract provenance information. Today this means detecting if its running in GitHub Actions and generating the OIDC ID token and extracting provenance information from the environment.
+
+The `sigstore-js` client should stay up-to-date with any new [CI/CD providers that are supported in Fulcio](https://github.com/sigstore/fulcio/tree/main/federation).
+
+Including this capability in the client means that it's not required to run the trusted builder to include build provenance on publish. This would also allow users to use private instances of Fulcio and Rekor.
 
 #### SLSA provenance schema
 [SLSA](https://slsa.dev/) defines a [schema](https://slsa.dev/provenance/v0.2) for describing the build provenance of a software artifact. Where it came from and how it was built.
