@@ -461,7 +461,7 @@ Example build information included in the SLSA provenance attestation (this is t
 | buildType                          | https://npmjs.org/slsa/generator@v1                                                                                                                                                                                |
 | invocation.configSource.uri        | git+https://github.com/onwer/repo@refs/head/<branch>                                                                                                                                                               |
 | invocation.configSource.digest     | Git SHA                                                                                                                                                                                                            |
-| invocation.configSource.entryPoint | workflow name                                                                                                                                                                                                    |
+| invocation.configSource.entryPoint | workflow file path relative to the root of the repository                                                                                                                                                                                                    |
 | invocation.parameters              | Inputs to the trusted builder/reusable workflow. For GHA see here.                                                                                                                                                 |
 | invocation.environment             | Environment variables that are needed to be able to reproduce the build. Unclear right now what’s required for npm. More investigation needed.                                                                     |
 | buildConfig                        | JSON object with one member, `command` which is a list of all the commands/steps used in the build (as specified in the reusable workflow). Environment variables that are input to the build may also go in here. |
@@ -473,7 +473,52 @@ Example build information included in the SLSA provenance attestation (this is t
 | metadata.completeness.materials    | False. Builds could be pulling in extraneous scripts that are not all known ahead of time.                                                                                                                                                                                    |
 | metadata.reproducible              | False. Would only be possible if specific build tools are used and this would be too limiting for a general purpose npm publish action.                                                                                                                                                                          |
 | materials.uri                      | git+https://github.com/onwer/repo@refs/head/branch                                                                                                                                                               |
-| materials.digest                   | Git SHA                                                                                                                                                                                                            |
+| materials.digest.sha1                   | Git SHA                                                                                                                                                                                                            |
+
+Note that some CI/CD systems like GitHub Actions reuse the run ID for re-runs so we'll need to include run attempt in order to uniquely identify the run.
+
+The `buildConfig` format should mirror the [slsa-github-generator](https://github.com/slsa-framework/slsa-github-generator):
+
+```
+"buildConfig": {
+  "version": 1,
+  "steps": [{
+    "command": "npm ci",
+    "env": null,
+    "workingDir": "/path/to/workingdir/in/runner"
+  }, {
+    "command": "npm run build",
+    "env": null,
+    "workingDir": "/path/to/workingdir/in/runner"
+  }, {
+    "command": "npm publish --with=build-signatures",
+    "env": null,
+    "workingDir": "/path/to/workingdir/in/runner"
+  }]
+}
+```
+
+The `invocation.environment` should include context from the CI environment. For GitHub Actions this would include:
+
+```
+"github_actor": "github-handle",
+"github_actor_id": "123456",
+"github_base_ref": "",
+"github_event_name": "workflow_dispatch",
+"github_event_payload": ...,
+"github_head_ref": "",
+"github_ref": "refs/heads/main",
+"github_ref_type": "branch",
+"github_repository_id": "8923542",
+"github_repository_owner": "github-handle",
+"github_repository_owner_id": "123456",
+"github_run_attempt": "1",
+"github_run_id": "2193104371",
+"github_run_number": "16",
+"github_sha1": "d29d1701b47bbbe489e94b053611e5a7bf6d9414"
+```
+
+The `invocation.configSource.entryPoint` should be the relative path of the workflow file. The environment variable `GITHUB_CONTEXT.workflow` includes the name of the workflow if it is set which may be the same as other workflows in the same repository. In the case of GitHub Actions the only way to retrieve the path reliably is via the [GitHub workflows API](https://docs.github.com/en/rest/actions/workflow-runs#get-a-workflow-run).
 
 The npm CLI will need to extract this information from the current build environment (e.g. GitHub Actions, CircleCI, GitLab PipeLines etc.).
 
@@ -486,7 +531,7 @@ The environment variables below are needed to create the materials section, `con
 |-------------------|----------------------------|------------------|----------|
 | Run id            | GITHUB_CONTEXT.run_id      | ??               | ??       |
 | Run attempt       | GITHUB_CONTEXT.run_attempt | ??               | ??       |
-| Workflow name      | GITHUB_CONTEXT.workflow     | ??               | ??       |
+| Workflow name      | Retrieve relative workflow file path from the [GitHub workflows API](https://docs.github.com/en/rest/actions/workflow-runs#get-a-workflow-run).     | ??               | ??       |
 | Server URL        | GITHUB_CONTEXT.server_url  | ??               | ??       |
 | Repository        | GITHUB_CONTEXT.repository  | ??               | ??       |
 | Ref               | GITHUB_CONTEXT.ref         | ??               | ??       |
