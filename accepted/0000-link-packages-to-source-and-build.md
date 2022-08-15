@@ -245,7 +245,7 @@ While inclusion in the registry is proof that the package was published by an au
 
 As part of authorizing publishing of the package, the registry should sign a statement (release attestation) about accepting the package release and publish it to Rekor (public ledger).
 
-WebPKI CAs currently use a similar approach when they publish all issued certificates to a [transparency log](https://certificate.transparency.dev/).
+Web Public Key Infrastructure ([Web PKI](https://en.wikipedia.org/wiki/Public_key_infrastructure)) CAs currently use a similar approach when they publish all issued certificates to a [transparency log](https://certificate.transparency.dev/).
 
 ### CI/CD OIDC provider support
 Today only GitHub Actions is fully supported by Fulcio. We’d like to see support added for any public CI/CD service that can meet these requirements:
