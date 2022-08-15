@@ -105,7 +105,7 @@ However, adopting something like Sigstore raises several major questions (beyond
 
 Sigstore has three main components: a CLI tool (Cosign), a Certificate Authority ([fulcio.sigstore.dev](https://docs.sigstore.dev/fulcio/overview/)), and a time stamping and immutable ledger service ([rekor.sigstore.dev](https://docs.sigstore.dev/rekor/overview/)).
 
-The Cosign functionality will be embedded directly in npm CLI, so we're left with the public [fulcio.sigstore.dev](https://docs.sigstore.dev/fulcio/overview/) (CA) and [rekor.sigstore.dev](https://docs.sigstore.dev/rekor/overview/) (ledger) services.
+The Cosign functionality will be embedded directly in npm CLI, so we're left with the public [fulcio.sigstore.dev](https://docs.sigstore.dev/fulcio/overview/) (Certificate Authority) and [rekor.sigstore.dev](https://docs.sigstore.dev/rekor/overview/) (ledger) services.
 
 ##### What does [fulcio.sigstore.dev](https://docs.sigstore.dev/fulcio/overview/) give us?
 - Independent party to validate claims of the OIDC identity token which contains references back to the repo, workflow run and git SHA.
@@ -245,7 +245,7 @@ While inclusion in the registry is proof that the package was published by an au
 
 As part of authorizing publishing of the package, the registry should sign a statement (release attestation) about accepting the package release and publish it to Rekor (public ledger).
 
-Web Public Key Infrastructure ([Web PKI](https://en.wikipedia.org/wiki/Public_key_infrastructure)) CAs currently use a similar approach when they publish all issued certificates to a [transparency log](https://certificate.transparency.dev/).
+Web Public Key Infrastructure ([Web PKI](https://en.wikipedia.org/wiki/Public_key_infrastructure)) Certificate Authorities (CA) currently use a similar approach when they publish all issued certificates to a [transparency log](https://certificate.transparency.dev/).
 
 ### CI/CD OIDC provider support
 Today only GitHub Actions is fully supported by Fulcio. We’d like to see support added for any public CI/CD service that can meet these requirements:
@@ -374,7 +374,7 @@ Interaction between the npm CLI tool running in CI, the npm registry, and the Si
 ```
 
 1. `npm publish --with=build-signatures` detects execution within a supported CI/CD environment and initializes token exchange to get a JWT id token from the CI/CD system's OIDC identity provider.
-2. npm CLI creates a new ephemeral key pair, requests a certificate from Fulcio (CA) and authenticates via the JWT id token.
+2. npm CLI creates a new ephemeral key pair, requests a certificate from Fulcio (Certificate Authority) and authenticates via the JWT id token.
 3. A SLSA build provenance attestation is created based on information available within the JWT and CI system and signs it with the ephemeral key.
 4. npm CLI uploads the completed attestation record on Rekor for public packages.
 5. npm registry creates a release attestation, stating that the version has been accepted and published, and places the record on Rekor for public packages.
