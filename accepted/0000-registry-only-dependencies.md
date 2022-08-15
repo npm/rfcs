@@ -60,7 +60,7 @@ found N vulnerabilities
 
 From a CLI perspective, this could easily (ideally) be delegated to the `npm query` command.
 ```sh
-$ npm query ":root > *:is(:type(git,remote))"
+$ npm query ":is(:type(git,remote))"
 ```
 
 ### Options
