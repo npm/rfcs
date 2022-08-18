@@ -81,7 +81,7 @@ As such, there are several risks of adopting Sigstore for npm that are worth cal
 To mitigate some of these risks, GitHub is planning to work directly with Sigstore to define and support robust production-grade SLOs for uptime and reliability that meet the requirements for npm. This will involve being on-call and wearing the pager for production services.
 
 In addition, GitHub is planning to support Sigstore by:
-- Running a signed timestamp authority for Rekor as well as a Certificate Transparency monitor for Fulcio. This will help spread the trust outside the four walls of Sigstore.
+- Running a signed timestamp authority for Rekor as well as a Certificate Transparency monitor for Fulcio and a transparency log for Rekor. This will help spread the trust outside the four walls of Sigstore.
 - Maintaining the Sigstore trust root and having a root key holder as part of the group of Sigstore root key holders.
 
 The details around these commitments are still in process of being solidified. The current plan is to commit to this for the foreseeable future as long as npm and/or GitHub is relying on Sigstore services. GitHub would be communicating any changes to these commitments.
