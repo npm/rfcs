@@ -1,15 +1,8 @@
-### References
-relates to #581
-
-----
-
 # Registry Only Dependencies
 
 ## Summary
 
 When auditing dependencies with `npm audit`, the npm CLI should have a mechanism for communicating (and optionally failing on) dependencies that _do not_ come from a registry, like a [git URL](https://docs.npmjs.com/cli/v7/configuring-npm/package-json#git-urls-as-dependencies).
-
-> _**Note**: this RFC has a hard dependency on [`npm query`](https://github.com/npm/cli/pull/5000) landing to support its implementation._
 
 ## Motivation
 
@@ -139,29 +132,3 @@ As far as I know, while other package managers allow installing from URLs and gi
 This seems like a worthwhile area for npm to be the first mover.
 
 To demonstrate, if you see [this demo repo](https://github.com/thescientist13/npm-query-registry-only-deps-rfc-demo) and follow the steps to `npm link` with a version that has `npm query`, you will see output for **eslint** but not **babel**, which is the desired outcome in this situation given that _package.json_ has eslint as a `git` dependency.
-
-## Unresolved Questions and Bikeshedding
-
-### Default Behavior
-As proposed, the default behavior would be the `silent` option.  As part of a semver-major change, the default behavior could be changed to that of the `warn` option instead.
-
-> _Decided that `warn` would be the appropriate initial default._
-
-### Dependency Distinctions
-A point raised was if different dependency types should have different rules applied to them, or if this flag should apply equally across direct and transitive dependencies alike.  ex.
-- warn by default for direct dependencies
-- hide by default for transitive dependencies
-- etc
-
-> _Decided that the upcoming `npm query` RFC would be the appropriate way to overlay more granular filtering and preferences.  Through this, `npm audit` could become over more powerful by elevating this RFC to signal other potential risks like for:_
->  - CVEs (default)
->  - Signatures
->  - Engines
->  - Peer Deps, et al
-
-### Naming
-Currently the flag is `--only-registry-tarballs` which while explicit, is a bit verbose.  I think the final flag name is less consequential / material to the ultimate objective of this RFC, as long as it gets clearly captured in relevant areas of the documentation.
-
-> _Decided on a name of `--only-non-remote-deps` to account for local linking of packages done by a user intentionally._
->
-> _Another name change made to call the flag `--only-registry-deps`._
