@@ -4,7 +4,7 @@
 
 Today `npm audit` has a limited set of options to filter the packages that are included or excluded from it's scope. There has also been [very public, legitimate critcism about the signal to noise ratio](https://overreacted.io/npm-audit-broken-by-design/) of `npm audit`'s ouput. Unfortunately, this has lead many developers to turn off `npm audit` checks completely during installation (ex. `--no-audit`) or switching to alternative package managers who do not run audits by default. 
 
-The current configuration options are based on `Arborist`'s underlying  support for, & limited to, package types (ie. `--omit` & `--include` can be used today to filter by only `prod`, `dev`, `optional` & `peer` dependency types today). Expanding `npm audit`'s filter capabilities & leveraging the new, rebust [Dependency Selector Syntax](https://docs.npmjs.com/cli/v8/using-npm/dependency-selectors) - at the command-line/project-level - will help end-users define complex groups of dependencies to be included.
+The current configuration options are based on `Arborist`'s underlying  support for, & limited to, package types (ie. `--omit` & `--include` can be used today to filter by only `prod`, `dev`, `optional`, & `peer` dependency types today). Expanding `npm audit`'s filter capabilities & leveraging the new, robust [Dependency Selector Syntax](https://docs.npmjs.com/cli/v8/using-npm/dependency-selectors) - at the command-line/project-level - will help end-users define complex groups of dependencies to be included.
 
 ### Solution
 
