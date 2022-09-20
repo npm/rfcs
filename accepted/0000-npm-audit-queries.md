@@ -1,4 +1,4 @@
-# Add `--query` flag to `npm audit`
+# Add `--audit-query` flag to `npm audit`
 
 ### Motivation
 
@@ -8,11 +8,11 @@ The current configuration options are based on `Arborist`'s underlying  support 
 
 ### Solution
 
-Add support for a new `--query` flag to `npm audit` which takes a **Dependency Selector** as it's value. 
+Add support for a new `--audit-query` flag to `npm audit` which takes a **Dependency Selector** as it's value. 
 
 ### Implementation
 
-When the `--query` flag is defined it will set `--omit` & `--include` values to empty & configure `Arborist` to run the `tree.querySelectorAll("<query-selector-string-value>")`.
+When the `--audit-query` flag is defined it will set `--omit` & `--include` values to empty & configure `Arborist` to run the `tree.querySelectorAll("<query-selector-string-value>")`.
 
 ### Prior Art
 
