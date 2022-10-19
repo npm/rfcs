@@ -6,31 +6,6 @@ team](https://github.com/orgs/npm/teams/cli-team) and the wider community
 to have discussions about the features and direction of the package
 manager.
 
-## RFC Meetings
-
-### Why a meeting?
-In our ongoing efforts to better listen to & collaborate with the community, we've started a call that helps to move conversations on RFCs & initiatives forward. It is a secondary, synchronous forum which we use to engage with the community beyond the discussion/comment threads in issues & PRs.
-
-### When is the meeting?
-
-#### Wednesday's @ 2:00 PM EST
-
-**Cadence:**
-This meeting is scheduled to take place **weekly**. Previous meeting agendas & notes can be found [here](https://github.com/npm/rfcs/issues?q=is%3Aissue+sort%3Aupdated-desc+is%3Aclosed+label%3Ameeting)
-
-**Livestream:**
-You don't have to join the Zoom call to attend a meeting, you can watch our calls [live](https://youtube.com/channel/UCK71Wk0I45SLTSXQA23GdIw/live) or view [previous meetings](https://www.youtube.com/playlist?list=PLQso55XhxkgBKhtFahRx20wyWE488kKJJ) on YouTube.
-
-### How to join?
-
-**Add to your Calendar:**
-You can track all **npm** public events by adding/tracking our **public events calendar**:
-
-* gCal: [`https://calendar.google.com/calendar/u/0/embed?src=c_b393db8300b7d1fb61b0f8a644ed392934d8f56f122d5a6e8acb10aa53668c5d@group.calendar.google.com`](https://calendar.google.com/calendar/u/0/embed?src=c_b393db8300b7d1fb61b0f8a644ed392934d8f56f122d5a6e8acb10aa53668c5d@group.calendar.google.com) 
-* iCal: [`https://calendar.google.com/calendar/ical/c_b393db8300b7d1fb61b0f8a644ed392934d8f56f122d5a6e8acb10aa53668c5d%40group.calendar.google.com/public/basic.ics`](https://calendar.google.com/calendar/ical/c_b393db8300b7d1fb61b0f8a644ed392934d8f56f122d5a6e8acb10aa53668c5d%40group.calendar.google.com/public/basic.ics)
-
-**Zoom Link:** You can join the livestreamed Zoom meeting/call [here](https://github.zoom.us/j/94543839461?pwd=S0lwYytLd2tlMVBxTlJGbE5QQlhGUT09)
-
 ## What is an RFC?
 
 The name is a reference to the **IETF's Request For Comments** process, and
@@ -200,3 +175,27 @@ unanswered questions that may require implementation exploration.
 More often, if an RFC has been previously ratified, and either cannot be
 implemented as described, or should be superceded by another proposal, it
 will be withdrawn as part of another RFC submitted through this process.
+
+---
+
+## Open Office Hours
+
+In our ongoing efforts to better listen to & collaborate with the community, we've started an open office hours call that helps to move conversations on RFCs forward as well as help answer broader community questions. It is notably a call without an agenda but provides a synchronous forum to engage with the community beyond the discussion/comment threads in issues & PRs.
+
+### When?
+
+#### Wednesday's @ 2:00 PM EST
+
+**Cadence:**
+This event is scheduled to take place **weekly**. Previous meetings (including "Open RFC" calls) agendas & notes can be found [here](https://github.com/npm/rfcs/issues?q=is%3Aissue+sort%3Aupdated-desc+is%3Aclosed+label%3Ameeting) or watched on [YouTube](https://www.youtube.com/playlist?list=PLQso55XhxkgBKhtFahRx20wyWE488kKJJ).
+
+### How to join?
+
+**Add to your Calendar:**
+
+You can track all **npm** public events by adding/tracking our **public events calendar**:
+
+* gCal: [`https://calendar.google.com/calendar/u/0/embed?src=c_b393db8300b7d1fb61b0f8a644ed392934d8f56f122d5a6e8acb10aa53668c5d@group.calendar.google.com`](https://calendar.google.com/calendar/u/0/embed?src=c_b393db8300b7d1fb61b0f8a644ed392934d8f56f122d5a6e8acb10aa53668c5d@group.calendar.google.com) 
+* iCal: [`https://calendar.google.com/calendar/ical/c_b393db8300b7d1fb61b0f8a644ed392934d8f56f122d5a6e8acb10aa53668c5d%40group.calendar.google.com/public/basic.ics`](https://calendar.google.com/calendar/ical/c_b393db8300b7d1fb61b0f8a644ed392934d8f56f122d5a6e8acb10aa53668c5d%40group.calendar.google.com/public/basic.ics)
+
+**Zoom Link:** You can join the Public Open Offices hours Zoom calls [here](https://github.zoom.us/j/94543839461?pwd=S0lwYytLd2tlMVBxTlJGbE5QQlhGUT09)
