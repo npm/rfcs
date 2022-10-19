@@ -26,8 +26,8 @@ You don't have to join the Zoom call to attend a meeting, you can watch our call
 **Add to your Calendar:**
 You can track all **npm** public events by adding/tracking our **public events calendar**:
 
-* gCal: [`https://calendar.google.com/calendar/embed?src=npmjs.com_oonluqt8oftrt0vmgrfbg6q6go%40group.calendar.google.com`](https://calendar.google.com/calendar/embed?src=npmjs.com_oonluqt8oftrt0vmgrfbg6q6go%40group.calendar.google.com)
-* iCal: [`https://calendar.google.com/calendar/ical/npmjs.com_oonluqt8oftrt0vmgrfbg6q6go%40group.calendar.google.com/public/basic.ics`](https://calendar.google.com/calendar/ical/npmjs.com_oonluqt8oftrt0vmgrfbg6q6go%40group.calendar.google.com/public/basic.ics)
+* gCal: [`https://calendar.google.com/calendar/u/0/embed?src=c_b393db8300b7d1fb61b0f8a644ed392934d8f56f122d5a6e8acb10aa53668c5d@group.calendar.google.com`](https://calendar.google.com/calendar/u/0/embed?src=c_b393db8300b7d1fb61b0f8a644ed392934d8f56f122d5a6e8acb10aa53668c5d@group.calendar.google.com) 
+* iCal: [`https://calendar.google.com/calendar/ical/c_b393db8300b7d1fb61b0f8a644ed392934d8f56f122d5a6e8acb10aa53668c5d%40group.calendar.google.com/public/basic.ics`](https://calendar.google.com/calendar/ical/c_b393db8300b7d1fb61b0f8a644ed392934d8f56f122d5a6e8acb10aa53668c5d%40group.calendar.google.com/public/basic.ics)
 
 **Zoom Link:** You can join the livestreamed Zoom meeting/call [here](https://github.zoom.us/j/94543839461?pwd=S0lwYytLd2tlMVBxTlJGbE5QQlhGUT09)
 
