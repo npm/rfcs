@@ -24,6 +24,6 @@
     "@octokit/rest": "^18.0.1",
     "dotenv": "^8.2.0",
     "handlebars": "^4.7.6",
-    "node-fetch": "^2.6.1"
+    "node-fetch": "^2.6.7"
   }
 }
