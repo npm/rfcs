@@ -43,7 +43,7 @@ Open source maintainers must be able to link their packages to the source and bu
 - Verification should be performed without depending on any third-party systems other than the registry.
 - Compatible with third-party npm clients, e.g. `yarn` and `pnpm`.
 - Should allow third-party npm registries, e.g. GitHub Packages, Artifactory and Verdaccio to follow suit and implement similar interfaces.
-- Should be maintained with >99.9% uptime so that developers are not blocked from publishing new packages.
+- Should be maintained with >99.5% uptime so that developers are not blocked from publishing new packages.
 - Should allow future extensions to support centrally managed signing authorities such as certificates managed by an enterprise and inner source within air-gapped enterprise environments.
 - Buy-in from the broader open source community.
 
@@ -76,11 +76,11 @@ The [Sigstore](https://www.sigstore.dev/) project has been selected as the solut
 Note that nothing in this current proposal precludes us from offering additional signing methods in the future as they become available and mature.
 
 ## Risks of adopting Sigstore
-Sigstore infrastructure and tooling are currently not considered production ready and are run on a best-effort basis. The Sigstore project is working towards a [General Availability](https://blog.sigstore.dev/an-update-on-general-availability-5c5563d4e400) release later this year but we don't yet know what these guarantees will look like yet.
+Sigstore infrastructure and tooling reached [General Availability](https://blog.sigstore.dev/sigstore-ga-ddd6ba67894d) in October 2022.
 
-As such, there are several risks of adopting Sigstore for npm that are worth calling out:
+While Sigstore going GA is an important milestone in securing the future of the project, there are still several risks in adopting Sigstore for npm that are worth calling out:
 - No buy-in from the broader open source npm community.
-- Sigstore's public and free-to-use infrastructure is not able to meet our uptime requirements (>99.9%).
+- Sigstore's public and free-to-use infrastructure is not able to meet our uptime requirements (>99.5%).
 - Sigstore is not able to secure the funding required to run the infrastructure with production-grade support, SLOs, and on-call rotation.
 
 To mitigate some of these risks, GitHub is planning to work directly with Sigstore to define and support robust production-grade SLOs for uptime and reliability that meet the requirements for npm. This will involve being on-call and wearing the pager for production services.
@@ -204,7 +204,6 @@ While no existing solution addresses all of the goals outlined above at this tim
 
 Using OIDC to handle authentication of workloads requesting a short-lived X.509 certificate allows this solution to be vendor neutral and work consistently across many source repositories and CI systems.
 
-
 ### Signing methods
 #### Author managed keys
 The most common existing solution to signing software involves maintainer-managed keys, which has known [usability](https://www.usenix.org/legacy/events/sec99/full_papers/whitten/whitten.ps) [and](https://latacora.micro.blog/2019/07/16/the-pgp-problem.html) [security](https://blog.cryptographyengineering.com/2014/08/13/whats-matter-with-pgp/) [issues](https://www.wired.co.uk/article/efail-pgp-vulnerability-outlook-thunderbird-smime). Registries that have implemented public key signing have seen either limited adoption or achieved adoption only by mandating it (e.g., Maven Central, which reports developer friction).
@@ -243,12 +242,12 @@ Only builds executed inside a build system that supports OIDC workload identitie
 
 Today, this means adding direct vendor support for commercial CI/CD vendors. We realize that this isn't ideal as it centralizes support to a handful of vendors. We believe this compromise is the best option we have given our goals around building and publishing in the open, respecting maintainer pseudonymity and avoiding maintainer-managed keys or secrets.
 
-### Authorizing a release
-A provenance attestation captures information about the source code repo, revision and build information. This information on its own does not capture if the release was accepted by the registry as coming from an authorized user.
+### Authorizing a package publish
+A provenance attestation captures information about the source code repo, revision and build information. This information on its own does not capture if the published package was accepted by the registry as coming from an authorized user.
 
 While inclusion in the registry is proof that the package was published by an authorized actor, no verifiable attestation exists that captures the details of the decision taken by the registry to allow the publish step.
 
-As part of authorizing publishing of the package, the registry should sign a statement (release attestation) about accepting the package release and publish it to Rekor (public ledger).
+As part of authorizing publishing of the package, the registry should sign a statement (publish attestation) about accepting the package and upload it to Rekor (public ledger).
 
 Web Public Key Infrastructure ([Web PKI](https://en.wikipedia.org/wiki/Public_key_infrastructure)) Certificate Authorities (CA) currently use a similar approach when they publish all issued certificates to a [transparency log](https://certificate.transparency.dev/).
 
@@ -281,7 +280,7 @@ We will also work with OpenSSF and other package ecosystems adopting [Sigstore](
 
 #### Comparison of provided and required ID token claims
 
-The following claims are required to fully support generating build provenance for npm releases.
+The following claims are required to fully support generating build provenance for npm packages.
 
 | Claim           | Required                                                                  | GitHub           | GitLab                                  | CircleCI                                                       |
 |-----------------|---------------------------------------------------------------------------|------------------|-----------------------------------------|----------------------------------------------------------------|
@@ -339,17 +338,17 @@ GET https://registry-host.tld/-/npm/v1/sigstore-config
 }
 ```
 
-This would allow future extensions where maintainers can configure the instance being used, making sure the release attestation gets placed on the same Rekor instance as the build attestation. The release attestation will be generated by the registry when the package has been successfully authorized and published.
+This would allow future extensions where maintainers can configure the instance being used, making sure the publish attestation gets placed on the same Rekor instance as the build attestation. The publish attestation will be generated by the registry when the package has been successfully authorized and published.
 
 #### Publishing
-Maintainers will need to enable build provenance generation with a command line flag: `npm publish --with=build-signatures` in addition to running it in a supported CI/CD system. The command will error with an error message if this is not run in a supported build system.
+Maintainers will need to enable build provenance generation with a command line flag: `npm publish --provenance` in addition to running it in a supported CI/CD system. The command will error with an error message if this is not run in a supported build system.
 
 Once enabled, the CLI will perform the required steps to generate the provenance attestation and upload this to the public Rekor ledger for transparency and a detached copy that contains proof of inclusion from Rekor will be stored in the npm registry.
 
 ##### What goes on the public Rekor ledger?
 Only public npm packages will be signed and published to the public [rekor.sigstore.dev](https://docs.sigstore.dev/rekor/overview) ledger by default.
 
-Privately scoped packages, or packages from private repositories, will not be signed or published to the public ledger. This will be determined by interrogating the npm registry at publish time. Users will be able to override this similar to the `cosign --force` command by passing an argument to `npm publish`, e.g. `--force-build-signatures`.
+Privately scoped packages, or packages from private repositories, will not be signed or published to the public ledger. This will be determined by interrogating the npm registry at publish time. Users will be able to override this similar to the `cosign --force` command by passing an argument to `npm publish`, e.g. `--force-public-provenance`.
 
 The entry will be stored and retrieved using the shasum of the package tarball. This will make sure we don't find any signatures for a deleted package that has been resurrected with the same name and version.
 
@@ -373,38 +372,38 @@ Interaction between the npm CLI tool running in CI, the npm registry, and the Si
     npm_cli->>npm_registry: Publish package and upload Rekor entry
     npm_registry->>fulcio: Request signing certificate
     fulcio->>npm_registry: Signing certificate
-    npm_registry->>rekor: Upload signed release attestations
+    npm_registry->>rekor: Upload signed publish attestations
     rekor->>npm_registry: Rekor entry
     npm_registry->>npm_registry: Attach rekor entry to published package
     npm_registry->>npm_cli: Success
 ```
 
-1. `npm publish --with=build-signatures` detects execution within a supported CI/CD environment and initializes token exchange to get a JWT id token from the CI/CD system's OIDC identity provider.
+1. `npm publish --provenance` detects execution within a supported CI/CD environment and initializes token exchange to get a JWT id token from the CI/CD system's OIDC identity provider.
 2. npm CLI creates a new ephemeral key pair, requests a certificate from Fulcio (Certificate Authority) and authenticates via the JWT id token.
 3. A SLSA build provenance attestation is created based on information available within the JWT and CI system and signs it with the ephemeral key.
 4. npm CLI uploads the completed attestation record on Rekor for public packages.
-5. npm registry creates a release attestation, stating that the version has been accepted and published, and places the record on Rekor for public packages.
+5. npm registry creates a publish attestation, stating that the version has been accepted and published, and places the record on Rekor for public packages.
 
 #### Verifying
 The package integrity captured by the provenance attestation will be verified by the npm CLI. To begin with, the package integrity should be verified when running the  `npm audit signatures` command and eventually transparently integrated into `npm install` and enabled by default.
 
-There should be a way to only verify existing registry signatures or build signatures using the audit command: `npm audit signatures --type=registry|build`.
+There should be a way to only verify existing registry signatures or build signatures using the audit command: `npm audit signatures --type=registry|attestations`.
 
 This will be staged rollout over several npm CLI releases as changing the default behavior of `npm install` is a breaking change:
 
-1. The existing `npm audit signatures` command will start verifying build signatures, possibly adding an opt-in flag to audit these signatures during `npm install`, e.g. `--audit=build-signatures`
-2. Start auditing build signatures by default when running `npm install`. This will only check packages that have build attestations and ignore the rest. Allow opting out of this behavior with `--no-audit=build-signatures` or `--no-audit`.
-3. Allow users to opt-in to a strict mode to require packages to be published with build provenance information, e.g. `npm install --require=build-signatures`. Initially, this might only be usable by maintainers that only depend on their dependencies. It will take a long time for this to be feasible for the average install as all transitive dependencies would need to include build provenance on the installed version. We could allow policies that make gradual enforcement possible, e.g. only require build provenance on packages published after some minimum date.
+1. The existing `npm audit signatures` command will start verifying build signatures, possibly adding an opt-in flag to audit these signatures during `npm install`, e.g. `--audit=attestations`
+2. Start auditing build signatures by default when running `npm install`. This will only check packages that have build attestations and ignore the rest. Allow opting out of this behavior with `--no-audit=attestations` or `--no-audit`.
+3. Allow users to opt-in to a strict mode to require packages to be published with build provenance information, e.g. `npm install --require=audit-attestations`. Initially, this might only be usable by maintainers that only depend on their dependencies. It will take a long time for this to be feasible for the average install as all transitive dependencies would need to include build provenance on the installed version. We could allow policies that make gradual enforcement possible, e.g. only require build provenance on packages published after some minimum date.
 
 Signature verification needs to be performant and have a negligible impact on `npm install`. We believe the main bottleneck here will be the network, downloading the signatures to verify. The crypto operations involved in verification are negligible on modern hardware. We propose the CLI makes a bulk API request to the npm registry, similar to how advisories are fetched, for all provenance attestations for a given install.
 
 A performance benchmark should be added to the CLI test suite to detect any regressions to verification performance.
 
 ##### Detailed steps to verify
-1. npm CLI downloads the provenance and release attestations for each installed package (the download will be done in bulk for all installed packages)
+1. npm CLI downloads the provenance and publish attestations for each installed package (the download will be done in bulk for all installed packages)
     1. Verify the build provenance attestation is signed by a certificate created for the builder/actions run.
     2. One Rekor entry proves that the build provenance attestation was placed on the public ledger.
-    3. One Rekor entry proves that the npm package was accepted and released by the npm registry (the Rekor entry contains the package’s url (PURL), sha512 digest and is signed with a certificate for the npm registry).
+    3. One Rekor entry proves that the npm package was accepted and published by the npm registry (the Rekor entry contains the package’s url (PURL), sha512 digest and is signed by the npm registry).
     4. Verify both of the certificates are issued by Fulcio and identifying different workloads (builder and the npm registry).
 2. npm CLI verifies that the Rekor entries, Signed Certificate Timestamp (SCT), certificate and certificate chain in the build provenance are trusted. The [sigstore-js](https://github.com/sigstore/sigstore-js) client includes a TUF client that's used to verify, and optionally update, the public keys for both Rekor and Fulcio.
 3. npm CLI verifies that the signature of the attestation is valid.
@@ -412,7 +411,7 @@ A performance benchmark should be added to the CLI test suite to detect any regr
 5. npm CLI verifies that the attestation is for the correct package (attestation’s subject SHA512 digest is the same as the packages).
 6. npm CLI verifies that the builder listed in the attestation is trusted.
 7. npm CLI verifies that the Rekor entries match the current package (the SHA512 digest in the package must match).
-8. npm CLI verifies that the certificate used with the Rekor npm package entry is signed with a certificate matching npm and the package name.
+8. npm CLI verifies that the publish attestation was signed using a trusted public key from the npm registry.
 9. npm CLI verifies that the certificate used to sign the package digest matches the package name and repository in the build provenance’s config source section.
 
 There are two obvious failure scenarios we need to handle when verifying:
@@ -426,7 +425,7 @@ We're planning on providing detailed documentation on how to wire up the Sigstor
 
 ### Supporting third-party npm registries
 At a high level, third-party registries will need to support the following:
-- Generate release attestations
+- Generate publish attestations
 - Accept build provenance attestation documents on publish, alongside the packument (`package.json`) and tarball
 - Storing the attestations in the registry
 - Providing a query endpoint for retrieving attestations
@@ -438,7 +437,7 @@ To ensure the provenance information hasn't been tampered with during the build,
 
 Non-falsifiable provenance information is a [requirement to reach SLSA level 3](https://slsa.dev/spec/v0.1/requirements#non-falsifiable) (framework for securing the supply chain).
 
-Using a trusted builder to publish an npm release will ensure a higher level of build integrity. Using it will be optional, but highly recommended. Verification of build provenance will include checks to determine if a trusted builder was used.
+Using a trusted builder to publish an npm package will ensure a higher level of build integrity. Using it will be optional, but highly recommended. Verification of build provenance will include checks to determine if a trusted builder was used.
 
 At a high level, the trusted builder will checkout the git repo, install dependencies and execute a user supplied build command (e.g. `npm run build`) followed by `npm publish`. 
 
@@ -507,7 +506,7 @@ The `buildConfig` format should mirror the [slsa-github-generator](https://githu
     "env": null,
     "workingDir": "/path/to/workingdir/in/runner"
   }, {
-    "command": "npm publish --with=build-signatures",
+    "command": "npm publish --provenance",
     "env": null,
     "workingDir": "/path/to/workingdir/in/runner"
   }]
@@ -561,20 +560,40 @@ The signed build provenance attestation must be stored and transferred together 
 
 For a more detailed look into different envelope schemas, see this [comparison of signing envelope formats](https://docs.google.com/document/d/18YVGA4mq45wfUkWrAqWkymzdHRcXxlwINKXnEp86L0w/edit#heading=h.3v6vw85pjg5e).
 
-### Release attestations
-When a package is successfully published, the npm registry will "attest" the release and upload this to Rekor. This includes a signature that links the repository to the package name. This must be verified by the CLI when during verification.
+### Publish attestations
+When a package is successfully published, the npm registry will "attest" the publish and upload this to Rekor. This includes a signature that links the repository to the package name. This must be verified by the CLI when during verification.
 
-This can be achieved by publishing the package signature to Rekor by using the proposed [“package entry”](https://github.com/sigstore/rekor/pull/805) log type.
+The npm publish attestation conforms to the [in-toto attestation spec (v0.1.0)](https://github.com/in-toto/attestation/tree/v0.1.0/spec).
 
-The release attestation will contain the following claims, linking the build to the release:
-- Package org/name
-- Package version
-- Registry signature
-- Tarball shasum
+#### Statement spec
+
+```json
+{
+  "_type": "https://in-toto.io/Statement/v0.1",
+  "subject": [{
+    "name": "pkg:npm/@scope/package-foo@1.4.3",
+    "digest": { "sha512": "41o0P/CEffYGDqvo2pHQXRBOfFOxvYY3WkwkQTy..." }
+  }],
+  "predicateType": "https://github.com/npm/attestation/tree/main/specs/publish/v0.1",
+  "predicate": {
+    "name": "@scope/package-foo",
+    "version": "1.4.3",
+    "registry": "https://registry.npmjs.org",
+  }
+}
+```
+
+- `subject[0].name`: A [package url (purl)]([url](https://github.com/package-url/purl-spec))
+- `subject[0].digest`: Sha-512 hexdigest of the published tarball.
+- `predicate.name`: Package name
+- `predicate.version`: Published version
+- `predicate.registry`: Registry URL
+
+See more details on the [publish attestation spec](https://github.com/npm/attestation/edit/main/specs/publish/v0.1).
 
 ### Logging additional events on the Rekor transparency log
 
-The current proposal only suggests publishing two events to the public Rekor log: sign during build and release/publish.
+The current proposal only suggests publishing two events to the public Rekor log: sign during build and publish.
 
 Publishing a richer set of events to the log could help create a safe and independent history of sensitive events. This could provide the possibility of detection when the registry DB or blob bucket are compromised, because it would be out of sync with the transparency log.
 
@@ -585,7 +604,7 @@ Possible events that could be recorded in the transparency log:
 - User registration
 - Sign during build
 - Push
-- Publish or release
+- Package Publish/Release
 - Yank or delete
 - Owner added
 - Owner removed
@@ -628,7 +647,7 @@ The definitions are not exhaustive and only cover how it's been used in this doc
 - **OpenID Connect ([OIDC](https://openid.net/specs/openid-connect-core-1_0.html)) identity provider**:  Authenticates users and issues verifiable id tokens that includes identity information, e.g. email. Examples include Google or GitHub.
 - **Package hijacking attack**: Where a malicious version of an existing open source package gets uploaded to the registry. The [eslint-scope](https://eslint.org/blog/2018/07/postmortem-for-malicious-package-publishes) attack was a notable example of this kind of attack, and it frequently occurs due to compromised npm credentials but can also happen due to compromised builds or CI/CD.
 - **[Rekor](https://docs.sigstore.dev/rekor/overview)**: Public immutable tamper-resistant ledger of signed software artifacts. Verifies that the Fulcio certificate was valid at the time of signing.
-- **Release attestation**: Verifiable metadata stating that a new package release has been published on the npm registry.
+- **Publish attestation**: Verifiable metadata stating that the npm registry has authorized and accepted a published package version.
 - **[Sigstore](https://www.sigstore.dev/)**: Public good infrastructure and standard for signing and verifying artifacts using short-lived “disposable keys”.
 - **[SLSA](https://slsa.dev/)**: Comprehensive checklists of best practices for securing the software supply chain. SLSA levels specify how secure the different components are.
 - **Software supply chain**: The series of actions performed to create a software product. These steps usually begin with users committing to a version control system and end with the software product's installation on a client's system.
