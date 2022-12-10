@@ -5,17 +5,62 @@
   "main": "index.js",
   "private": true,
   "scripts": {
-    "create-agenda": "node ./scripts/create-agenda.js"
+    "lint": "eslint \"**/*.js\"",
+    "postlint": "template-oss-check",
+    "template-oss-apply": "template-oss-apply --force",
+    "lintfix": "npm run lint -- --fix",
+    "snap": "tap",
+    "test": "tap",
+    "posttest": "npm run lint"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/npm/statusboard.git"
+    "url": "https://github.com/npm/rfcs.git"
   },
   "keywords": [],
-  "author": "npm Inc. <support@npmjs.com>",
+  "author": "GitHub Inc.",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/npm/rfcs/issues"
   },
-  "homepage": "https://github.com/npm/rfcs#readme"
+  "homepage": "https://github.com/npm/rfcs#readme",
+  "files": [
+    "bin/",
+    "lib/"
+  ],
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "templateOSS": {
+    "//@npmcli/template-oss": "This file is partially managed by @npmcli/template-oss. Edits may be overwritten.",
+    "version": "4.11.0",
+    "windowsCI": false,
+    "macCI": false,
+    "ciVersions": [
+      "18.x"
+    ],
+    "allowPaths": [
+      "accepted/",
+      "implemented/",
+      "meetings/",
+      "withdrawn/"
+    ],
+    "rootRepo": {
+      "add": {
+        ".github/ISSUE_TEMPLATE/bug.yml": false,
+        ".commitlintrc.js": false
+      }
+    }
+  },
+  "tap": {
+    "nyc-arg": [
+      "--exclude",
+      "tap-snapshots/**"
+    ]
+  },
+  "devDependencies": {
+    "@npmcli/eslint-config": "^4.0.1",
+    "@npmcli/template-oss": "4.11.0",
+    "tap": "^16.3.2"
+  }
 }
