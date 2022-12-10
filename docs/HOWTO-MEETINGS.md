@@ -6,7 +6,7 @@
 
 #### Week before...
 - Ensure an event has been booked in the [**Public Events Calendar**](https://calendar.google.com/calendar/ical/npmjs.com_oonluqt8oftrt0vmgrfbg6q6go%40group.calendar.google.com/public/basic.ics) (note: the title of the event must start with "Open RFC") at least a week ahead of time
-- The week before, or week of, run the `npm run agenda` script to create the agenda issue in `npm/rfcs` via https://github.com/npm/statusboard (TODO: this script should be moved & the GitHub Action/Workflow should be fixed - as it's broken currently)
+- The week before, or week of, run the [`stafftools`](https://github.com/npm/stafftools) `rfc-agenda`
 
 #### Day-of...
 1. Create a [**hackmd.io**](https://hackmd.io/) shared document & copy the agenda into the [example template](#meeting-notes-template)
