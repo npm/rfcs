@@ -195,7 +195,7 @@ This event is scheduled to take place **weekly**. Previous meetings (including "
 
 You can track all **npm** public events by adding/tracking our **public events calendar**:
 
-* gCal: [`https://calendar.google.com/calendar/u/0/embed?src=c_b393db8300b7d1fb61b0f8a644ed392934d8f56f122d5a6e8acb10aa53668c5d@group.calendar.google.com`](https://calendar.google.com/calendar/u/0/embed?src=c_b393db8300b7d1fb61b0f8a644ed392934d8f56f122d5a6e8acb10aa53668c5d@group.calendar.google.com) 
-* iCal: [`https://calendar.google.com/calendar/ical/c_b393db8300b7d1fb61b0f8a644ed392934d8f56f122d5a6e8acb10aa53668c5d%40group.calendar.google.com/public/basic.ics`](https://calendar.google.com/calendar/ical/c_b393db8300b7d1fb61b0f8a644ed392934d8f56f122d5a6e8acb10aa53668c5d%40group.calendar.google.com/public/basic.ics)
+* gCal: [`https://calendar.google.com/calendar/embed?src=c_a0133cbf87923c19822d1e868565c3ed281dc47859d9523a2462f4a6a57f20c8%40group.calendar.google.com`](https://calendar.google.com/calendar/embed?src=c_a0133cbf87923c19822d1e868565c3ed281dc47859d9523a2462f4a6a57f20c8%40group.calendar.google.com) 
+* iCal: [`https://calendar.google.com/calendar/ical/c_a0133cbf87923c19822d1e868565c3ed281dc47859d9523a2462f4a6a57f20c8%40group.calendar.google.com/public/basic.ics`](https://calendar.google.com/calendar/ical/c_a0133cbf87923c19822d1e868565c3ed281dc47859d9523a2462f4a6a57f20c8%40group.calendar.google.com/public/basic.ics)
 
-**Zoom Link:** You can join the Public Open Offices hours Zoom calls [here](https://github.zoom.us/j/94543839461?pwd=S0lwYytLd2tlMVBxTlJGbE5QQlhGUT09)
+**Zoom Link:** You can join the Public Open Offices hours Zoom calls [here](https://github.zoom.us/j/93497811229?pwd=SjJWaVd1V2dEZkMvUWRMQlFYdVgzQT09)
