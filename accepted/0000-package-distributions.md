@@ -163,7 +163,7 @@ While this is most useful for slow and costly binary builds, it is also interest
 
 - Do we need to feature flag this for `npm@8`? ex. put this feature under a new flag (ex. `--with-distributions`)? Does that limit it's impact/usage?
 - Should we outline best practices? 
-  - ex. a best practice we could recommend for maintainers to ensure they're consumers are using `distributions` properly, & to avoid confusion, is to set `engines` value for `npm` & educate maintainers/consumers on `--engines-strict`
+  - ex. a best practice we could recommend for maintainers to ensure their consumers are using `distributions` properly, & to avoid confusion, is to set `engines` value for `npm` & educate maintainers/consumers on `--engines-strict`
 
 ```json
 {
