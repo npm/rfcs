@@ -95,14 +95,14 @@ The current best practice/work-around is to define all package distributions as 
 * **Do not** reify the others, or any of their dependencies (unless they are required to meet another dependency in the tree)
 * Reify the main package as a `Link` to the chosen distribution
 
-### For Publisher's:
+### For Publishers:
 
 * Publish the main package with the source, pointing to distribution package specifiers and selection criteria
 * Publish pre-built distributions as needed
 
 This is amenable to publishing distributions post-hoc as a CI build.  If any fail to build and publish, no matter, they will simply fail to install, and fall back to the main package.
 
-### For Consumer's:
+### For Consumers:
 
 * Add a `foo` as a dependency
 * Pre-built distributions will be added to lockfile.
