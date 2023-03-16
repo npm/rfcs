@@ -202,6 +202,7 @@ While this is most useful for slow and costly binary builds, it is also interest
 ```
 
 - Do we really want to allow for arbitrary binary assets to be placed, or should this be restricted to npm packages?
+- Do we want this feature to also address the use case of `full` vs `slim` packages, or `commonjs` vs `esm`? These are not platform specific dependencies, rather they are usage specific. Defining a way to retrieve these is currently outside of the scope of this feature but may be something to consider adding.
 
 ## Known risks
 
