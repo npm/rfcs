@@ -18,6 +18,14 @@ Introduce a new field called `distributions` which will be utilized by the `npm`
 
 The current best practice/work-around is to define all package distributions as `optionalDependencies` & rely on the environment failing to install them - then testing to see which dep successfully installed & use accordingly.
 
+A major pit fall of this approach is that optional dependencies that don't get installed also don't get added to the package-lock.json. If a user were to install the `foo` package described below in Windows, only the `foo` and `foo-win` packages would be locked. A contributor to the same project working in MacOS would only get `foo` and `foo-darwin` locked. This creates churn that is especially noticeable in any project that is expected to run in multiple environments.
+
+In addition to this, there is no requirement for any optional dependencies to be installed. This means it is a perfectly valid dependency tree to omit every single optional dependency.
+
+Another significant concern is that after zero or more optional dependencies have been installed, the consuming package must attempt to require each of them wrapped in a `try/catch` block in order to discover which, if any, of its optional dependencies has been installed.
+
+It's worth mentioning as well that this approach does not cover the use cases that are currently met by the `postinstall` script mentioned below, meaning that it is only possible to install platform specific dependencies as npm packages. The ability to download an arbitrary binary asset from an external host and place it within the package's own directory is not within the scope of optional dependencies.
+
 #### Example:
 ```json
 {
@@ -39,6 +47,24 @@ The current best practice/work-around is to define all package distributions as 
   ]
 }
 ```
+
+### Optional dependency enhancements
+
+The optional dependency approach detailed above has some problems with it, however some of those problems can be addressed within the scope of improving the current behavior of optional dependencies.
+
+The primary change that would have to be made is that _all_ optional dependencies in a tree must be added to the `package-lock.json` regardless of whether or not the system running the install command is capable of installing each. This eliminates the churn in the lock file created by installations on multiple hosts.
+
+The missing ability to require at least one of the optional dependencies listed can also be addressed in a separate feature by allowing for some additional metadata to be added to the `package.json` that signals at least one of a set of optional dependencies must be installed.
+
+Working around the multiple attempts at `require` can realistically only be addressed by providing a pre-written function that wraps `require` to make this simpler.
+
+Again, it is worth mentioning that these improvements still would not allow the retrieval of arbitrary binary assets to be placed within the package's directory. All platform specific dependencies would have to be npm packages.
+
+### Postinstall scripts
+
+Another common approach is to use a `postinstall` script that determines what binary asset is needed and fetches it when the `foo` package is installed. There are several significant concerns with this approach. If a user installs the package with `--ignore-scripts`, something that the npm team hopes to make the default in the future, the `postinstall` script will not be run and the binary asset will never be retrieved. In the event that the user installing the package does allow scripts to run, there are still additional concerns. Because the fetch is done manually, it lacks both the caching and integrity verification that npm packages provide _unless_ the maintainer implementing the script accounts for these needs. There is also the concern of the binary being hosted outside of the npm registry, meaning that users with fine grained firewalls would have to allow a new host and all users become vulnerable to that host being compromised.
+
+For these reasons, the npm CLI team feels that a `postinstall` script is not considered a best practice and should be avoided.
 
 ## Implementation
 
@@ -161,7 +187,7 @@ While this is most useful for slow and costly binary builds, it is also interest
 
 ## Unresolved Questions and Bikeshedding
 
-- Do we need to feature flag this for `npm@8`? ex. put this feature under a new flag (ex. `--with-distributions`)? Does that limit it's impact/usage?
+- Do we need to feature flag this for `npm@9`? ex. put this feature under a new flag (ex. `--with-distributions`)? Does that limit it's impact/usage?
 - Should we outline best practices? 
   - ex. a best practice we could recommend for maintainers to ensure their consumers are using `distributions` properly, & to avoid confusion, is to set `engines` value for `npm` & educate maintainers/consumers on `--engines-strict`
 
@@ -174,3 +200,9 @@ While this is most useful for slow and costly binary builds, it is also interest
   ...
 }
 ```
+
+- Do we really want to allow for arbitrary binary assets to be placed, or should this be restricted to npm packages?
+
+## Known risks
+
+The `distributions` feature as described here has a significant known risk in the requirement of platform specific packages having no dependencies. This is often an impractical requirement and in some cases may even be impossible. Requiring that a distribution package has no dependencies creates a road block for adoption and may limit its usefulness in practice.
