@@ -18,7 +18,7 @@ Introduce a new field called `distributions` which will be utilized by the `npm`
 
 The current best practice/work-around is to define all package distributions as `optionalDependencies` & rely on the environment failing to install them - then testing to see which dep successfully installed & use accordingly.
 
-A major pit fall of this approach is that optional dependencies that don't get installed also don't get added to the package-lock.json. If a user were to install the `foo` package described below in Windows, only the `foo` and `foo-win` packages would be locked. A contributor to the same project working in MacOS would only get `foo` and `foo-darwin` locked. This creates churn that is especially noticeable in any project that is expected to run in multiple environments.
+A major pitfall of this approach is that optional dependencies that don't get installed also don't get added to the package-lock.json. If a user were to install the `foo` package described below in Windows, only the `foo` and `foo-win` packages would be locked. A contributor to the same project working in MacOS would only get `foo` and `foo-darwin` locked. This creates churn that is especially noticeable in any project that is expected to run in multiple environments.
 
 In addition to this, there is no requirement for any optional dependencies to be installed. This means it is a perfectly valid dependency tree to omit every single optional dependency.
 
