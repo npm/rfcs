@@ -184,7 +184,7 @@ In our ongoing efforts to better listen to & collaborate with the community, we'
 
 ### When?
 
-#### Wednesday's @ 2:00 PM EST
+#### ~Wednesday's @ 2:00 PM EST~ UNTIL FURTHER NOTICE, OPEN OFFICE HOURS HAVE BEEN SUSPENDED
 
 **Cadence:**
 This event is scheduled to take place **weekly**. Previous meetings (including "Open RFC" calls) agendas & notes can be found [here](https://github.com/npm/rfcs/issues?q=is%3Aissue+sort%3Aupdated-desc+is%3Aclosed+label%3Ameeting) or watched on [YouTube](https://www.youtube.com/playlist?list=PLQso55XhxkgBKhtFahRx20wyWE488kKJJ).
