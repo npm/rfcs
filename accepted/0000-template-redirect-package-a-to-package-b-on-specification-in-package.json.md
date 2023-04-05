@@ -3,7 +3,7 @@
 ## Summary
 
 The RFC recommentation allows for `redirecting` a `package A` to Package B while installation using a key in a `package.json` specification. This feature should install `Package B` when a installation of `Package A` is made from npm.
-
+ 
 
 ## Motivation
 
