@@ -14,9 +14,9 @@ The RFC recommentation allows for `redirecting` a `package A` to Package B while
 
 ## Detailed Explanation
 
-I have two packages ajs and bjs. Due to some reason I intend to merge both. Right now, I am installing ajs with npm install ajs and bjs with npm install bjs. But after the merge I wish to install bjs when ajs (npm i ajs) is installed.
+I have two packages `a.js` and `b.js`. Due to some reason I intend to merge both. Right now, I am installing `a.js` with `npm install a.js` and `b.js` with `npm install b.js`. But after the merge I wish to install `b.js` when `ajs` (`npm i a.js`) is installed.
 
-Allow redirecting a package A to Package B while installation using a key in a package.json specification. This feature should allow for installong Package B when a installation of Package A is made from npm.
+The RFC recommentation allows for `redirecting` a `package A` to Package B while installation using a key in a `package.json` specification. This feature should install `Package B` when a installation of `Package A` is made from npm.
 
 I am aware of manual installation of `npm i <alias>@npm:<package>`. It does not solve my purpose. I wish not to copy one repo `packagea` to another to maintain the sanity of the deprecated repository upgraded to another `packageb`. The only option I see is update the github url in the repository. But I doubt it solves the purpose. Any help is welcome.
 
@@ -223,5 +223,5 @@ NA
 
 ## Unresolved Questions and Bikeshedding
 
-NA
+Open for discussion.
 
