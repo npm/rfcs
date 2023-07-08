@@ -135,9 +135,43 @@ While such a feature might be useful for ordering script execution in npm, it re
 
 ## Implementation
 
-{{Give a high-level overview of implementation requirements and concerns. Be specific about areas of code that need to change, and what their potential effects are. Discuss which repositories and sub-components will be affected, and what its overall code effect might be.}}
+The first step in the implementation would be to update the [`workspacePaths` as defined in `BaseCommand`](https://github.com/npm/cli/blob/b1c3256d62250b5dca113dd99bf1bd99f2500318/lib/base-command.js#L162) to be an array of arrays, rather than an array of strings. For example, in our simple example, `workspacePaths` would be
 
-{{THIS SECTION IS REQUIRED FOR RATIFICATION -- you can skip it if you don't know the technical details when first submitting the proposal, but it must be there before it's accepted}}
+```javascript
+[["transitive-dependency"], ["dependency"], ["dependent"]];
+```
+
+regardless of the settings in the `workspaces-sort` configuration. However, for topological-parallel, some child arrays may have multiple entries, representing a "batch" of packages that can be operated on in parallel.
+
+```javascript
+[
+  ["workspace-a"],
+  ["workspace-b1", "workspace-b2", "workspace-b3"],
+  ["workspace-c"],
+];
+```
+
+Next will be to find all places that we access `workspacePaths`, and change it to operate in batches. While this does introduce considerable complexity to call sites, it does not require checking the `workspace-sort-algorithm`, since all existing algorithms can be represented with a two-dimensional array with appropriate batching.
+
+For instance, we will change the implementation of [`run-script.js`](https://github.com/npm/cli/blob/b1c3256d62250b5dca113dd99bf1bd99f2500318/lib/commands/run-script.js#L200) to operate on batches of workspaces in parallel
+
+```javascript
+for (const workspacePathBatch of this.workspacePaths) {
+  await Promise.all(
+    workspacePathBatch.map(async (workspacePath) => {
+      const { content: pkg } = await pkgJson.normalize(workspacePath);
+      const runResult = await this.run(args, {
+        path: workspacePath,
+        pkg,
+      });
+
+      // etc.
+    })
+  );
+}
+```
+
+[A repository search](https://github.com/search?q=repo%3Anpm%2Fcli%20this.workspacePaths&type=code) shows 9 such places that would have to be modified.
 
 ## Prior Art
 
