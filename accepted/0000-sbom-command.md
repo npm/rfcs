@@ -2,7 +2,7 @@
 
 ## Summary
 
-Update the npm CLI with a new command which will generate a Software Bill of Materials (SBOM) for the current project. Users will have the option to generate an SBOM conforming to either the [Software Package Data Exchange (SPDX](https://spdx.github.io/spdx-spec/v2.3/)) or [CycloneDX](https://cyclonedx.org/specification/overview/) specifications.
+Update the npm CLI with a new command which will generate a Software Bill of Materials (SBOM) containing an inventory of the current project's dependencies. Users will have the option to generate an SBOM conforming to either the [Software Package Data Exchange (SPDX](https://spdx.github.io/spdx-spec/v2.3/)) or [CycloneDX](https://cyclonedx.org/specification/overview/) specifications.
 
 
 ## Motivation
@@ -23,9 +23,9 @@ A new `sbom` command will be added to the npm CLI which will generate an SBOM fo
 
 Supported command options: 
 
-`--sbom-format` - SBOM format to use for output. Valid values are “spdx” or “cyclonedx”.
+`--sbom-format` - SBOM format to use for output. Valid values are “spdx” or “cyclonedx”. In the future, the set of valid values can be expanded to select differents versions of the supported output formats (e.g. "cyclonedx1.4" vs "cyclonedx1.5")
 
-`--omit` - Dependency types to omit from generated SBOM. Valid values are “dev”, “optional”, and “peer” (can be set multiple times). 
+`--omit` - Dependency types to omit from generated SBOM. Valid values are “dev”, “optional”, and “peer” (can be set multiple times). By default, all development, optional, and peer dependencies will be included in the generated SBOM unless explicitly excluded.
 
 `--package-lock-only` - Constructs the SBOM based on the tree described by the _package-lock.json_, rather than the contents of _node_modules_. Defaults to _false_. If the _node_modules_ folder is not present, this flag will be required in order to generate an SBOM.
  
@@ -34,6 +34,8 @@ Supported command options:
 `--workspaces` - Runs the command in the context of all configured workspaces. 
 
 If the user runs the `sbom` command without first installing the dependencies for the project (i.e. there is no _node_modules_ folder present) an error will be displayed. An SBOM can be generated solely based on the contents of the _package-lock.json_ but requires the user to explicitly specify the `--package-lock-only` flag.
+
+Initially, we'll support the most widely used versions of the SPDX and CycloneDX specifications (likely v2.3 for SPDX and v1.4 for CycloneDX). Best effort will be made to support new versions as they gain adoption across the ecosystem.
 
 
 ## Rationale and Alternatives
@@ -85,24 +87,12 @@ Both of the SBOM formats present a flat list of dependencies (CycloneDX groups t
 }
 ```
 
-Scoped packages will have a <code>[group](https://cyclonedx.org/docs/1.5/json/#components_items_group)</code> field which identifies just the scope portion of the package name. For example:
-
-```json
-{
-  "type": "library",
-  "name": "node14",
-  "group": "@tsconfig",
-  "version": "1.0.3",
-  "bom-ref": "@tsconfig/node14@1.0.3"
-}
-```
-
-The <code>[properties](https://cyclonedx.org/docs/1.5/json/#components_items_properties)</code> collection also provides for a standard property under the [npm taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy/blob/main/cdx/npm.md) for annotating development dependencies. For any package which was determined to be a development dependency of the root project, we would add the following to the <code>properties</code> collection: 
+The <code>[properties](https://cyclonedx.org/docs/1.4/json/#components_items_properties)</code> collection also provides for a standard property under the [npm taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy/blob/main/cdx/npm.md) for annotating development dependencies. For any package which was determined to be a development dependency of the root project, we would add the following to the <code>properties</code> collection: 
 
 ```json
 {
   "name": "cdx:npm:package:development",
-  "value": true
+  "value": "true"
 }
 ```
 
@@ -208,9 +198,9 @@ The proposed CycloneDX SBOM generated for the project above would look like the 
 
 ```json
 {
-  "$schema": "http://cyclonedx.org/schema/bom-1.5.schema.json",
+  "$schema": "http://cyclonedx.org/schema/bom-1.4.schema.json",
   "bomFormat": "CycloneDX",
-  "specVersion": "1.5",
+  "specVersion": "1.4",
   "serialNumber": "urn:uuid:1b4cd070-3f4c-4f63-965e-4ab302ad7b41",
   "version": 1,
   "metadata": {
@@ -239,8 +229,7 @@ The proposed CycloneDX SBOM generated for the project above would look like the 
   "components": [
     {
       "type": "library",
-      "name": "node14",
-      "group": "@tsconfig",
+      "name": "@tsconfig/node14",
       "version": "1.0.3",
       "bom-ref": "@tsconfig/node14@1.0.3",
       "purl": "pkg:npm/%40tsconfig/node14@1.0.3",
@@ -251,7 +240,7 @@ The proposed CycloneDX SBOM generated for the project above would look like the 
         },
         {
           "name": "cdx:npm:package:development",
-          "value": true
+          "value": "true"
         }
       ],
       "hashes": [
@@ -422,6 +411,7 @@ The proposed SPDX SBOM generated for the project above would look like the follo
 ## References
 
 * [NTIA Software Bill of Materials](https://ntia.gov/page/software-bill-materials)
+* [Types of Sofware Bill of Materials (SBOM) Documents](https://www.cisa.gov/sites/default/files/2023-04/sbom-types-document-508c.pdf)
 * [OSSF - SBOM Everywhere SIG](https://github.com/ossf/sbom-everywhere)
 * [Authoritative Guide to SBOM](https://cyclonedx.org/guides/sbom/OWASP_CycloneDX-SBOM-Guide-en.pdf)
 * [SPDX Spec v2.3](https://spdx.github.io/spdx-spec/v2.3/)
