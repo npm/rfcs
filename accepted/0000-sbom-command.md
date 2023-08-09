@@ -142,10 +142,6 @@ The <code>[externalRefs](https://spdx.github.io/spdx-spec/v2.3/package-informati
 Making it a distinct command allows us to add SBOM-specific features in the future like a `--sign` flag which could be used to generate a signed SBOM. \
  \
 _Recommendation: Add a distinct command for generating an SBOM._
-
-* SPDX doesn’t provide a natural way to differentiate between the various npm dependency types like “dev”, “peer”, and “optional”. We might consider using something like the [package comment field](https://spdx.github.io/spdx-spec/v2.3/package-information/#720-package-comment-field) to capture this information. \
- \
- _Recommendation: Skip for the first version of this feature. Wait to see if there is demand for this information and/or if the specification evolves to account for this metadata._
  
 * Does `npm-sbom` command have a notion of a “default” SBOM format? Do we give preference to one of CycloneDX/SPDX or do we remain totally neutral (possibly at the expense of DX)? \
  \
@@ -304,7 +300,7 @@ The proposed SPDX SBOM generated for the project above would look like the follo
   "name": "hello-world@1.0.0",
   "documentNamespace": "http://spdx.org/spdxdocs/hello-world-1.0.0-<uuid>",
   "creationInfo": {
-    "created": "2023-08-04T21:41:02.071Z",
+    "created": "2023-08-09T22:31:28.107Z",
     "creators": [
       "Tool: npm/cli-9.8.1"
     ]
@@ -327,7 +323,7 @@ The proposed SPDX SBOM generated for the project above would look like the follo
         },
         {
           "referenceCategory": "PACKAGE-MANAGER",
-          "referernceType": "purl",
+          "referenceType": "purl",
           "referenceLocator": "pkg:npm/hello-world@1.0.0"
         }
       ]
@@ -341,12 +337,12 @@ The proposed SPDX SBOM generated for the project above would look like the follo
       "externalRefs": [
         {
           "referenceCategory": "PACKAGE-MANAGER",
-          "referernceType": "npm",
+          "referenceType": "npm",
           "referenceLocator": "@tsconfig/node14@1.0.3"
         },
         {
           "referenceCategory": "PACKAGE-MANAGER",
-          "referernceType": "purl",
+          "referenceType": "purl",
           "referenceLocator": "pkg:npm/%40tsconfig/node14@1.0.3"
         }
       ],
@@ -366,12 +362,12 @@ The proposed SPDX SBOM generated for the project above would look like the follo
       "externalRefs": [
         {
           "referenceCategory": "PACKAGE-MANAGER",
-          "referernceType": "npm",
+          "referenceType": "npm",
           "referenceLocator": "debug@4.3.4"
         },
         {
           "referenceCategory": "PACKAGE-MANAGER",
-          "referernceType": "purl",
+          "referenceType": "purl",
           "referenceLocator": "pkg:npm/debug@4.3.4"
         }
       ],
@@ -391,12 +387,12 @@ The proposed SPDX SBOM generated for the project above would look like the follo
       "externalRefs": [
         {
           "referenceCategory": "PACKAGE-MANAGER",
-          "referernceType": "npm",
+          "referenceType": "npm",
           "referenceLocator": "ms@2.1.2"
         },
         {
           "referenceCategory": "PACKAGE-MANAGER",
-          "referernceType": "purl",
+          "referenceType": "purl",
           "referenceLocator": "pkg:npm/ms@2.1.2"
         }
       ],
@@ -406,6 +402,28 @@ The proposed SPDX SBOM generated for the project above would look like the follo
           "checksumValue": "b0690fc7e56332d9..."
         }
       ]
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-DOCUMENT",
+      "relatedSpdxElement": "SPDXRef-Package-hello-world-1.0.0",
+      "relationshipType": "DESCRIBES"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-debug-4.3.4",
+      "relatedSpdxElement": "SPDXRef-Package-hello-world-1.0.0",
+      "relationshipType": "DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-tsconfig.node14-1.0.3",
+      "relatedSpdxElement": "SPDXRef-Package-hello-world-1.0.0",
+      "relationshipType": "DEV_DEPENDENCY_OF"
+    },
+    {
+      "spdxElementId": "SPDXRef-Package-ms-2.1.2",
+      "relatedSpdxElement": "SPDXRef-Package-debug-4.3.4",
+      "relationshipType": "DEPENDENCY_OF"
     }
   ]
 }
