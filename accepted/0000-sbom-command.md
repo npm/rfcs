@@ -300,15 +300,18 @@ The proposed SPDX SBOM generated for the project above would look like the follo
 {
   "spdxVersion": "SPDX-2.3",
   "dataLicense": "CC0-1.0",
-  "SPXID": "SPDXRef-DOCUMENT",
+  "SPDXID": "SPDXRef-DOCUMENT",
   "name": "hello-world@1.0.0",
   "documentNamespace": "http://spdx.org/spdxdocs/hello-world-1.0.0-<uuid>",
   "creationInfo": {
     "created": "2023-08-04T21:41:02.071Z",
     "creators": [
-      "Tool: pkg:npm/cli@9.8.1"
+      "Tool: npm/cli-9.8.1"
     ]
   },
+  "documentDescribes": [
+    "SPDXRef-Package-hello-world-1.0.0"
+  ],
   "packages": [
     {
       "name": "hello-world",
@@ -319,7 +322,7 @@ The proposed SPDX SBOM generated for the project above would look like the follo
       "externalRefs": [
         {
           "referenceCategory": "PACKAGE-MANAGER",
-          "referernceType": "npm",
+          "referenceType": "npm",
           "referenceLocator": "hello-world@1.0.0"
         },
         {
