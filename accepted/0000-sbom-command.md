@@ -72,6 +72,13 @@ Both of the SBOM formats present a flat list of dependencies (CycloneDX groups t
   "version": "4.3.4",
   "bom-ref": "debug@4.3.4",
   "purl": "pkg:npm/debug@4.3.4",
+  "scope": "required",
+  "externalReferences": [
+    {
+      "type": "distribution",
+      "url": "https://registry.npmjs.org/debug/-/debug-4.3.4.tgz"
+    }
+  ],
   "properties": [
     {
       "name": "cdx:npm:package:path",
@@ -97,6 +104,8 @@ The <code>[properties](https://cyclonedx.org/docs/1.4/json/#components_items_pro
 ```
 
 Similarly, there are named properties defined for identifying things like "bundled", "private", and "extraneous" dependencies. Dependencies will be annotated with this properties as appropriate.
+
+The CycloneDX specification also provides [fields](https://cyclonedx.org/docs/1.4/json/#components) for capturing other package metadata like author, license, website, etc. Not all packages provide this information, but these fields will be populated when the information is available.
 
 #### SPDX
 
@@ -230,7 +239,14 @@ The proposed CycloneDX SBOM generated for the project above would look like the 
       "type": "library",
       "name": "@tsconfig/node14",
       "version": "1.0.3",
+      "scope": "required",
       "purl": "pkg:npm/%40tsconfig/node14@1.0.3",
+      "externalReferences": [
+        {
+          "type": "distribution",
+          "url": "https://registry.npmjs.org/@tsconfig/node14/-/node14-1.0.3.tgz"
+        }
+      ],
       "properties": [
         {
           "name": "cdx:npm:package:path",
@@ -253,7 +269,14 @@ The proposed CycloneDX SBOM generated for the project above would look like the 
       "type": "library",
       "name": "debug",
       "version": "4.3.4",
+      "scope": "required",
       "purl": "pkg:npm/debug@4.3.4",
+      "externalReferences": [
+        {
+          "type": "distribution",
+          "url": "https://registry.npmjs.org/debug/-/debug-4.3.4.tgz"
+        }
+      ],
       "properties": [
         {
           "name": "cdx:npm:package:path",
@@ -272,7 +295,14 @@ The proposed CycloneDX SBOM generated for the project above would look like the 
       "type": "library",
       "name": "ms",
       "version": "2.1.2",
+      "scope": "required",
       "purl": "pkg:npm/ms@2.1.2",
+      "externalReferences": [
+        {
+          "type": "distribution",
+          "url": "https://registry.npmjs.org/ms/-/ms-2.1.2.tgz"
+        }
+      ],
       "properties": [
         {
           "name": "cdx:npm:package:path",
