@@ -434,19 +434,19 @@ The proposed SPDX SBOM generated for the project above would look like the follo
       "relationshipType": "DESCRIBES"
     },
     {
-      "spdxElementId": "SPDXRef-Package-debug-4.3.4",
-      "relatedSpdxElement": "SPDXRef-Package-hello-world-1.0.0",
-      "relationshipType": "DEPENDENCY_OF"
+      "spdxElementId": "SPDXRef-Package-hello-world-1.0.0",
+      "relatedSpdxElement": "SPDXRef-Package-debug-4.3.4",
+      "relationshipType": "DEPENDS_ON"
     },
     {
-      "spdxElementId": "SPDXRef-Package-tsconfig.node14-1.0.3",
-      "relatedSpdxElement": "SPDXRef-Package-hello-world-1.0.0",
+      "spdxElementId": "SPDXRef-Package-hello-world-1.0.0",
+      "relatedSpdxElement": "SPDXRef-Package-tsconfig.node14-1.0.3",
       "relationshipType": "DEV_DEPENDENCY_OF"
     },
     {
-      "spdxElementId": "SPDXRef-Package-ms-2.1.2",
-      "relatedSpdxElement": "SPDXRef-Package-debug-4.3.4",
-      "relationshipType": "DEPENDENCY_OF"
+      "spdxElementId": "SPDXRef-Package-debug-4.3.4",
+      "relatedSpdxElement": "SPDXRef-Package-ms-2.1.2",
+      "relationshipType": "DEPENDS_ON"
     }
   ]
 }
