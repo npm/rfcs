@@ -96,6 +96,8 @@ The <code>[properties](https://cyclonedx.org/docs/1.4/json/#components_items_pro
 }
 ```
 
+Similarly, there are named properties defined for identifying things like "bundled", "private", and "extraneous" dependencies. Dependencies will be annotated with this properties as appropriate.
+
 #### SPDX
 
 ```json
