@@ -194,13 +194,13 @@ The proposed CycloneDX SBOM generated for the project above would look like the 
 
 ```json
 {
-  "$schema": "http://cyclonedx.org/schema/bom-1.4.schema.json",
+  "$schema": "https://cyclonedx.org/schema/bom-1.4.schema.json",
   "bomFormat": "CycloneDX",
   "specVersion": "1.4",
-  "serialNumber": "urn:uuid:1b4cd070-3f4c-4f63-965e-4ab302ad7b41",
+  "serialNumber": "urn:uuid:f2fa9eae-72f1-430c-a9b3-986ffe05bc6e",
   "version": 1,
   "metadata": {
-    "timestamp": "2023-08-04T21:37:16.639Z",
+    "timestamp": "2023-08-10T00:19:08.697Z",
     "tools": [
       {
         "vendor": "npm",
@@ -209,10 +209,10 @@ The proposed CycloneDX SBOM generated for the project above would look like the 
       }
     ],
     "component": {
+      "bom-ref": "hello-world@1.0.0",
       "type": "application",
       "name": "hello-world",
       "version": "1.0.0",
-      "bom-ref": "hello-world@1.0.0",
       "purl": "pkg:npm/hello-world@1.0.0",
       "properties": [
         {
@@ -224,10 +224,10 @@ The proposed CycloneDX SBOM generated for the project above would look like the 
   },
   "components": [
     {
+      "bom-ref": "@tsconfig/node14@1.0.3",
       "type": "library",
       "name": "@tsconfig/node14",
       "version": "1.0.3",
-      "bom-ref": "@tsconfig/node14@1.0.3",
       "purl": "pkg:npm/%40tsconfig/node14@1.0.3",
       "properties": [
         {
@@ -247,10 +247,10 @@ The proposed CycloneDX SBOM generated for the project above would look like the 
       ]
     },
     {
+      "bom-ref": "debug@4.3.4",
       "type": "library",
       "name": "debug",
       "version": "4.3.4",
-      "bom-ref": "debug@4.3.4",
       "purl": "pkg:npm/debug@4.3.4",
       "properties": [
         {
@@ -266,10 +266,10 @@ The proposed CycloneDX SBOM generated for the project above would look like the 
       ]
     },
     {
+      "bom-ref": "ms@2.1.2",
       "type": "library",
       "name": "ms",
       "version": "2.1.2",
-      "bom-ref": "ms@2.1.2",
       "purl": "pkg:npm/ms@2.1.2",
       "properties": [
         {
@@ -283,6 +283,29 @@ The proposed CycloneDX SBOM generated for the project above would look like the 
           "content": "b0690fc7e56332d9..."
         }
       ]
+    }
+  ],
+  "dependencies": [
+    {
+      "ref": "hello-world@1.0.0",
+      "dependsOn": [
+        "debug@4.3.4",
+        "@tsconfig/node14@1.0.3"
+      ]
+    },
+    {
+      "ref": "@tsconfig/node14@1.0.3",
+      "dependsOn": []
+    },
+    {
+      "ref": "debug@4.3.4",
+      "dependsOn": [
+        "ms@2.1.2"
+      ]
+    },
+    {
+      "ref": "ms@2.1.2",
+      "dependsOn": []
     }
   ]
 }
