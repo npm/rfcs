@@ -29,9 +29,9 @@ Supported command options:
 
 `--package-lock-only` - Constructs the SBOM based on the tree described by the _package-lock.json_, rather than the contents of _node_modules_. Defaults to _false_. If the _node_modules_ folder is not present, this flag will be required in order to generate an SBOM.
  
-`--workspace` - Runs the command only in the context of the specified workspace (can be set multiple times).
+`--workspace` - When used with a project utilizing [workspaces](https://docs.npmjs.com/cli/v9/using-npm/workspaces), generates an SBOM containing only the identified workspaces (the flag can be specified multiple times to capture multiple workspaces). The SBOM will be rooted in the base directory of the project but will only include the specified child workspace(s).
 
-`--workspaces` - Runs the command in the context of all configured workspaces. 
+`--workspaces` - When used with a project utilizing [workspaces](https://docs.npmjs.com/cli/v9/using-npm/workspaces), generates an SBOM that includes ONLY the project's child workspaces. Any dependencies which are associated exclusively with the root project will be omitted.
 
 If the user runs the `sbom` command without first installing the dependencies for the project (i.e. there is no _node_modules_ folder present) an error will be displayed. An SBOM can be generated solely based on the contents of the _package-lock.json_ but requires the user to explicitly specify the `--package-lock-only` flag.
 
