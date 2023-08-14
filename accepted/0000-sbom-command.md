@@ -107,6 +107,8 @@ Similarly, there are named properties defined for identifying things like "bundl
 
 The CycloneDX specification also provides [fields](https://cyclonedx.org/docs/1.4/json/#components) for capturing other package metadata like author, license, website, etc. Not all packages provide this information, but these fields will be populated when the information is available.
 
+For generating the CycloneDX SBOM, we could utilize the <code>[@cyclonedx/cyclonedx-library](https://www.npmjs.com/package/@cyclonedx/cyclonedx-library)</code> (2.9MB unpacked) package which provides data models and serializers for generating valid CycloneDX documents. This library has direct dependencies on <code>[spdx-expression-parse](https://www.npmjs.com/package/spdx-expression-parse)</code> (which is already included as part of the npm CLI) and <code>[packageurl-js](https://www.npmjs.com/package/packageurl-js)</code> (39kB unpacked).
+
 #### SPDX
 
 ```json
