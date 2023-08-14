@@ -147,6 +147,9 @@ All packages will specify a `false` value for the <code>[filesAnaylzed](https://
 
 The <code>[externalRefs](https://spdx.github.io/spdx-spec/v2.3/package-information/#721-external-reference-field)</code> field will contain two <code>[PACKAGE-MANAGER](https://spdx.github.io/spdx-spec/v2.3/external-repository-identifiers/#f3-package-manager)</code> references, one using the <code>[npm](https://spdx.github.io/spdx-spec/v2.3/external-repository-identifiers/#f32-npm)</code> reference type and the other using the <code>[purl](https://spdx.github.io/spdx-spec/v2.3/external-repository-identifiers/#f35-purl)</code> reference type.
 
+## Prior Art
+
+As it relates to the CycloneDX SBOM format, much of the capability described as part of the new `npm-sbom` command is already available in the <code>[@cyclonedx/cyclonedx-npm](https://www.npmjs.com/package/%40cyclonedx/cyclonedx-npm)</code> project. The `@cyclonedx/cyclonedx-npm` project also includes documentation about deriving SBOM [results](https://github.com/CycloneDX/cyclonedx-node-npm/blob/main/docs/result.md) from an npm project and [component deduplication](https://github.com/CycloneDX/cyclonedx-node-npm/blob/main/docs/component_deduplication.md).
 
 ## Unresolved Questions and Bikeshedding
 
