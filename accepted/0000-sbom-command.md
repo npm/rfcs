@@ -13,22 +13,22 @@ SBOMs help to solve this problem by providing a standardized way to document the
 
 Beyond the security benefit there may be a regulatory requirement to provide SBOMs in some sectors. In response to some recent, high-visibility attacks, The White House has issued an [Executive Order](https://www.whitehouse.gov/briefing-room/presidential-actions/2021/05/12/executive-order-on-improving-the-nations-cybersecurity/) which specifically includes directives which would make SBOMs a requirement for any vendor selling to the federal government.
 
-Adding SBOM generation to the tool which many developers are already using to manage their project dependencies eliminates any friction which may come from having to adopt/learn a separate tool. 
+Adding SBOM generation to the tool which many developers are already using to manage their project dependencies eliminates any friction which may come from having to adopt/learn a separate tool.
 
 
 ## Detailed Explanation
 
-A new `sbom` command will be added to the npm CLI which will generate an SBOM for the current project. The SBOM will use the current project as the root and enumerate all of its dependencies (similar to the way `npm-ls` does) in one of the two supported SBOM formats. See the 
+A new `sbom` command will be added to the npm CLI which will generate an SBOM for the current project. The SBOM will use the current project as the root and enumerate all of its dependencies (similar to the way `npm-ls` does) in one of the two supported SBOM formats. See the
 [Example SBOMs](#example-sboms) section for sample CycloneDX and SPDX SBOM documents.
 
-Supported command options: 
+Supported command options:
 
 `--sbom-format` - SBOM format to use for output. Valid values are “spdx” or “cyclonedx”. In the future, the set of valid values can be expanded to select differents versions of the supported output formats (e.g. "cyclonedx1.4" vs "cyclonedx1.5")
 
 `--omit` - Dependency types to omit from generated SBOM. Valid values are “dev”, “optional”, and “peer” (can be set multiple times). By default, all development, optional, and peer dependencies will be included in the generated SBOM unless explicitly excluded.
 
 `--package-lock-only` - Constructs the SBOM based on the tree described by the _package-lock.json_, rather than the contents of _node_modules_. Defaults to _false_. If the _node_modules_ folder is not present, this flag will be required in order to generate an SBOM.
- 
+
 `--workspace` - When used with a project utilizing [workspaces](https://docs.npmjs.com/cli/v9/using-npm/workspaces), generates an SBOM containing only the identified workspaces (the flag can be specified multiple times to capture multiple workspaces). The SBOM will be rooted in the base directory of the project but will only include the specified child workspace(s).
 
 `--workspaces` - When used with a project utilizing [workspaces](https://docs.npmjs.com/cli/v9/using-npm/workspaces), generates an SBOM that includes ONLY the project's child workspaces. Any dependencies which are associated exclusively with the root project will be omitted.
@@ -52,13 +52,14 @@ While you can effectively generate the same output we’re proposing with this c
 
 The `npm-sbom` command is similar in function to `npm-ls` command and will likely utilize a similar implementation. We’ll use <code>[arborist](https://github.com/npm/cli/tree/latest/workspaces/arborist)</code> to construct the dependency tree and the <code>[treeverse](https://github.com/isaacs/treeverse)</code> library to traverse the tree and assemble the SBOM.
 
+### Errors
 
-### Local (Linked) Dependencies
+When using the `node_modules` to render the SBOM (i.e. when NOT using the `--package-lock-only` flag) and of the following conditions will cause an error to be reported and prevent the SBOM from being generated:
 
-The generated SBOM will exclude any dependencies which are referenced via links on the local file system. A warning will be displayed for any linked dependency informing the user that it was omitted from the SBOM.
+- Any missing dependencies which are NOT marked as optional
+- Any invalid dependencies (e.g. a mismatch between the `package-lock.json` and the `node_modules`)
 
-
-### Format Details 
+### Format Details
 
 Both of the SBOM formats present a flat list of dependencies (CycloneDX groups these under a key named `components` while SPDX groups them under a key named `packages`). The following sections describe how a dependency will be presented for the different SBOM formats.
 
@@ -94,7 +95,7 @@ Both of the SBOM formats present a flat list of dependencies (CycloneDX groups t
 }
 ```
 
-The <code>[properties](https://cyclonedx.org/docs/1.4/json/#components_items_properties)</code> collection also provides for a standard property under the [npm taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy/blob/main/cdx/npm.md) for annotating development dependencies. For any package which was determined to be a development dependency of the root project, we would add the following to the <code>properties</code> collection: 
+The <code>[properties](https://cyclonedx.org/docs/1.4/json/#components_items_properties)</code> collection also provides for a standard property under the [npm taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy/blob/main/cdx/npm.md) for annotating development dependencies. For any package which was determined to be a development dependency of the root project, we would add the following to the <code>properties</code> collection:
 
 ```json
 {
@@ -158,7 +159,7 @@ As it relates to the CycloneDX SBOM format, much of the capability described as 
 Making it a distinct command allows us to add SBOM-specific features in the future like a `--sign` flag which could be used to generate a signed SBOM. \
  \
 _Recommendation: Add a distinct command for generating an SBOM._
- 
+
 * Does `npm-sbom` command have a notion of a “default” SBOM format? Do we give preference to one of CycloneDX/SPDX or do we remain totally neutral (possibly at the expense of DX)? \
  \
 _Recommendation: Default to SPDX if no format is specified._
@@ -197,7 +198,7 @@ The complete dependency tree for this project looks like this:
 ```
 $ npm ls
 
-hello-world@1.0.0 
+hello-world@1.0.0
 ├── @tsconfig/node14@14.1.0
 └─┬ debug@4.3.4
   └── ms@2.1.2
