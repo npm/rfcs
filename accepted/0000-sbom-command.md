@@ -23,7 +23,7 @@ A new `sbom` command will be added to the npm CLI which will generate an SBOM fo
 
 Supported command options:
 
-`--sbom-format` - SBOM format to use for output. Valid values are “spdx” or “cyclonedx”. In the future, the set of valid values can be expanded to select differents versions of the supported output formats (e.g. "cyclonedx1.4" vs "cyclonedx1.5")
+`--sbom-format` - SBOM format to use for output. Valid values are “spdx” or “cyclonedx”. In the future, the set of valid values can be expanded to select differents versions of the supported output formats (e.g. "cyclonedx1.4" vs "cyclonedx1.5").
 
 `--omit` - Dependency types to omit from generated SBOM. Valid values are “dev”, “optional”, and “peer” (can be set multiple times). By default, all development, optional, and peer dependencies will be included in the generated SBOM unless explicitly excluded.
 
@@ -162,7 +162,7 @@ _Recommendation: Add a distinct command for generating an SBOM._
 
 * Does `npm-sbom` command have a notion of a “default” SBOM format? Do we give preference to one of CycloneDX/SPDX or do we remain totally neutral (possibly at the expense of DX)? \
  \
-_Recommendation: Default to SPDX if no format is specified._
+_Recommendation: Remain neutral with regard to SPDX vs CycloneDX. Make the `--sbom-format` flag mandatory.
 
 * Both CycloneDX and SPDX support multiple document formats (JSON, XML, Protocol Buffers, etc). Should we support output of multiple formats, or do we stick w/ JSON? \
  \
