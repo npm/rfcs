@@ -52,11 +52,11 @@ While you can effectively generate the same output we’re proposing with this c
 
 ## Implementation
 
-The `npm-sbom` command is similar in function to `npm-ls` command and will likely utilize a similar implementation. We’ll use <code>[arborist](https://github.com/npm/cli/tree/latest/workspaces/arborist)</code> to construct the dependency tree and the <code>[treeverse](https://github.com/isaacs/treeverse)</code> library to traverse the tree and assemble the SBOM.
+The `npm-sbom` command will use <code>[arborist](https://github.com/npm/cli/tree/latest/workspaces/arborist)</code> to construct the dependency tree for the current project and then invoke `querySelectorAll` to select the set of nodes to be included in the SBOM.
 
 ### Errors
 
-When using the `node_modules` to render the SBOM (i.e. when NOT using the `--package-lock-only` flag) and of the following conditions will cause an error to be reported and prevent the SBOM from being generated:
+When using the `node_modules` to render the SBOM (i.e. when NOT using the `--package-lock-only` flag) any of the following conditions will cause an error to be reported and prevent the SBOM from being generated:
 
 - Any missing dependencies which are NOT marked as optional
 - Any invalid dependencies (e.g. a mismatch between the `package-lock.json` and the `node_modules`)
