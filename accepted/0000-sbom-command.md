@@ -360,9 +360,9 @@ The proposed SPDX SBOM generated for the project above would look like the follo
   "name": "hello-world@1.0.0",
   "documentNamespace": "http://spdx.org/spdxdocs/hello-world-1.0.0-<uuid>",
   "creationInfo": {
-    "created": "2023-08-09T22:31:28.107Z",
+    "created": "2023-09-12T21:32:11.984Z",
     "creators": [
-      "Tool: npm/cli-9.8.1"
+      "Tool: npm/cli-10.1.0"
     ]
   },
   "documentDescribes": [
@@ -373,14 +373,13 @@ The proposed SPDX SBOM generated for the project above would look like the follo
       "name": "hello-world",
       "SPDXID": "SPDXRef-Package-hello-world-1.0.0",
       "versionInfo": "1.0.0",
+      "packageFileName": "",
+      "primaryPackagePurpose": "LIBRARY",
       "downloadLocation": "NOASSERTION",
       "filesAnalyzed": false,
+      "homepage": "NOASSERTION",
+      "licenseDeclared": "ISC",
       "externalRefs": [
-        {
-          "referenceCategory": "PACKAGE-MANAGER",
-          "referenceType": "npm",
-          "referenceLocator": "hello-world@1.0.0"
-        },
         {
           "referenceCategory": "PACKAGE-MANAGER",
           "referenceType": "purl",
@@ -390,26 +389,25 @@ The proposed SPDX SBOM generated for the project above would look like the follo
     },
     {
       "name": "@tsconfig/node14",
-      "SPDXID": "SPDXRef-Package-tsconfig.node14-1.0.3",
-      "versionInfo": "1.0.3",
+      "SPDXID": "SPDXRef-Package-tsconfig.node14-14.1.0",
+      "versionInfo": "14.1.0",
+      "packageFileName": "node_modules/@tsconfig/node14",
+      "description": "A base TSConfig for working with Node 14.",
       "downloadLocation": "https://registry.npmjs.org/@tsconfig/node14/...",
       "filesAnalyzed": false,
+      "homepage": "https://github.com/tsconfig/bases#readme",
+      "licenseDeclared": "MIT",
       "externalRefs": [
         {
           "referenceCategory": "PACKAGE-MANAGER",
-          "referenceType": "npm",
-          "referenceLocator": "@tsconfig/node14@1.0.3"
-        },
-        {
-          "referenceCategory": "PACKAGE-MANAGER",
           "referenceType": "purl",
-          "referenceLocator": "pkg:npm/%40tsconfig/node14@1.0.3"
+          "referenceLocator": "pkg:npm/%40tsconfig/node14@14.1.0"
         }
       ],
       "checksums": [
         {
           "algorithm": "SHA512",
-          "checksumValue": "cac4fc9a1762c562..."
+          "checksumValue": "566b021b4e18479f..."
         }
       ]
     },
@@ -417,14 +415,13 @@ The proposed SPDX SBOM generated for the project above would look like the follo
       "name": "debug",
       "SPDXID": "SPDXRef-Package-debug-4.3.4",
       "versionInfo": "4.3.4",
+      "packageFileName": "node_modules/debug",
+      "description": "Lightweight debugging utility for Node.js and the browser",
       "downloadLocation": "https://registry.npmjs.org/debug/-/debug-4.3.4.tgz",
       "filesAnalyzed": false,
+      "homepage": "https://github.com/debug-js/debug#readme",
+      "licenseDeclared": "MIT",
       "externalRefs": [
-        {
-          "referenceCategory": "PACKAGE-MANAGER",
-          "referenceType": "npm",
-          "referenceLocator": "debug@4.3.4"
-        },
         {
           "referenceCategory": "PACKAGE-MANAGER",
           "referenceType": "purl",
@@ -442,14 +439,13 @@ The proposed SPDX SBOM generated for the project above would look like the follo
       "name": "ms",
       "SPDXID": "SPDXRef-Package-ms-2.1.2",
       "versionInfo": "2.1.2",
+      "packageFileName": "node_modules/ms",
+      "description": "Tiny millisecond conversion utility",
       "downloadLocation": "https://registry.npmjs.org/ms/-/ms-2.1.2.tgz",
       "filesAnalyzed": false,
+      "homepage": "https://github.com/zeit/ms#readme",
+      "licenseDeclared": "MIT",
       "externalRefs": [
-        {
-          "referenceCategory": "PACKAGE-MANAGER",
-          "referenceType": "npm",
-          "referenceLocator": "ms@2.1.2"
-        },
         {
           "referenceCategory": "PACKAGE-MANAGER",
           "referenceType": "purl",
@@ -477,7 +473,7 @@ The proposed SPDX SBOM generated for the project above would look like the follo
     },
     {
       "spdxElementId": "SPDXRef-Package-hello-world-1.0.0",
-      "relatedSpdxElement": "SPDXRef-Package-tsconfig.node14-1.0.3",
+      "relatedSpdxElement": "SPDXRef-Package-tsconfig.node14-14.1.0",
       "relationshipType": "DEV_DEPENDENCY_OF"
     },
     {
