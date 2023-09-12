@@ -25,6 +25,8 @@ Supported command options:
 
 `--sbom-format` - SBOM format to use for output. Valid values are “spdx” or “cyclonedx”. In the future, the set of valid values can be expanded to select differents versions of the supported output formats (e.g. "cyclonedx1.4" vs "cyclonedx1.5").
 
+`--sbom-type` - Type of project for which the SBOM is being generated. Valid values are "library", "application", and "framework". For CycloneDX SBOMs, this value will be recorded as the `type` of the root component. For SPDX SBOMs, this value will be recorded as the `primaryPackagePurpose` of the root package. Defaults to "library".
+
 `--omit` - Dependency types to omit from generated SBOM. Valid values are “dev”, “optional”, and “peer” (can be set multiple times). By default, all development, optional, and peer dependencies will be included in the generated SBOM unless explicitly excluded.
 
 `--package-lock-only` - Constructs the SBOM based on the tree described by the _package-lock.json_, rather than the contents of _node_modules_. Defaults to _false_. If the _node_modules_ folder is not present, this flag will be required in order to generate an SBOM.
