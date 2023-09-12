@@ -207,21 +207,23 @@ The proposed CycloneDX SBOM generated for the project above would look like the 
 
 ```json
 {
-  "$schema": "https://cyclonedx.org/schema/bom-1.5.schema.json",
+  "$schema": "http://cyclonedx.org/schema/bom-1.5.schema.json",
   "bomFormat": "CycloneDX",
   "specVersion": "1.5",
-  "serialNumber": "urn:uuid:f2fa9eae-72f1-430c-a9b3-986ffe05bc6e",
+  "serialNumber": "urn:uuid:0ffefc31-0159-4197-8551-26103dd0280f",
   "version": 1,
   "metadata": {
-    "timestamp": "2023-08-10T00:19:08.697Z",
+    "timestamp": "2023-09-12T21:40:13.091Z",
     "lifecycles": [
-      { "phase": "build" }
+      {
+        "phase": "build"
+      }
     ],
     "tools": [
       {
         "vendor": "npm",
         "name": "cli",
-        "version": "9.8.1"
+        "version": "10.1.0"
       }
     ],
     "component": {
@@ -229,29 +231,33 @@ The proposed CycloneDX SBOM generated for the project above would look like the 
       "type": "application",
       "name": "hello-world",
       "version": "1.0.0",
+      "scope": "required",
       "purl": "pkg:npm/hello-world@1.0.0",
       "properties": [
         {
           "name": "cdx:npm:package:path",
           "value": ""
         }
+      ],
+      "externalReferences": [],
+      "licenses": [
+        {
+          "license": {
+            "id": "ISC"
+          }
+        }
       ]
     }
   },
   "components": [
     {
-      "bom-ref": "@tsconfig/node14@1.0.3",
+      "bom-ref": "@tsconfig/node14@14.1.0",
       "type": "library",
       "name": "@tsconfig/node14",
-      "version": "1.0.3",
-      "scope": "required",
-      "purl": "pkg:npm/%40tsconfig/node14@1.0.3",
-      "externalReferences": [
-        {
-          "type": "distribution",
-          "url": "https://registry.npmjs.org/@tsconfig/node14/-/node14-1.0.3.tgz"
-        }
-      ],
+      "version": "14.1.0",
+      "scope": "optional",
+      "description": "A base TSConfig for working with Node 14.",
+      "purl": "pkg:npm/%40tsconfig/node14@14.1.0",
       "properties": [
         {
           "name": "cdx:npm:package:path",
@@ -262,10 +268,35 @@ The proposed CycloneDX SBOM generated for the project above would look like the 
           "value": "true"
         }
       ],
+      "externalReferences": [
+        {
+          "type": "distribution",
+          "url": "https://registry.npmjs.org/@tsconfig/node14/-/node14-14.1.0.tgz"
+        },
+        {
+          "type": "vcs",
+          "url": "git+https://github.com/tsconfig/bases.git"
+        },
+        {
+          "type": "website",
+          "url": "https://github.com/tsconfig/bases#readme"
+        },
+        {
+          "type": "issue-tracker",
+          "url": "https://github.com/tsconfig/bases/issues"
+        }
+      ],
       "hashes": [
         {
           "alg": "SHA-512",
-          "content": "cac4fc9a1762c562..."
+          "content": "566b021b4e18479f..."
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
         }
       ]
     },
@@ -275,23 +306,44 @@ The proposed CycloneDX SBOM generated for the project above would look like the 
       "name": "debug",
       "version": "4.3.4",
       "scope": "required",
+      "author": "Josh Junon",
+      "description": "Lightweight debugging utility for Node.js and the browser",
       "purl": "pkg:npm/debug@4.3.4",
-      "externalReferences": [
-        {
-          "type": "distribution",
-          "url": "https://registry.npmjs.org/debug/-/debug-4.3.4.tgz"
-        }
-      ],
       "properties": [
         {
           "name": "cdx:npm:package:path",
           "value": "node_modules/debug"
         }
       ],
+      "externalReferences": [
+        {
+          "type": "distribution",
+          "url": "https://registry.npmjs.org/debug/-/debug-4.3.4.tgz"
+        },
+        {
+          "type": "vcs",
+          "url": "git://github.com/debug-js/debug.git"
+        },
+        {
+          "type": "website",
+          "url": "https://github.com/debug-js/debug#readme"
+        },
+        {
+          "type": "issue-tracker",
+          "url": "https://github.com/debug-js/debug/issues"
+        }
+      ],
       "hashes": [
         {
           "alg": "SHA-512",
           "content": "3d15851ee494dde0..."
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
         }
       ]
     },
@@ -301,23 +353,43 @@ The proposed CycloneDX SBOM generated for the project above would look like the 
       "name": "ms",
       "version": "2.1.2",
       "scope": "required",
+      "description": "Tiny millisecond conversion utility",
       "purl": "pkg:npm/ms@2.1.2",
-      "externalReferences": [
-        {
-          "type": "distribution",
-          "url": "https://registry.npmjs.org/ms/-/ms-2.1.2.tgz"
-        }
-      ],
       "properties": [
         {
           "name": "cdx:npm:package:path",
           "value": "node_modules/ms"
         }
       ],
+      "externalReferences": [
+        {
+          "type": "distribution",
+          "url": "https://registry.npmjs.org/ms/-/ms-2.1.2.tgz"
+        },
+        {
+          "type": "vcs",
+          "url": "git+https://github.com/zeit/ms.git"
+        },
+        {
+          "type": "website",
+          "url": "https://github.com/zeit/ms#readme"
+        },
+        {
+          "type": "issue-tracker",
+          "url": "https://github.com/zeit/ms/issues"
+        }
+      ],
       "hashes": [
         {
           "alg": "SHA-512",
           "content": "b0690fc7e56332d9..."
+        }
+      ],
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
         }
       ]
     }
@@ -327,11 +399,11 @@ The proposed CycloneDX SBOM generated for the project above would look like the 
       "ref": "hello-world@1.0.0",
       "dependsOn": [
         "debug@4.3.4",
-        "@tsconfig/node14@1.0.3"
+        "@tsconfig/node14@14.1.0"
       ]
     },
     {
-      "ref": "@tsconfig/node14@1.0.3",
+      "ref": "@tsconfig/node14@14.1.0",
       "dependsOn": []
     },
     {
