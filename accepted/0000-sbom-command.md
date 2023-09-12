@@ -158,11 +158,11 @@ As it relates to the CycloneDX SBOM format, much of the capability described as 
 
 * Does `npm-sbom` command have a notion of a “default” SBOM format? Do we give preference to one of CycloneDX/SPDX or do we remain totally neutral (possibly at the expense of DX)? \
  \
-_Recommendation: Remain neutral with regard to SPDX vs CycloneDX. Make the `--sbom-format` flag mandatory.
+_Recommendation:_ Remain neutral with regard to SPDX vs CycloneDX. Make the `--sbom-format` flag mandatory.
 
 * Both CycloneDX and SPDX support multiple document formats (JSON, XML, Protocol Buffers, etc). Should we support output of multiple formats, or do we stick w/ JSON? \
  \
-_Recommendation: Stick with JSON-only for the first version of this feature._
+_Recommendation:_ Stick with JSON-only for the first version of this feature.
 
 
 ## Example SBOMs
