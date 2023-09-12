@@ -37,7 +37,7 @@ Supported command options:
 
 If the user runs the `sbom` command without first installing the dependencies for the project (i.e. there is no _node_modules_ folder present) an error will be displayed. An SBOM can be generated solely based on the contents of the _package-lock.json_ but requires the user to explicitly specify the `--package-lock-only` flag.
 
-Initially, we'll support the most widely used versions of the SPDX and CycloneDX specifications (likely v2.3 for SPDX and v1.4 for CycloneDX). Best effort will be made to support new versions as they gain adoption across the ecosystem.
+Initially, we'll support the most widely used versions of the SPDX and CycloneDX specifications (likely v2.3 for SPDX and v1.5 for CycloneDX). Best effort will be made to support new versions as they gain adoption across the ecosystem.
 
 
 ## Rationale and Alternatives
@@ -97,7 +97,7 @@ Both of the SBOM formats present a flat list of dependencies (CycloneDX groups t
 }
 ```
 
-The <code>[properties](https://cyclonedx.org/docs/1.4/json/#components_items_properties)</code> collection also provides for a standard property under the [npm taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy/blob/main/cdx/npm.md) for annotating development dependencies. For any package which was determined to be a development dependency of the root project, we would add the following to the <code>properties</code> collection:
+The <code>[properties](https://cyclonedx.org/docs/1.5/json/#components_items_properties)</code> collection also provides for a standard property under the [npm taxonomy](https://github.com/CycloneDX/cyclonedx-property-taxonomy/blob/main/cdx/npm.md) for annotating development dependencies. For any package which was determined to be a development dependency of the root project, we would add the following to the <code>properties</code> collection:
 
 ```json
 {
@@ -108,7 +108,7 @@ The <code>[properties](https://cyclonedx.org/docs/1.4/json/#components_items_pro
 
 Similarly, there are named properties defined for identifying things like "bundled", "private", and "extraneous" dependencies. Dependencies will be annotated with this properties as appropriate.
 
-The CycloneDX specification also provides [fields](https://cyclonedx.org/docs/1.4/json/#components) for capturing other package metadata like author, license, website, etc. Not all packages provide this information, but these fields will be populated when the information is available.
+The CycloneDX specification also provides [fields](https://cyclonedx.org/docs/1.5/json/#components) for capturing other package metadata like author, license, website, etc. Not all packages provide this information, but these fields will be populated when the information is available.
 
 For generating the CycloneDX SBOM, we could utilize the <code>[@cyclonedx/cyclonedx-library](https://www.npmjs.com/package/@cyclonedx/cyclonedx-library)</code> (2.9MB unpacked) package which provides data models and serializers for generating valid CycloneDX documents. This library has direct dependencies on <code>[spdx-expression-parse](https://www.npmjs.com/package/spdx-expression-parse)</code> (which is already included as part of the npm CLI) and <code>[packageurl-js](https://www.npmjs.com/package/packageurl-js)</code> (39kB unpacked).
 
@@ -213,9 +213,9 @@ The proposed CycloneDX SBOM generated for the project above would look like the 
 
 ```json
 {
-  "$schema": "https://cyclonedx.org/schema/bom-1.4.schema.json",
+  "$schema": "https://cyclonedx.org/schema/bom-1.5.schema.json",
   "bomFormat": "CycloneDX",
-  "specVersion": "1.4",
+  "specVersion": "1.5",
   "serialNumber": "urn:uuid:f2fa9eae-72f1-430c-a9b3-986ffe05bc6e",
   "version": 1,
   "metadata": {
