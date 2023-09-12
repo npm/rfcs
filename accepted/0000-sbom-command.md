@@ -29,7 +29,7 @@ Supported command options:
 
 `--omit` - Dependency types to omit from generated SBOM. Valid values are “dev”, “optional”, and “peer” (can be set multiple times). By default, all development, optional, and peer dependencies will be included in the generated SBOM unless explicitly excluded.
 
-`--package-lock-only` - Constructs the SBOM based on the tree described by the _package-lock.json_, rather than the contents of _node_modules_. Defaults to _false_. If the _node_modules_ folder is not present, this flag will be required in order to generate an SBOM.
+`--package-lock-only` - Constructs the SBOM based on the tree described by the _package-lock.json_, rather than the contents of _node_modules_. For CycloneDX SBOMs, the [lifecycle phase](https://cyclonedx.org/guides/sbom/lifecycle_phases/) will be set to "pre-build" when this option is _true_.  Defaults to _false_. If the _node_modules_ folder is not present, this flag will be required in order to generate an SBOM.
 
 `--workspace` - When used with a project utilizing [workspaces](https://docs.npmjs.com/cli/v9/using-npm/workspaces), generates an SBOM containing only the identified workspaces (the flag can be specified multiple times to capture multiple workspaces). The SBOM will be rooted in the base directory of the project but will only include the specified child workspace(s).
 
@@ -220,6 +220,9 @@ The proposed CycloneDX SBOM generated for the project above would look like the 
   "version": 1,
   "metadata": {
     "timestamp": "2023-08-10T00:19:08.697Z",
+    "lifecycles": [
+      { "phase": "build" }
+    ],
     "tools": [
       {
         "vendor": "npm",
