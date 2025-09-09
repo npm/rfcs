@@ -19,7 +19,10 @@ The JSON content should look like:
     "version": 1,
     "location": "path/relative/to/parent/of/.npm/folder",
     "installed": [
-        { "name": "chalk", "version": "4.4.2", "integrity": "sha512-1Yjs2SvM8TflER/OD3cOjhWWOZb58A2t7wpE2S9XfBYTiIl+XFhQG2bjy4Pu1I+EAlCNUzRDYDdFwFYUKvXcIA==", "post_install": true }
+        { "name": "chalk", "version": "4.4.2", "integrity": "sha512-1Yjs2SvM8TflER/OD3cOjhWWOZb58A2t7wpE2S9XfBYTiIl+XFhQG2bjy4Pu1I+EAlCNUzRDYDdFwFYUKvXcIA==", "post_install": true, "from_cache": false }
+    ]
+    "removed": [
+        { "name": "chalk", "version": "4.4.1", "integrity": "sha512-1Yjs2SvM8TflER/OD3cOjhWWOZb58A2t7wpE2S9XfBYTiIl+XFhQG2bjy4Pu1I+EAlCNUzRDYDdFwFxUKvXcIA==", "post_uninstall": false, "removed_from_system": true }
     ]
 }
 ```
