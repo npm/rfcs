@@ -1,6 +1,7 @@
-const t = require('tap')
+const t = require('node:test')
+const a = require('node:assert')
 
-t.test('no tests yet', async t => {
+t.test('no tests yet', async () => {
   // TODO: test for formatting, etc in RFCs?
-  t.ok(1)
+  a.ok(1)
 })
