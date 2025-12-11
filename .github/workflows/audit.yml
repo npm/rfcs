@@ -30,8 +30,8 @@ jobs:
         uses: actions/setup-node@v4
         id: node
         with:
-          node-version: 22.x
-          check-latest: contains('22.x', '.x')
+          node-version: 24.x
+          check-latest: contains('24.x', '.x')
       - name: Install Latest npm
         uses: ./.github/actions/install-latest-npm
         with:

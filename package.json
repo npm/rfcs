@@ -9,10 +9,12 @@
     "postlint": "template-oss-check",
     "template-oss-apply": "template-oss-apply --force",
     "lintfix": "npm run eslint -- --fix",
-    "snap": "tap",
-    "test": "tap",
+    "snap": "node --test --test-update-snapshots './test/**/*.js'",
+    "test": "node --test './test/**/*.js'",
     "posttest": "npm run lint",
-    "eslint": "eslint \"**/*.{js,cjs,ts,mjs,jsx,tsx}\""
+    "eslint": "eslint \"**/*.{js,cjs,ts,mjs,jsx,tsx}\"",
+    "test:node20": "node --test test",
+    "test:cover": "node --test --experimental-test-coverage --test-timeout=3000 --test-coverage-lines=100 --test-coverage-functions=100 --test-coverage-branches=100 './test/**/*.js'"
   },
   "repository": {
     "type": "git",
@@ -48,13 +50,9 @@
         ".github/ISSUE_TEMPLATE/bug.yml": false,
         ".commitlintrc.js": false
       }
-    }
-  },
-  "tap": {
-    "nyc-arg": [
-      "--exclude",
-      "tap-snapshots/**"
-    ]
+    },
+    "testRunner": "node:test",
+    "latestCiVersion": 24
   },
   "devDependencies": {
     "@npmcli/eslint-config": "^6.0.0",
