@@ -34,8 +34,8 @@ jobs:
         uses: actions/setup-node@v4
         id: node
         with:
-          node-version: 22.x
-          check-latest: contains('22.x', '.x')
+          node-version: 24.x
+          check-latest: contains('24.x', '.x')
       - name: Install Latest npm
         uses: ./.github/actions/install-latest-npm
         with:
@@ -62,6 +62,7 @@ jobs:
           - 18.x
           - 20.x
           - 22.x
+          - 24.x
     runs-on: ${{ matrix.platform.os }}
     defaults:
       run:
@@ -85,7 +86,12 @@ jobs:
           node: ${{ steps.node.outputs.node-version }}
       - name: Install Dependencies
         run: npm i --ignore-scripts --no-audit --no-fund
-      - name: Add Problem Matcher
-        run: echo "::add-matcher::.github/matchers/tap.json"
+      - name: Test (with coverage on Node >= 24)
+        if: ${{ startsWith(matrix.node-version, '24') }}
+        run: npm run test:cover --ignore-scripts
+      - name: Test (on Node 20 with globbing workaround)
+        if: ${{ startsWith(matrix.node-version, '20') }}
+        run: npm run test:node20 --ignore-scripts
       - name: Test
+        if: ${{ !startsWith(matrix.node-version, '24') && !startsWith(matrix.node-version, '20') }}
         run: npm test --ignore-scripts
