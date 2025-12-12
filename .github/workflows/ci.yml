@@ -58,9 +58,9 @@ jobs:
             os: ubuntu-latest
             shell: bash
         node-version:
-          - 18.0.0
-          - 18.x
+          - 20.17.0
           - 20.x
+          - 22.9.0
           - 22.x
           - 24.x
     runs-on: ${{ matrix.platform.os }}
