@@ -15,16 +15,13 @@ and therefore carry no unique, irreplaceable data.
 
 On macOS, Apple's Time Machine backup tool backs up every file that it can see,
 including the often tens-of-thousands of small files inside `node_modules`. This
-has several painful side-effects:
+has several regrettable side-effects:
 
-* **Slow incremental backups.** Each `npm install` or `npm update` touches many
+- **Slower backups.** Each `npm install` or `npm update` touches many
   files, forcing Time Machine to scan and snapshot all of them on the next backup
   run.
-* **Rapid backup-disk consumption.** Accumulated snapshots of large
-  `node_modules` trees eat disk space quickly and can cause backups to fail
-  entirely when the backup volume fills up.
-* **Slower system performance during backups.** The high file count in
-  `node_modules` can cause noticeable I/O spikes while Time Machine is indexing.
+- **Higher backup-disk consumption.** Accumulated snapshots of large
+  `node_modules` trees eat disk space quickly.
 
 The xattr-based "sticky exclusion" mechanism provided by macOS lets any tool
 flag a directory so that it is permanently skipped by Time Machine — even when
@@ -43,7 +40,7 @@ same mechanism used by the Xcode build toolchain for its `DerivedData`
 directories, and is equivalent to running:
 
 ```sh
-tmutil addexclusion -p /path/to/node_modules
+tmutil addexclusion /path/to/node_modules
 ```
 
 ### When the attribute is applied
@@ -52,6 +49,8 @@ When the opt-in flag is set, npm should apply this attribute on macOS
 (i.e. `process.platform === 'darwin'`) as soon as a `node_modules` directory is
 created on disk — that is, at directory-creation time inside
 `@npmcli/arborist`, before any package files are written into it.
+
+According to the [2021-10-13 meeting notes](https://github.com/npm/rfcs/blob/816944d6fe9c85130a5a7a92883c29c69e5777e2/meetings/2021-10-13.md?plain=1#L94), it was agreed the setting should be first introduced as opt-in.
 
 ### Setting the attribute
 
@@ -75,9 +74,9 @@ or when the `xattr` binary is unavailable.
 
 A new boolean flag `time-machine-exclude` is added to npm's configuration:
 
-| Key                    | Default  | Description |
-|------------------------|----------|-------------|
-| `time-machine-exclude` | `false`  | When `true`, marks `node_modules` with the macOS Time Machine exclusion xattr after every install on macOS. |
+| Key                    | Default | Description                                                                                                 |
+| ---------------------- | ------- | ----------------------------------------------------------------------------------------------------------- |
+| `time-machine-exclude` | `false` | When `true`, marks `node_modules` with the macOS Time Machine exclusion xattr after every install on macOS. |
 
 Users who want `node_modules` excluded from their backups set
 `time-machine-exclude=true` in their `.npmrc` (or via `npm config set`).
@@ -89,11 +88,12 @@ Users who want `node_modules` excluded from their backups set
 npm could apply the xattr on every macOS install and provide a flag to opt back
 in to backups. This would protect the majority of users automatically.
 
-**Drawback:** Silently preventing something from being backed up — without the
-user asking for it — is surprising behaviour and has caused concern among npm
-collaborators. A user who relies on their backup for disaster recovery may not
-realise `node_modules` is excluded until they attempt a restore. The opt-in
-approach ensures the user has made a deliberate choice.
+**Drawback:** Silently preventing something from being backed up without the
+user asking for it is likely to surprise some users and has some maintainers have
+[raised concerns](https://github.com/npm/rfcs/issues/471#issuecomment-943215770).
+A user who relies on their backup for disaster recovery may not realise `node_modules`
+is excluded until they attempt a restore. The opt-in approach ensures the user
+has made a deliberate choice.
 
 ### Alternative 2 – Write the value as a binary plist
 
@@ -103,8 +103,9 @@ approach ensures the user has made a deliberate choice.
 **Drawback:** Generating a binary plist in Node.js without a native library
 requires manual `Buffer` construction (or shelling out to an additional tool).
 In practice, Time Machine respects the attribute whether the value is a raw
-string or a binary plist — many projects write it as a plain string with the
-same effect. Plain strings are simpler and carry no additional risk.
+string or a binary plist — [many projects](https://github.com/search?q=%22com.apple.metadata%3Acom_apple_backup_excludeItem%22&type=code)
+write it as a plain string with the same effect. Plain strings are simpler
+and carry no additional risk.
 
 ### Alternative 3 – Use `tmutil addexclusion`
 
@@ -112,7 +113,8 @@ same effect. Plain strings are simpler and carry no additional risk.
 interface for adding a "sticky" backup exclusion.
 
 **Drawback:** `tmutil` is significantly slower than writing the xattr directly,
-which would noticeably increase install time.
+which would noticeably increase install time. I'm not sure what extra work tmutil
+does which explain the longer execution time.
 
 ### Alternative 4 – Use `NSURLIsExcludedFromBackupKey` / `kCFURLIsExcludedFromBackupKey`
 
@@ -125,7 +127,7 @@ Cargo ([cargo#4386](https://github.com/rust-lang/cargo/pull/4386)).
 a native add-on, which significantly increases implementation and maintenance
 complexity.
 
-### Alternative 5 – Require users to use `tmutil` manually
+### Alternative 5 – Advising users to use `tmutil` manually
 
 Users can already run `tmutil addexclusion -p ~/project/node_modules` themselves.
 Some tools (e.g. `Finder`'s "Exclude from backups" checkbox) surface this, but
@@ -140,7 +142,7 @@ new project; does not scale.
 ### Chosen approach
 
 The opt-in default is the conservative choice: npm does not silently alter backup
-behaviour, but provides a first-class, project-level knob for developers who
+behaviour, but provides a first-class, either project-level or global knob for developers who
 actively want their `node_modules` excluded. Writing the xattr value as a plain
 string is the simplest correct implementation — no native add-on, no binary plist
 generation, no dependency on slow system utilities.
@@ -149,13 +151,13 @@ generation, no dependency on slow system utilities.
 
 ### Affected repositories / packages
 
-* **`@npmcli/arborist`** – The code path that creates a new `node_modules`
+- **`@npmcli/arborist`** – The code path that creates a new `node_modules`
   directory on disk is updated to immediately call a helper
   (`lib/utils/time-machine-exclude.js` or similar) when
   `process.platform === 'darwin'` and the `time-machine-exclude` config
   option is `true`.
 
-* **`npm/cli`** – Adds the `time-machine-exclude` configuration key (type:
+- **`npm/cli`** – Adds the `time-machine-exclude` configuration key (type:
   `Boolean`, default: `false`) to `lib/utils/config/definitions.js` and exposes
   it in the docs.
 
@@ -163,22 +165,22 @@ generation, no dependency on slow system utilities.
 
 ```js
 // lib/utils/time-machine-exclude.js  (inside @npmcli/arborist or npm/cli)
-const { execFile } = require('child_process')
+const { execFile } = require("child_process");
 
-const ATTR_NAME = 'com.apple.metadata:com_apple_backup_excludeItem'
-const ATTR_VALUE = 'com.apple.backupd'
+const ATTR_NAME = "com.apple.metadata:com_apple_backup_excludeItem";
+const ATTR_VALUE = "com.apple.backupd";
 
-function excludeFromTimeMachine (nodeModulesPath) {
-  if (process.platform !== 'darwin') {
-    return
+function excludeFromTimeMachine(nodeModulesPath) {
+  if (process.platform !== "darwin") {
+    return;
   }
-  execFile('xattr', ['-w', ATTR_NAME, ATTR_VALUE, nodeModulesPath], () => {
+  execFile("xattr", ["-w", ATTR_NAME, ATTR_VALUE, nodeModulesPath], () => {
     // errors intentionally ignored — absence of xattr binary or unsupported FS
     // must not break npm
-  })
+  });
 }
 
-module.exports = { excludeFromTimeMachine }
+module.exports = { excludeFromTimeMachine };
 ```
 
 ### No native add-on required
@@ -189,26 +191,23 @@ is needed.
 
 ## Prior Art
 
-* **Rust / Cargo** – Added the same xattr exclusion for `target/` directories in
+- **Rust / Cargo** – Added the same xattr exclusion for `target/` directories in
   [cargo#4386](https://github.com/rust-lang/cargo/pull/4386). This is the
   primary inspiration for this RFC.
-* **Python / Poetry** – Implemented the same exclusion for `.venv` directories
+- **Python / Poetry** – Implemented the same exclusion for `.venv` directories
   in [poetry#4599](https://github.com/python-poetry/poetry/pull/4599).
-* **Xcode** – Uses the same mechanism for `DerivedData`; Apple documents it in
+- **Xcode** – Uses the same mechanism for `DerivedData`; Apple documents it in
   their backup-exclusion guides.
 
 ## Unresolved Questions and Bikeshedding
 
-* **Config flag naming**: `backup-node-modules` vs `time-machine-exclude` vs
+- **Support broader range of OS and backup software**: The Windows/Linux backup
+  landscape is much more fragmented, with no shared approach for programmatically
+  excluding files/directories. But maybe there are some widely deployed tools which
+  should still be supported?
+- **Config flag naming**: `backup-node-modules` vs `time-machine-exclude` vs
   `no-backup`? The name should make the purpose clear and follow npm config
   naming conventions.
-* **Scope of exclusion**: Should only the top-level `node_modules` be excluded,
-  or also nested `node_modules` within workspaces? The simplest initial
-  implementation excludes only the root `node_modules` and each workspace's own
-  `node_modules`, matching where Arborist writes packages.
-* **Other backup tools**: The xattr is specific to Time Machine / `backupd`. It
+- **Other backup tools**: The xattr is specific to Time Machine / `backupd`. It
   does not exclude `node_modules` from iCloud Drive sync, Dropbox, or other
   tools. Those cases may be addressed in a separate RFC.
-* **Removal on `npm uninstall --global` or `rm -rf node_modules`**: The xattr
-  lives on the directory; when the directory is deleted and recreated, npm
-  re-applies the attribute on the next install.
