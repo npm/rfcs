@@ -2,12 +2,10 @@
 
 ## Summary
 
-When `npm install` creates a `node_modules` directory on macOS, npm should mark
-it with the extended attribute (xattr) that tells Time Machine to skip it. This
+On macOS, npm should provide an opt-in flag that marks a project's `node_modules`
+directory with the extended attribute that tells Time Machine to skip it. This
 prevents `node_modules` — which can be fully reconstructed from `package-lock.json`
-— from filling up backup disks and slowing down backup runs. The behaviour can
-be opted out of via an `.npmrc` flag for users who do wish to include
-`node_modules` in their backups.
+— from filling up backup disks and slowing down backup runs.
 
 ## Motivation
 
@@ -39,71 +37,85 @@ Preferences.
 
 macOS exposes a per-item backup exclusion flag through the extended attribute
 key `com.apple.metadata:com_apple_backup_excludeItem`. When this attribute is
-present on a file or directory with the binary-plist value `com.apple.backupd`,
-Time Machine (and the underlying `backupd` daemon) skips that item permanently.
-This is the same mechanism used by the Xcode build toolchain for its `DerivedData`
-directories.
+present on a file or directory with a binary plist value encoding the string
+`"com.apple.backupd"`, Time Machine (and the underlying `backupd` daemon) skips
+that item permanently. This is the same mechanism used by the Xcode build
+toolchain for its `DerivedData` directories, and is equivalent to running:
 
-The binary plist value is:
-```
-62 70 6C 69 73 74 30 30 5F 10 11 63 6F 6D 2E 61  |bplist00_..com.a|
-70 70 6C 65 2E 62 61 63 6B 75 70 64 08 00 00 00  |pple.backupd....|
-00 00 00 01 01 00 00 00 00 00 00 00 01 00 00 00  |................|
-00 00 00 00 00 00 00 00 00 00 00 00 1C           |.............|
-```
-
-This is equivalent to running:
 ```sh
 tmutil addexclusion -p /path/to/node_modules
 ```
 
 ### When the attribute is applied
 
-npm should set this attribute whenever it creates or updates a `node_modules`
-directory on macOS (i.e. `process.platform === 'darwin'`). Concretely, this
-means applying it after the reify step in `@npmcli/arborist` completes, once
-the `node_modules` directory is known to exist on disk.
+When the opt-in flag is set, npm should apply this attribute whenever it creates
+or updates a `node_modules` directory on macOS (i.e. `process.platform ===
+'darwin'`). Concretely, this means applying it after the reify step in
+`@npmcli/arborist` completes, once the `node_modules` directory is known to
+exist on disk.
 
 ### Setting the attribute
 
 Because Node.js does not provide a built-in API for extended attributes, npm
 should shell out to the macOS `xattr` command-line utility, which ships with
-every macOS installation:
+every macOS installation. The attribute value is a binary plist encoding of the
+string `"com.apple.backupd"`, generated programmatically — the same approach
+used by the Python `plistlib.dumps("com.apple.backupd", fmt=plistlib.FMT_BINARY)`
+call in Poetry. In Node.js this can be built with standard `Buffer` operations:
 
-```sh
-xattr -w -x com.apple.metadata:com_apple_backup_excludeItem \
-  "62706c6973743030 5f1011 636f6d2e6170706c652e6261636b757064 08 0000000000000101 0000000000000001 000000000000001c" \
-  /path/to/node_modules
+```js
+// Construct a minimal binary plist containing a single ASCII string.
+// This mirrors what Python's plistlib.dumps(str, fmt=FMT_BINARY) produces.
+function binaryPlistString (str) {
+  const header = Buffer.from('bplist00')
+  const payload = Buffer.from(str, 'ascii')
+  // Object descriptor: 0x5F = variable-length ASCII string,
+  //                    0x10 = 1-byte integer follows for the length
+  const objDesc = Buffer.from([0x5f, 0x10, payload.length])
+  // Offset table: the single object starts right after the 8-byte header
+  const offsetTable = Buffer.from([header.length])
+  // 32-byte trailer (Apple binary plist spec):
+  //   5 unused bytes, 1 sort-version byte, 1 offset-int-size byte,
+  //   1 object-ref-size byte, 8-byte object count, 8-byte top-object index,
+  //   8-byte offset-table start
+  const offsetTableStart = header.length + objDesc.length + payload.length
+  const trailer = Buffer.alloc(32)
+  trailer[6] = 1  // offset int size: 1 byte
+  trailer[7] = 1  // object ref size: 1 byte
+  trailer.writeBigUInt64BE(BigInt(1), 8)                        // num objects
+  trailer.writeBigUInt64BE(BigInt(0), 16)                       // top object
+  trailer.writeBigUInt64BE(BigInt(offsetTableStart), 24)        // offset table
+  return Buffer.concat([header, objDesc, payload, offsetTable, trailer])
+}
 ```
 
-The call is made with `child_process.execFile` (non-blocking, errors suppressed)
-so that it does not affect npm's exit code or performance on non-macOS systems
-or when the `xattr` binary is unavailable.
+The call to `xattr` is then made with `child_process.execFile` (non-blocking,
+errors suppressed) so that it does not affect npm's exit code or performance on
+non-macOS systems or when the `xattr` binary is unavailable.
 
 ### New configuration option
 
-A new boolean flag `backup-node-modules` is added to npm's configuration:
+A new boolean flag `time-machine-exclude` is added to npm's configuration:
 
-| Key                  | Default  | Description |
-|----------------------|----------|-------------|
-| `backup-node-modules`| `false`  | When `true`, prevents npm from marking `node_modules` with the Time Machine exclusion xattr on macOS. |
+| Key                    | Default  | Description |
+|------------------------|----------|-------------|
+| `time-machine-exclude` | `false`  | When `true`, marks `node_modules` with the macOS Time Machine exclusion xattr after every install on macOS. |
 
-Setting `backup-node-modules=true` in `.npmrc` (or via `npm config set`) gives
-users who need `node_modules` in their backups a simple escape hatch.
+Users who want `node_modules` excluded from their backups set
+`time-machine-exclude=true` in their `.npmrc` (or via `npm config set`).
 
 ## Rationale and Alternatives
 
-### Alternative 1 – Opt-in (do nothing by default)
+### Alternative 1 – Opt-out (exclude by default)
 
-npm could expose the `backup-node-modules=false` flag but leave the default as
-`true` (i.e. back up by default, opt out of backup exclusion). This mirrors the
-current status quo.
+npm could apply the xattr on every macOS install and provide a flag to opt back
+in to backups. This would protect the majority of users automatically.
 
-**Drawback:** Users who suffer from bloated backups or slow backup runs must
-first discover the problem, then discover the flag. Many users will never find
-it. The downside of the default (disk-consuming, slow backups) is worse than
-the downside of the proposed default (no backup of something that is
-reconstructible), making opt-in a poorer default.
+**Drawback:** Silently preventing something from being backed up — without the
+user asking for it — is surprising behaviour and has caused concern among npm
+collaborators. A user who relies on their backup for disaster recovery may not
+realise `node_modules` is excluded until they attempt a restore. The opt-in
+approach ensures the user has made a deliberate choice.
 
 ### Alternative 2 – Require users to use `tmutil` manually
 
@@ -117,19 +129,13 @@ install.
 **Drawback:** Relies on the user taking manual action every time they start a
 new project; does not scale.
 
-### Alternative 3 – Use a `.nobackup` file convention
-
-Some tools place a sentinel file (e.g. `CACHEDIR.TAG`) inside directories to
-hint that the contents are caches. This is not recognised by Time Machine and
-would have no effect.
-
 ### Chosen approach
 
-The proposed opt-out default strikes the best balance: the vast majority of
-developers do not want `node_modules` in their backups (it is reproducible from
-`package-lock.json`), while the minority who do can set one flag. The xattr
-approach is the correct macOS-native mechanism, requires no third-party
-dependency, and is battle-tested by both Xcode and the Rust toolchain.
+The opt-in default is the conservative choice: npm does not silently alter backup
+behaviour, but provides a first-class, project-level knob for developers who
+actively want their `node_modules` excluded. The xattr mechanism is the correct
+macOS-native approach, requires no third-party dependency, and is battle-tested
+by both Xcode and the Rust toolchain.
 
 ## Implementation
 
@@ -137,10 +143,10 @@ dependency, and is battle-tested by both Xcode and the Rust toolchain.
 
 * **`@npmcli/arborist`** – After the `reify()` call writes `node_modules` to
   disk, a new helper (`lib/utils/time-machine-exclude.js` or similar) is invoked
-  when `process.platform === 'darwin'` and the `backup-node-modules` config
-  option is `false`.
+  when `process.platform === 'darwin'` and the `time-machine-exclude` config
+  option is `true`.
 
-* **`npm/cli`** – Adds the `backup-node-modules` configuration key (type:
+* **`npm/cli`** – Adds the `time-machine-exclude` configuration key (type:
   `Boolean`, default: `false`) to `lib/utils/config/definitions.js` and exposes
   it in the docs.
 
@@ -151,17 +157,31 @@ dependency, and is battle-tested by both Xcode and the Rust toolchain.
 const { execFile } = require('child_process')
 
 const ATTR_NAME = 'com.apple.metadata:com_apple_backup_excludeItem'
-const ATTR_VALUE =
-  '62706c6973743030' +
-  '5f1011636f6d2e6170706c652e6261636b757064' +
-  '0800000000000001010000000000000001' +
-  '000000000000001c'
+
+// Construct a minimal binary plist containing a single ASCII string.
+// This mirrors what Python's plistlib.dumps(str, fmt=FMT_BINARY) produces.
+function binaryPlistString (str) {
+  const header = Buffer.from('bplist00')
+  const payload = Buffer.from(str, 'ascii')
+  // 0x5F = variable-length ASCII string, 0x10 = 1-byte length follows
+  const objDesc = Buffer.from([0x5f, 0x10, payload.length])
+  const offsetTable = Buffer.from([header.length])
+  const offsetTableStart = header.length + objDesc.length + payload.length
+  const trailer = Buffer.alloc(32)
+  trailer[6] = 1  // offset int size
+  trailer[7] = 1  // object ref size
+  trailer.writeBigUInt64BE(BigInt(1), 8)
+  trailer.writeBigUInt64BE(BigInt(0), 16)
+  trailer.writeBigUInt64BE(BigInt(offsetTableStart), 24)
+  return Buffer.concat([header, objDesc, payload, offsetTable, trailer])
+}
 
 function excludeFromTimeMachine (nodeModulesPath) {
   if (process.platform !== 'darwin') {
     return
   }
-  execFile('xattr', ['-w', '-x', ATTR_NAME, ATTR_VALUE, nodeModulesPath], () => {
+  const attrValue = binaryPlistString('com.apple.backupd').toString('hex')
+  execFile('xattr', ['-w', '-x', ATTR_NAME, attrValue, nodeModulesPath], () => {
     // errors intentionally ignored — absence of xattr binary or unsupported FS
     // must not break npm
   })
