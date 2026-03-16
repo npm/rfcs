@@ -109,7 +109,7 @@ and carry no additional risk.
 
 ### Alternative 3 – Use `tmutil addexclusion`
 
-`tmutil addexclusion -p /path/to/node_modules` is the official command-line
+`tmutil addexclusion /path/to/node_modules` is the official command-line
 interface for adding a "sticky" backup exclusion.
 
 **Drawback:** `tmutil` is significantly slower than writing the xattr directly,
@@ -129,7 +129,7 @@ complexity.
 
 ### Alternative 5 – Advising users to use `tmutil` manually
 
-Users can already run `tmutil addexclusion -p ~/project/node_modules` themselves.
+Users can already run `tmutil addexclusion ~/project/node_modules` themselves.
 Some tools (e.g. `Finder`'s "Exclude from backups" checkbox) surface this, but
 the exclusion must be re-applied after `node_modules` is deleted and reinstalled.
 The "sticky exclusion" set by npm persists even across reinstalls because it
