@@ -2,7 +2,7 @@
 
 ## Summary
 
-Add first-class, install-time patching of installed dependencies to the npm CLI, on parity with `pnpm patch`, `yarn patch`, and `bun patch`. This RFC proposes three new commands (`npm patch`, `npm patch-commit`, `npm patch-remove`), a new top-level `patchedDependencies` field in `package.json`, an additive change to `package-lock.json` that records a hash of every applied patch, and an apply pipeline integrated into Arborist's reify step so that patches apply uniformly across every supported `install-strategy` (`hoisted`, `nested`, `shallow`, and `linked`).
+Add first-class, install-time patching of installed dependencies to the npm CLI, on parity with `pnpm patch`, `yarn patch`, and `bun patch`. This RFC proposes a new `npm patch` command with four subcommands (`add`, `commit`, `ls`, `rm`), a new top-level `patchedDependencies` field in `package.json`, an additive change to `package-lock.json` that records a hash of every applied patch, and an apply pipeline integrated into Arborist's reify step so that patches apply uniformly across every supported `install-strategy` (`hoisted`, `nested`, `shallow`, and `linked`).
 
 ## Motivation
 
@@ -55,19 +55,27 @@ Native patching has since shipped in pnpm, yarn (Berry), and bun, all with broad
 
 ### Commands
 
-#### `npm patch <pkg>[@<version>]`
+All operations live under `npm patch <subcommand>`, matching the mixed-register subcommand shape npm already uses (`npm cache add/clean/verify/ls`, `npm team create/destroy/add/rm/ls`) — short forms `ls` and `rm` for the read/remove cases, full verbs `add` and `commit` for the actions that take an argument and produce side effects.
+
+The bare form `npm patch <pkg>` is a shorthand for `npm patch add <pkg>` because that is the most common entry point. `npm patch` with no arguments prints help (it does **not** list patches — use `npm patch ls`). This follows npm CLI precedent: `npm pkg`, `npm cache`, and `npm team` all print help when invoked with no subcommand.
+
+**Disambiguation.** The bare form `npm patch <arg>` is parsed as follows: if `<arg>` is exactly one of `add`, `commit`, `ls`, or `rm`, it is treated as a subcommand; otherwise it is treated as a package selector and routed to `npm patch add <arg>`. A package literally named `add` (or any other subcommand name) must be referenced via the explicit form `npm patch add add`. This mirrors the existing rule that `npm install install` is how you would install a hypothetical package called `install`.
+
+**Help.** `npm patch --help` and `npm help patch` both render the full subcommand list and flags. Per-subcommand help (`npm patch add --help`, etc.) is also provided.
+
+#### `npm patch add <pkg>[@<version>]`
 
 Prepares a package for editing.
 
-1. Resolves `<pkg>[@<version>]` against the current install (or registry if a version is provided that is not in the tree). If the version is omitted, the resolved version from the current tree is used; if more than one resolved version of `<pkg>` is present, the command lists each `name@version` with the path of its first dependant and asks the user to re-run with an exact selector (e.g. `npm patch lodash@4.17.21`). It does not silently pick one.
+1. Resolves `<pkg>[@<version>]` against the current install (or registry if a version is provided that is not in the tree). If the version is omitted, the resolved version from the current tree is used; if more than one resolved version of `<pkg>` is present, the command lists each `name@version` with the path of its first dependant and asks the user to re-run with an exact selector (e.g. `npm patch add lodash@4.17.21`). It does not silently pick one.
 2. Rejects non-registry resolutions explicitly: `file:`, `link:`, `git:`, `http(s):` tarball, and workspace-relative resolutions cannot be patched — they have no canonical "original" tarball to diff against, and a patched workspace package is just an edit to the workspace. The error directs the user to edit the source directly. (See "Non-registry dependencies" below.)
 3. Extracts a clean copy of the package tarball into a temporary edit directory **outside** `node_modules` (default: `<os.tmpdir()>/npm-patch/<pkg>@<version>-<random>`).
 4. Prints the path to stdout, e.g.:
 
    ```
-   $ npm patch lodash@4.17.21
+   $ npm patch add lodash@4.17.21
    You can now edit the following directory: /var/folders/.../npm-patch/lodash@4.17.21-XYZ
-   When done, run: npm patch-commit /var/folders/.../npm-patch/lodash@4.17.21-XYZ
+   When done, run: npm patch commit /var/folders/.../npm-patch/lodash@4.17.21-XYZ
    ```
 
 The edit directory is intentionally outside `node_modules` to avoid the trap that bites bun's earlier designs and `patch-package`'s edit-in-place workflow: editing under `node_modules/` mutates the local cacache contents and bleeds into other projects, and is also fragile under `linked` mode where `node_modules/<pkg>` is a symlink into the content-addressed store.
@@ -77,11 +85,11 @@ Flags:
 - `--edit-dir <path>`: override the temp directory.
 - `--ignore-existing`: discard a previous unfinished edit and start fresh.
 
-#### `npm patch-commit <edit-dir>`
+#### `npm patch commit <edit-dir>`
 
 Finalises a patch.
 
-1. Diffs `<edit-dir>` against the original tarball contents (using the same extraction performed by `npm patch`).
+1. Diffs `<edit-dir>` against the original tarball contents (using the same extraction performed by `npm patch add`).
 2. Writes a unified diff to `<patches-dir>/<name>@<version>.patch` (default `./patches/`, configurable — see below).
 3. Adds an entry to `patchedDependencies` in the project's root `package.json`:
 
@@ -101,8 +109,6 @@ Flags:
 - `--patches-dir <dir>`: override the destination directory for this invocation.
 - `--keep-edit-dir`: do not remove the edit directory after committing.
 
-For users who prefer a single-command flow (matching bun), an alias is exposed as `npm patch --commit <edit-dir>` — the package name is **not** re-supplied because it is already encoded in the edit directory.
-
 #### `npm patch ls`
 
 Lists currently registered patches with their resolved targets:
@@ -116,7 +122,7 @@ patches/types-fix.patch             react                 (matched 0 nodes — e
 
 Useful for auditing which patches are active and which are unused before an install.
 
-#### `npm patch-remove <pkg>[@<version>]`
+#### `npm patch rm <pkg>[@<version>]`
 
 Reverses a patch.
 
@@ -171,7 +177,7 @@ The same `.patch` file may appear as the value of multiple keys. This covers the
 }
 ```
 
-When `npm patch-remove express@4.18.3` is invoked, the file is preserved because `4.18.2` still references it. When the last reference is removed, the file is deleted.
+When `npm patch rm express@4.18.3` is invoked, the file is preserved because `4.18.2` still references it. When the last reference is removed, the file is deleted.
 
 #### Workspaces
 
@@ -179,7 +185,7 @@ When `npm patch-remove express@4.18.3` is invoked, the file is preserved because
 
 The single-source-of-truth model has two practical consequences for monorepo authors:
 
-1. **Authoring**: `npm patch <pkg>@<version>` run from a workspace member writes the entry and patch file to the **root** manifest and root `<patches-dir>/`, not the member. The CLI prints the resolved destination so the user is not surprised.
+1. **Authoring**: `npm patch add <pkg>@<version>` run from a workspace member writes the entry and patch file to the **root** manifest and root `<patches-dir>/`, not the member. The CLI prints the resolved destination so the user is not surprised.
 2. **Ownership / review**: a single `CODEOWNERS` rule on `/patches/**` and a root `package.json` change is sufficient to gate every patch review, regardless of which workspace member depends on the patched transitive. This matches how `overrides` and `dependencies` are already audited in large monorepos.
 
 If a workspace member legitimately needs a per-member patch (e.g. a trial fix that should not affect siblings), the right tool is `overrides` to a published fork, not `patchedDependencies`.
@@ -197,7 +203,7 @@ A new config key, `patches-dir`, overrides this:
 patches-dir = .npm/patches
 ```
 
-Patch files are plain unified diffs (POSIX `diff -u`-compatible, also applyable by `git apply`). Filenames default to `<name>@<version>.patch`. For scoped packages, the leading `@scope/` becomes a subdirectory inside `<patches-dir>`, so `npm patch-commit` creates the directory if it does not exist. Examples:
+Patch files are plain unified diffs (POSIX `diff -u`-compatible, also applyable by `git apply`). Filenames default to `<name>@<version>.patch`. For scoped packages, the leading `@scope/` becomes a subdirectory inside `<patches-dir>`, so `npm patch commit` creates the directory if it does not exist. Examples:
 
 ```
 patches/lodash@4.17.21.patch
@@ -289,12 +295,12 @@ Patches target a registry tarball as their "original", so the diff has a stable 
 | Dependency type            | Behaviour                                                                                                                                                                                                                   |
 | -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `npm:` (registry alias)    | Supported. The aliased registry tuple is used as the baseline; the selector is keyed on the alias name.                                                                                                                     |
-| `file:` (local tarball)    | Rejected by `npm patch` with a clear error. The user already controls the source; edit it directly.                                                                                                                         |
+| `file:` (local tarball)    | Rejected by `npm patch add` with a clear error. The user already controls the source; edit it directly.                                                                                                                     |
 | `link:` / workspace member | Rejected. Workspace members are project source code, not vendored dependencies — edit the source.                                                                                                                           |
 | `git:` / `github:`         | Rejected in the initial RFC. The "original" would be a specific commit, which is reproducible, but the workflow is significantly more complex (shallow clones, submodules, build steps) and is deferred to a follow-up RFC. |
 | `http(s):` tarball         | Rejected. No integrity guarantee equivalent to registry tarballs; see future work.                                                                                                                                          |
 
-Rejection means: `npm patch <pkg>` exits non-zero with a message explaining why, pointing at the source-edit alternative. An entry in `patchedDependencies` whose resolved type is one of the rejected categories above is also a hard error at install time.
+Rejection means: `npm patch add <pkg>` exits non-zero with a message explaining why, pointing at the source-edit alternative. An entry in `patchedDependencies` whose resolved type is one of the rejected categories above is also a hard error at install time.
 
 ### `optionalDependencies`, `peerDependencies`, deprecated packages
 
@@ -329,7 +335,7 @@ my-app@1.0.0
 
 | Surface          | New                                                                                                        |
 | ---------------- | ---------------------------------------------------------------------------------------------------------- |
-| Commands         | `npm patch`, `npm patch ls`, `npm patch-commit`, `npm patch-remove`                                        |
+| Commands         | `npm patch add`, `npm patch commit`, `npm patch ls`, `npm patch rm` (plus `npm patch <pkg>` shorthand for `npm patch add <pkg>`) |
 | Manifest fields  | `patchedDependencies` (auto-stripped by `npm publish` / `npm pack`)                                        |
 | Lockfile fields  | `patched.path`, `patched.integrity`                                                                        |
 | Lockfile version | bumped to `4`; older clients **error** on v4 lockfiles containing patches                                  |
@@ -397,7 +403,7 @@ This is elegant in yarn's locator-driven model. For `package-lock.json`'s nested
 Affected repositories and packages. All implementation now lives under the `npm/cli` monorepo and a small set of supporting `npm/*` packages. The previously-separate `npm/arborist` repository was archived and its code moved to `npm/cli/workspaces/arborist`.
 
 - **[`npm/cli`](https://github.com/npm/cli)** — top-level CLI:
-  - new commands (`npm patch`, `npm patch ls`, `npm patch-commit`, `npm patch-remove`)
+  - new `npm patch` command with subcommands `add`, `commit`, `ls`, `rm`
   - new config (`patches-dir`) and CLI-only flags (`--allow-unused-patches`, `--ignore-patch-failures`)
   - `npm ls` / `npm audit` annotations
   - `npm/cli/workspaces/arborist` (formerly the `npm/arborist` repo): read `patchedDependencies` during build-ideal-tree; attach patch records to nodes during reify; apply patches to extracted trees; honour the side-store layout under `install-strategy=linked`
@@ -405,13 +411,14 @@ Affected repositories and packages. All implementation now lives under the `npm/
 - **[`npm/pacote`](https://github.com/npm/pacote)**: helper to materialise a clean tarball into the temp edit directory (already supported via `pacote.extract`).
 - **[`npm/cacache`](https://github.com/npm/cacache)**: no changes.
 - **[`npm/ssri`](https://github.com/npm/ssri)**: no changes (used as-is for patch integrity).
-- **[`npm/package-json`](https://github.com/npm/package-json)**: schema awareness of the `patchedDependencies` field for read/write helpers used by `npm patch-commit` and `npm patch-remove`.
+- **[`npm/package-json`](https://github.com/npm/package-json)**: schema awareness of the `patchedDependencies` field for read/write helpers used by `npm patch commit` and `npm patch rm`.
 - **[`npm/map-workspaces`](https://github.com/npm/map-workspaces)**: detect a `patchedDependencies` entry in a workspace member's `package.json` so the install-time hard error can cite the offending workspace.
 - **[`docs.npmjs.com`](https://github.com/npm/documentation)**: command pages, config page, lockfile schema, plus a migration guide from `patch-package`.
 
 Tests:
 
-- Round-trip: `npm patch` → edit → `npm patch-commit` → `npm install` → patched files present.
+- Round-trip: `npm patch add` → edit → `npm patch commit` → `npm install` → patched files present.
+- Shorthand routing: `npm patch <pkg>` is equivalent to `npm patch add <pkg>`; subcommand-name shadowing (`npm patch add` is the subcommand, `npm patch add add` reaches a package literally named `add`).
 - Each `install-strategy` value: `hoisted`, `nested`, `shallow`, `linked`. The `linked` test must verify that (a) an unrelated project sharing the global cache does **not** see the patched copy and (b) two consumers in the same project sharing `(packageIntegrity, patchIntegrity)` dedupe to one side-store entry.
 - Workspaces: patch declared at root applies to a transitive dep used only by a workspace member; patch declared in a workspace member's manifest **errors**.
 - `npm ci` with a tampered patch file → fails with hash mismatch.
@@ -420,12 +427,12 @@ Tests:
 - Failure modes: failed apply, unused patch, missing patch file, with and without `--allow-unused-patches` / `--ignore-patch-failures` on `npm install`; `npm ci` rejects both flags.
 - Lockfile migration: v3 → v4 bump; older client encountering v4 with `patched` records errors; v4 without `patched` records installs cleanly under older clients.
 - `npm publish` / `npm pack`: `patchedDependencies` stripped from the output tarball; `patches/` excluded from the output tarball.
-- Non-registry deps: `file:`, `link:`, workspace, `git:`, `http(s):` — `npm patch` errors with the documented message.
+- Non-registry deps: `file:`, `link:`, workspace, `git:`, `http(s):` — `npm patch add` errors with the documented message.
 - `optionalDependencies`: skipped optional patched dep does not trigger unused-patch error; installed optional patched dep applies the patch.
 
 Implementation rollout. The entire feature ships **atomically in a single npm release** — no part of it is allowed to lag behind the others, because every "almost finished" intermediate state is a vector for the silent-skip and silent-leak failure modes this RFC exists to prevent. The atomic deliverable is:
 
-- CLI commands: `npm patch`, `npm patch ls`, `npm patch-commit`, `npm patch-remove`.
+- CLI commands: `npm patch add`, `npm patch commit`, `npm patch ls`, `npm patch rm` (plus the bare `npm patch <pkg>` shorthand for `add`).
 - Manifest field: `patchedDependencies` (root-only; hard error in workspace members).
 - Lockfile schema: `patched.{path,integrity}` per node, `lockfileVersion: 4`, with `npm ci` enforcing hash match and older clients erroring on v4 lockfiles that contain patch records.
 - Apply pipeline for **all four** supported `install-strategy` values — `hoisted`, `nested`, `shallow`, and `linked` — at the same seam in arborist's reify step. `linked` uses the content-addressed side-store key `(packageIntegrity, patchIntegrity)` described in [`linked` install-strategy: side-store](#linked-install-strategy-side-store) and is treated as a first-class target, not a follow-up.
