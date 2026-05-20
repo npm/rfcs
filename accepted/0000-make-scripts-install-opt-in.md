@@ -279,13 +279,17 @@ The two commands share implementation. Splitting them avoids the `!`-prefix synt
 
 ### Enforcement behavior
 
-When a dependency has install scripts and is not in the `allowScripts` allowlist:
+The policy is a tri-state per package:
 
-- The install continues by default. Scripts are skipped, and a warning is printed listing the blocked packages with a suggestion to run `npm approve-scripts`.
-- In strict mode (`strict-script-builds=true` in `.npmrc`), the install fails with an error instead.
-- The `--dangerously-allow-all-scripts` flag overrides the allowlist and runs all scripts.
+- `true`: install scripts run.
+- `false`: install scripts are silently skipped.
+- absent: install scripts run (Phase 1 default) and a post-install advisory warning lists the package so users can review it. In a future major release this default flips to skip-with-warning.
 
-The existing `--ignore-scripts` flag continues to work as before, disabling all scripts including root project scripts.
+In strict mode (`strict-allow-scripts=true`), the install fails before any scripts run if any dependency has install scripts that aren't covered by a `true` or `false` entry. The `--dangerously-allow-all-scripts` flag bypasses the policy and runs every install script.
+
+The `--allow-scripts` CLI flag is restricted to one-off and global contexts (`npm exec`, `npx`, `npm install -g`). Passing it during a project-scoped `npm install`, `ci`, `update`, or `rebuild` is an error: team-wide policy belongs in `package.json#allowScripts` or `.npmrc`, not in a command-line flag that gets copy-pasted into READMEs.
+
+The existing `--ignore-scripts` flag continues to work as before, disabling all scripts (including root project scripts) regardless of `allowScripts`.
 
 ### Affected commands
 
@@ -379,11 +383,11 @@ The primary enforcement point is in the `@npmcli/run-script` and `@npmcli/arbori
 
 New `.npmrc` settings:
 
-| Setting                         | Type                 | Default | Description                                                      |
-|---------------------------------|----------------------|---------|------------------------------------------------------------------|
-| `allow-scripts`                 | Comma-separated list | (empty) | Packages allowed to run install scripts (for global/npx context) |
-| `strict-script-builds`          | Boolean              | `false` | When `true`, blocked scripts cause install to fail               |
-| `dangerously-allow-all-scripts` | Boolean              | `false` | When `true`, all scripts run (escape hatch)                      |
+| Setting                         | Type                 | Default | Description                                                                                                                  |
+|---------------------------------|----------------------|---------|------------------------------------------------------------------------------------------------------------------------------|
+| `allow-scripts`                 | Comma-separated list | (empty) | Packages allowed to run install scripts. Valid only for `npm exec` / `npx` / `npm install -g`; rejected in project installs. |
+| `strict-allow-scripts`          | Boolean              | `false` | When `true`, packages with install scripts that aren't covered by `allowScripts` cause the install to fail before scripts run. |
+| `dangerously-allow-all-scripts` | Boolean              | `false` | When `true`, bypass `allowScripts` entirely and run every install script (escape hatch).                                     |
 
 ## Prior Art
 
@@ -406,20 +410,19 @@ New `.npmrc` settings:
 
 ## Migration Plan
 
-### Phase 1: Tooling and advisory warnings (next minor release)
+### Phase 1: Enforcement for opt-in entries; advisory for unlisted (next minor release)
 
 - Ship `npm approve-scripts` and `npm deny-scripts` (with `--pending` mode for previewing on `approve-scripts`).
-- Recognize the `allowScripts` field in `package.json`.
-- Print advisory warnings when dependency install scripts run that are not covered by an `allowScripts` field.
-- No change in default behavior: scripts still run.
+- Recognise the `allowScripts` field in `package.json`.
+- `true` entries run scripts; `false` entries silently skip them. Both do exactly what the user wrote.
+- Packages with install scripts that aren't covered by an `allowScripts` entry still run as before, with a post-install advisory warning. Nothing changes for anyone who hasn't opted in.
+- `strict-allow-scripts=true` and `--dangerously-allow-all-scripts` are wired up and enforce as described above.
+- `--allow-scripts` CLI flag is rejected in project-scoped installs; it remains available for `npm exec`, `npx`, and `npm install -g`.
 
 ### Phase 2: Default-deny (next major release)
 
-- Dependency install scripts are blocked by default.
-- Scripts for packages listed in `allowScripts` with `true` still run.
-- Blocked scripts produce a warning with remediation instructions.
-- `strict-script-builds=true` available for CI environments that want hard failures.
-- `--dangerously-allow-all-scripts` available as an escape hatch.
+- Packages with install scripts that aren't covered by `allowScripts` are skipped by default instead of running.
+- All other semantics from Phase 1 are unchanged.
 
 ### Phase 3: Ecosystem stabilization
 
