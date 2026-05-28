@@ -51,6 +51,8 @@ This RFC differs in every dimension:
 
 Native patching has since shipped in pnpm, yarn (Berry), and bun, all with broadly converging shapes. That doesn't _prove_ the 2020 footgun concern was wrong — concerns about long-tail abuse don't dissolve because other tools accepted the trade-off — but it does show the feature can be designed safely. The 2020 framing was specific to the shape of that proposal, not inherent to native patching.
 
+[RFC #868](https://github.com/npm/rfcs/pull/868), approved in parallel with this RFC, establishes that **imperative install-time code execution by dependencies is a supply-chain risk and should be opt-in by default**. It does not break `patch-package`'s root-`postinstall` workflow directly — root scripts are out of #868's scope — but it does mark the direction of travel: install-time effects should be declarative, auditable, and locked. `patchedDependencies` is the same idea applied to dependency *code modifications*: a declarative, lockfile-hashed mechanism that sits in the install pipeline itself instead of in a `postinstall` script.
+
 ## Detailed Explanation
 
 ### Commands
