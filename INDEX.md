@@ -4,11 +4,10 @@
 
 Generated 2026-05-29. See [README.md](./README.md) for the RFC process.
 
-## Accepted (14)
+## Accepted (13)
 
 | # | Title | Created | Accepted | Implemented | Withdrawn | Implementation |
 | - | ----- | ------- | -------- | ----------- | --------- | -------------- |
-| [0052](./accepted/0052-registry-scoped-keyfile-and-certfile.md) | Registry-scoped keyfile / certfile credential options | 2026-05-29 | 2026-05-29 | — | — | — |
 | [0050](./accepted/0050-location-config-parameter.md) | Location Config Parameter | — | — | — | — | — |
 | [0049](./accepted/0049-link-packages-to-source-and-build.md) | Link npm packages to the originating source code repository and build | — | — | — | — | — |
 | [0048](./accepted/0048-no-integrity-for-git.md) | Stop storing `integrity` for git dependencies | — | — | — | — | — |
@@ -23,10 +22,11 @@ Generated 2026-05-29. See [README.md](./README.md) for the RFC process.
 | [0007](./accepted/0007-publish-without-tag.md) | Publish older versions without a tag | — | — | — | — | — |
 | [0006](./accepted/0006-shallow-updates.md) | Shallow update support for `npm update` | — | — | — | — | — |
 
-## Implemented (31)
+## Implemented (32)
 
 | # | Title | Created | Accepted | Implemented | Withdrawn | Implementation |
 | - | ----- | ------- | -------- | ----------- | --------- | -------------- |
+| [0052](./implemented/0052-registry-scoped-keyfile-and-certfile.md) | Registry-scoped keyfile / certfile credential options | 2026-05-29 | 2026-05-29 | 2026-05-29 | — | [link](<https://github.com/npm/cli/pull/5160>) |
 | [0051](./implemented/0051-validate-signatures.md) | Improve npm signature verification | 2026-05-29 | 2026-05-29 | 2026-05-29 | — | [link](<https://github.com/npm/cli/pull/4827>) |
 | [0046](./implemented/0046-add-types-metadata-to-package-json.md) | Add Types Metadata to the Registry [Packument](https://github.com/npm/registry/blob/master/docs/REGISTRY-API.md#package-endpoints) | — | — | — | — | — |
 | [0045](./implemented/0045-workspaces-auto-cwd-context.md) | npm workspaces: auto switch context based on cwd | — | — | — | — | — |
