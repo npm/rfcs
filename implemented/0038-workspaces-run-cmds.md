@@ -1,12 +1,12 @@
 ---
 title: "npm Workspaces: Running commands"
 number: 38
-status: accepted
+status: implemented
 created: null
 accepted_at: null
-implemented_at: null
+implemented_at: 2026-05-29
 withdrawn_at: null
-implementation: null
+implementation: https://github.com/npm/cli/pull/2864
 ---
 # npm Workspaces: Running commands
 
