@@ -1,3 +1,13 @@
+---
+title: Add `funding` support to `package.json`
+number: 17
+status: implemented
+created: null
+accepted_at: null
+implemented_at: null
+withdrawn_at: null
+implementation: null
+---
 # Add `funding` support to `package.json`
 
 ## Summary

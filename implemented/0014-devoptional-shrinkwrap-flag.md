@@ -1,3 +1,13 @@
+---
+title: "`devOptional` flag in package-lock.json"
+number: 14
+status: implemented
+created: null
+accepted_at: null
+implemented_at: null
+withdrawn_at: null
+implementation: null
+---
 # `devOptional` flag in package-lock.json
 
 ## Summary

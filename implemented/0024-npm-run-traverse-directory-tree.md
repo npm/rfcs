@@ -1,3 +1,13 @@
+---
+title: Let `npm run` traverse monorepo directory tree up to the root before failing
+number: 24
+status: implemented
+created: null
+accepted_at: null
+implemented_at: null
+withdrawn_at: null
+implementation: null
+---
 # Let `npm run` traverse monorepo directory tree up to the root before failing
 
 ## Summary

@@ -1,3 +1,13 @@
+---
+title: Package Aliases
+number: 1
+status: implemented
+created: null
+accepted_at: null
+implemented_at: null
+withdrawn_at: null
+implementation: null
+---
 # Package Aliases
 
 **IMPLEMENTED** in [npm/cli#3](https://github.com/npm/cli/pull/3).

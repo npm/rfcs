@@ -1,3 +1,13 @@
+---
+title: Creating a npm audit xml report
+number: 4
+status: withdrawn
+created: null
+accepted_at: null
+implemented_at: null
+withdrawn_at: null
+implementation: null
+---
 # Withdrawal Amendment
 
 - Current **npm cli** team is unlikely to implement this.

@@ -32,6 +32,7 @@ jobs:
         with:
           node-version: 24.x
           check-latest: contains('24.x', '.x')
+          cache: npm
       - name: Install Latest npm
         uses: ./.github/actions/install-latest-npm
         with:

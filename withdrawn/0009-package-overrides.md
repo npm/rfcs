@@ -1,3 +1,13 @@
+---
+title: Implement a package override option
+number: 9
+status: withdrawn
+created: null
+accepted_at: null
+implemented_at: null
+withdrawn_at: null
+implementation: null
+---
 # Withdrawal Amendment
 
 Overridden by

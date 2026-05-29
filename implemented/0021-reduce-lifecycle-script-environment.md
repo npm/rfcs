@@ -1,3 +1,13 @@
+---
+title: Reduce the environment variables provided to lifecycle scripts
+number: 21
+status: implemented
+created: null
+accepted_at: null
+implemented_at: null
+withdrawn_at: null
+implementation: null
+---
 # Reduce the environment variables provided to lifecycle scripts
 
 In versions of npm up to v6, the following items are all placed into the

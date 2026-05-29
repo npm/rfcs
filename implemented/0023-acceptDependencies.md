@@ -1,3 +1,13 @@
+---
+title: "`acceptDependencies` to allow deduplication of conditionally compatible dependency versions"
+number: 23
+status: implemented
+created: null
+accepted_at: null
+implemented_at: null
+withdrawn_at: null
+implementation: null
+---
 # `acceptDependencies` to allow deduplication of conditionally compatible dependency versions
 
 ## Summary

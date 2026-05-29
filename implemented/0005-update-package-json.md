@@ -1,3 +1,13 @@
+---
+title: Change how `npm update` edits `package.json`
+number: 5
+status: implemented
+created: null
+accepted_at: null
+implemented_at: null
+withdrawn_at: null
+implementation: null
+---
 # Change how `npm update` edits `package.json`
 
 ## Summary

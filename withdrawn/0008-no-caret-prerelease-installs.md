@@ -1,3 +1,13 @@
+---
+title: No Caret Ranges for Prerelease Installs
+number: 8
+status: withdrawn
+created: null
+accepted_at: null
+implemented_at: null
+withdrawn_at: null
+implementation: null
+---
 # Withdrawal Amendment
 
 - Current **npm cli** team is unlikely to implement this

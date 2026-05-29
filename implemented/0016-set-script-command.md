@@ -1,3 +1,13 @@
+---
+title: Set script in package.json from command line
+number: 16
+status: implemented
+created: null
+accepted_at: null
+implemented_at: null
+withdrawn_at: null
+implementation: null
+---
 # Set script in package.json from command line
 
 

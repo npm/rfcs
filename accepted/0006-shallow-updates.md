@@ -1,3 +1,13 @@
+---
+title: Shallow update support for `npm update`
+number: 6
+status: accepted
+created: null
+accepted_at: null
+implemented_at: null
+withdrawn_at: null
+implementation: null
+---
 # Shallow update support for `npm update`
 
 ## Summary

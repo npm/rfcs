@@ -1,3 +1,13 @@
+---
+title: Link npm packages to the originating source code repository and build
+number: 49
+status: accepted
+created: null
+accepted_at: null
+implemented_at: null
+withdrawn_at: null
+implementation: null
+---
 # Link npm packages to the originating source code repository and build
 
 **Authors**: @feelepxyz @kommendorkapten @trevrosen

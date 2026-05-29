@@ -1,3 +1,13 @@
+---
+title: Stop storing `integrity` for git dependencies
+number: 48
+status: accepted
+created: null
+accepted_at: null
+implemented_at: null
+withdrawn_at: null
+implementation: null
+---
 # Stop storing `integrity` for git dependencies
 
 ## Summary

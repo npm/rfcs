@@ -73,7 +73,7 @@ the way.
 Typically, RFCs are discussed and ratified prior to implementation.
 However, this is not always the case!  Occasionally, we will develop a
 feature then write an RFC after the fact to describe and discuss it prior
-to merging into the latest npm release.
+to merging into the npm release on `main`.
 
 Very often, an RFC will be difficult to examine without running code.  In
 those cases, we may opt to develop a proof of concept (or even fully
@@ -94,8 +94,15 @@ development of the actual thing these RFCs are about.
 
 * Fork https://github.com/npm/rfcs
 * Copy `accepted/0000-template.md` into `accepted/0000-your-rfc-name.md`
-* Fill in and edit the template with your proposal
+* Fill in the `title` field at the top of the file and edit the body with
+  your proposal. Leave the rest of the front-matter (`number`, `status`,
+  dates, `implementation`) as-is — the automation fills it in for you.
 * Submit a PR to the `npm/rfcs` repo
+
+> **Note**
+> Numbering, status, file location, and dates are all bot-managed. See
+> [`docs/automation.md`](./docs/automation.md) for how it works and
+> [`INDEX.md`](./INDEX.md) for a generated table of all RFCs.
 
 ## How does review work?
 
@@ -116,8 +123,9 @@ repository.
 
 An RFC is ratified when there is consensus among npm collaborators that it
 should be accepted, and all objections have been considered.  At that
-point, it will be merged into the `latest` branch, and will be considered
-"ratified".
+point, it will be merged into the `main` branch, and will be considered
+"ratified". A bot follow-up PR then assigns the next RFC number and fills
+in the front-matter — see [`docs/automation.md`](./docs/automation.md).
 
 It is common for an RFC to require multiple rounds of editing to address
 concerns brought up in the discussion.
@@ -151,7 +159,9 @@ and resources that are well outside the scope of this RFC process.
 
 When the changes described in an RFC have been implemented and merged into the
 relevant repository (and thus, due to be released), the corresponding RFC will
-be moved from `accepted/` to `implemented/`.
+be moved from `accepted/` to `implemented/`. This is automated — a maintainer
+runs the [RFC transition workflow](./docs/automation.md#transition-an-rfc) from
+the Actions tab to record the transition.
 
 If you'd like to implement an accepted RFC, please make a PR in the
 appropriate repo and mention the RFC in the PR.  Feel free to do this even
@@ -165,7 +175,8 @@ implementation to ensure their accuracy and relevance. In cases where a
 previously ratified RFC is deemed to no longer be a viable candidate for
 implementation, an [**amendment section**](withdrawn/0000-template.md) will
 be added **to the top** of the document outlining the reason for repeal and
-subsequently moved to the `withdrawn/` section of this repository.
+subsequently moved to the `withdrawn/` section of this repository. The
+transition workflow scaffolds the amendment section for you.
 
 ## How do I change an RFC after ratification?
 

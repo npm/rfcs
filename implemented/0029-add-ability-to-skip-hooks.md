@@ -1,3 +1,13 @@
+---
+title: Add the ability to skip pre- and post hooks when running a script
+number: 29
+status: implemented
+created: null
+accepted_at: null
+implemented_at: null
+withdrawn_at: null
+implementation: null
+---
 # Add the ability to skip pre- and post hooks when running a script
 
 ## Summary

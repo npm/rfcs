@@ -20,9 +20,11 @@
 !/CODE_OF_CONDUCT.md
 !/CONTRIBUTING.md
 !/docs/
+!/INDEX.md
 !/lib/
 !/LICENSE*
 !/map.js
+!/package-lock.json
 !/package.json
 !/README*
 !/release-please-config.json

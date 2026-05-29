@@ -1,0 +1,113 @@
+name: RFC transition
+
+# Manually-dispatched workflow for moving an RFC between status folders.
+# Run from the Actions tab: pick an RFC number, target status, and optionally
+# an implementation reference. The workflow regenerates INDEX.md and opens a
+# bot PR with the result.
+
+on:
+  workflow_dispatch:
+    inputs:
+      rfc_number:
+        description: 'RFC number to transition (e.g. 50)'
+        required: true
+        type: string
+      status:
+        description: 'Target status'
+        required: true
+        type: choice
+        options:
+          - implemented
+          - withdrawn
+      implementation:
+        description: 'Implementation reference (e.g. npm/cli#1234). Optional. Only used for "implemented".'
+        required: false
+        type: string
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: rfc-transition
+  cancel-in-progress: false
+
+jobs:
+  transition:
+    name: Transition RFC #${{ inputs.rfc_number }} → ${{ inputs.status }}
+    if: github.repository_owner == 'npm'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+      - name: Setup Git user
+        run: |
+          git config --global user.email "npm-cli+bot@github.com"
+          git config --global user.name "npm CLI robot"
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24.x
+          cache: npm
+      - name: Install dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Transition
+        id: transition
+        env:
+          NUMBER: ${{ inputs.rfc_number }}
+          STATUS: ${{ inputs.status }}
+          IMPL: ${{ inputs.implementation }}
+        run: |
+          set -euo pipefail
+          args=(--number="$NUMBER" --status="$STATUS")
+          if [ -n "$IMPL" ]; then
+            args+=(--implementation="$IMPL")
+          fi
+          output=$(node bin/rfc-transition.js "${args[@]}")
+          echo "$output"
+          summary=$(echo "$output" | grep '^rfc-transition: result ' | tail -1)
+          new_rel=$(echo "$summary" | sed -nE 's/.*path=([^ ]+).*/\1/p')
+          slug=$(basename "$new_rel" .md | sed 's/^[0-9]*-//')
+          printf 'new_rel=%s\n' "$new_rel" >> "$GITHUB_OUTPUT"
+          printf 'slug=%s\n' "$slug" >> "$GITHUB_OUTPUT"
+      - name: Open bot PR
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NUMBER: ${{ inputs.rfc_number }}
+          STATUS: ${{ inputs.status }}
+          IMPL: ${{ inputs.implementation }}
+          NEW_REL: ${{ steps.transition.outputs.new_rel }}
+          SLUG: ${{ steps.transition.outputs.slug }}
+        run: |
+          set -euo pipefail
+          padded=$(printf '%04d' "$NUMBER")
+          branch="bot/rfc-transition-${padded}-${STATUS}"
+          git checkout -b "$branch"
+          git add -A
+          git commit -m "rfc: transition #${padded} → ${STATUS}"
+          git push --set-upstream origin "$branch"
+
+          body="Bot-generated transition of RFC **#${padded}** to status \`${STATUS}\`.
+
+          Moved to \`${NEW_REL}\`. Front-matter \`status\` and the relevant date field were updated. \`INDEX.md\` was regenerated."
+
+          if [ "$STATUS" = "withdrawn" ]; then
+            body="${body}
+
+          A \`# Withdrawal Amendment\` scaffold was prepended (if not already present). Edit it in this PR with the reason for withdrawal before merging."
+          fi
+
+          if [ -n "$IMPL" ]; then
+            body="${body}
+
+          Implementation: ${IMPL}"
+          fi
+
+          gh pr create \
+            --base main \
+            --head "$branch" \
+            --title "rfc: transition #${padded} → ${STATUS}" \
+            --body "$body"

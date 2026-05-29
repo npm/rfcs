@@ -1,3 +1,13 @@
+---
+title: Location Config Parameter
+number: 50
+status: accepted
+created: null
+accepted_at: null
+implemented_at: null
+withdrawn_at: null
+implementation: null
+---
 ## Summary
 
 Several commands in the npm CLI would benefit from the ability to specify a `location` the command should act on. The two specific implementations I'd like to propose are:
