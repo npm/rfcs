@@ -90,20 +90,17 @@ jobs:
           git commit -m "rfc: transition #${padded} → ${STATUS}"
           git push --set-upstream origin "$branch"
 
-          body="Bot-generated transition of RFC **#${padded}** to status \`${STATUS}\`.
-
-          Moved to \`${NEW_REL}\`. Front-matter \`status\` and the relevant date field were updated. \`INDEX.md\` was regenerated."
+          body=$(printf '%s\n\n%s' \
+            "Bot-generated transition of RFC **#${padded}** to status \`${STATUS}\`." \
+            "Moved to \`${NEW_REL}\`. Front-matter \`status\` and the relevant date field were updated. \`INDEX.md\` was regenerated.")
 
           if [ "$STATUS" = "withdrawn" ]; then
-            body="${body}
-
-          A \`# Withdrawal Amendment\` scaffold was prepended (if not already present). Edit it in this PR with the reason for withdrawal before merging."
+            body=$(printf '%s\n\n%s' "$body" \
+              "A \`# Withdrawal Amendment\` scaffold was prepended (if not already present). Edit it in this PR with the reason for withdrawal before merging.")
           fi
 
           if [ -n "$IMPL" ]; then
-            body="${body}
-
-          Implementation: ${IMPL}"
+            body=$(printf '%s\n\n%s' "$body" "Implementation: ${IMPL}")
           fi
 
           gh pr create \
