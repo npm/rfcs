@@ -1,12 +1,12 @@
 ---
 title: Dependency resolution overrides
 number: 36
-status: accepted
+status: implemented
 created: null
 accepted_at: null
-implemented_at: null
+implemented_at: 2026-05-29
 withdrawn_at: null
-implementation: null
+implementation: https://github.com/npm/arborist/pull/354
 ---
 # Dependency resolution overrides
 
