@@ -4,10 +4,11 @@
 
 Generated 2026-05-29. See [README.md](./README.md) for the RFC process.
 
-## Accepted (13)
+## Accepted (14)
 
 | # | Title | Created | Accepted | Implemented | Withdrawn | Implementation |
 | - | ----- | ------- | -------- | ----------- | --------- | -------------- |
+| [0051](./accepted/0051-validate-signatures.md) | Improve npm signature verification | 2026-05-29 | 2026-05-29 | — | — | — |
 | [0050](./accepted/0050-location-config-parameter.md) | Location Config Parameter | — | — | — | — | — |
 | [0049](./accepted/0049-link-packages-to-source-and-build.md) | Link npm packages to the originating source code repository and build | — | — | — | — | — |
 | [0048](./accepted/0048-no-integrity-for-git.md) | Stop storing `integrity` for git dependencies | — | — | — | — | — |
