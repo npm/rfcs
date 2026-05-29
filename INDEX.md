@@ -4,10 +4,11 @@
 
 Generated 2026-05-29. See [README.md](./README.md) for the RFC process.
 
-## Accepted (13)
+## Accepted (14)
 
 | # | Title | Created | Accepted | Implemented | Withdrawn | Implementation |
 | - | ----- | ------- | -------- | ----------- | --------- | -------------- |
+| [0052](./accepted/0052-registry-scoped-keyfile-and-certfile.md) | Registry-scoped keyfile / certfile credential options | 2026-05-29 | 2026-05-29 | — | — | — |
 | [0050](./accepted/0050-location-config-parameter.md) | Location Config Parameter | — | — | — | — | — |
 | [0049](./accepted/0049-link-packages-to-source-and-build.md) | Link npm packages to the originating source code repository and build | — | — | — | — | — |
 | [0048](./accepted/0048-no-integrity-for-git.md) | Stop storing `integrity` for git dependencies | — | — | — | — | — |
