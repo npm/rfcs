@@ -29,6 +29,10 @@ Automatic. When an `accepted/0000-*.md` is merged to `main`, the bot:
 
 Review and merge the bot PR like any other.
 
+If the push trigger didn't fire (e.g. the workflow itself was broken when the
+RFC was merged), re-run manually: **Actions → RFC ratify → Run workflow**
+with `file` = `accepted/0000-name.md`. Same outcome as the automatic path.
+
 ## Transition (implemented / withdrawn)
 
 Manual: **Actions → RFC transition → Run workflow**.

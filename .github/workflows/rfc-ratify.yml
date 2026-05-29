@@ -14,6 +14,12 @@ on:
       - main
     paths:
       - accepted/0000-*.md
+  workflow_dispatch:
+    inputs:
+      file:
+        description: 'Path to an accepted/0000-*.md file to ratify (e.g. accepted/0000-foo.md). Use this when the push trigger did not fire — e.g. the workflow file itself was broken at merge time.'
+        required: true
+        type: string
 
 permissions:
   contents: write
@@ -47,21 +53,36 @@ jobs:
           cache: npm
       - name: Install dependencies
         run: npm ci --ignore-scripts --no-audit --no-fund
-      - name: Find newly-added accepted/0000-*.md files
+      - name: Find files to ratify
         id: added
+        env:
+          DISPATCH_FILE: ${{ inputs.file }}
         run: |
-          added=$(git diff --name-only --diff-filter=A HEAD^ HEAD -- 'accepted/0000-*.md' || true)
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            case "$DISPATCH_FILE" in
+              accepted/0000-*.md) ;;
+              *) echo "::error::Input 'file' must match accepted/0000-*.md (got: $DISPATCH_FILE)"; exit 1 ;;
+            esac
+            if [ ! -f "$DISPATCH_FILE" ]; then
+              echo "::error::File not found on main: $DISPATCH_FILE"
+              exit 1
+            fi
+            added="$DISPATCH_FILE"
+            echo "Manual dispatch: $added"
+          else
+            added=$(git diff --name-only --diff-filter=A HEAD^ HEAD -- 'accepted/0000-*.md' || true)
+            if [ -z "$added" ]; then
+              echo "No newly-added accepted/0000-*.md files in this push."
+            else
+              echo "Found:"
+              echo "$added"
+            fi
+          fi
           {
             echo "files<<EOF"
             echo "$added"
             echo "EOF"
           } >> "$GITHUB_OUTPUT"
-          if [ -z "$added" ]; then
-            echo "No newly-added accepted/0000-*.md files in this push."
-          else
-            echo "Found:"
-            echo "$added"
-          fi
       - name: Compute reserved numbers (from open bot ratify branches)
         if: steps.added.outputs.files != ''
         id: reserved
@@ -111,15 +132,15 @@ jobs:
             git add -A
             git commit -m "rfc: ratify #${number} (${slug})"
             git push --set-upstream origin "$branch"
+            body=$(printf '%s\n\n%s\n\n%s\n' \
+              "Bot-generated follow-up to the merge of \`${file}\`." \
+              "Assigns RFC number **${number}**, renames the file to \`${new_rel}\`, fills in front-matter (\`status\`, \`accepted_at\`, \`created\`), and regenerates \`INDEX.md\`." \
+              "Front-matter was synthesized from the file's \`# Title\` heading. Edit the front-matter or the title in this PR if you need different values, then merge.")
             gh pr create \
               --base main \
               --head "$branch" \
               --title "rfc: ratify #${number} (${slug})" \
-              --body "Bot-generated follow-up to the merge of \`${file}\`.
-
-Assigns RFC number **${number}**, renames the file to \`${new_rel}\`, fills in front-matter (\`status\`, \`accepted_at\`, \`created\`), and regenerates \`INDEX.md\`.
-
-Front-matter was synthesized from the file's \`# Title\` heading. Edit the front-matter or the title in this PR if you need different values, then merge."
+              --body "$body"
             # Accumulate this number into the reserved list so the next iteration skips it.
             if [ -z "$run_reserved" ]; then
               run_reserved="$number"
