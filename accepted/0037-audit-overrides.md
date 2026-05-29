@@ -1,3 +1,13 @@
+---
+title: npm audit fix can apply overrides
+number: 37
+status: accepted
+created: null
+accepted_at: null
+implemented_at: null
+withdrawn_at: null
+implementation: null
+---
 # npm audit fix can apply overrides
 
 ## Summary

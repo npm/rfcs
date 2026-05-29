@@ -1,3 +1,13 @@
+---
+title: Silence successful npm pre/post/install scripts
+number: 22
+status: implemented
+created: null
+accepted_at: null
+implemented_at: null
+withdrawn_at: null
+implementation: null
+---
 # Silence successful npm pre/post/install scripts
 
 ## Summary

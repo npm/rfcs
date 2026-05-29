@@ -1,3 +1,13 @@
+---
+title: Add Types Metadata to the Registry [Packument](https://github.com/npm/registry/blob/master/docs/REGISTRY-API.md#package-endpoints)
+number: 46
+status: implemented
+created: null
+accepted_at: null
+implemented_at: null
+withdrawn_at: null
+implementation: null
+---
 # Add Types Metadata to the Registry [Packument](https://github.com/npm/registry/blob/master/docs/REGISTRY-API.md#package-endpoints)
 
 ## Summary

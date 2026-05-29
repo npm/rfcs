@@ -1,3 +1,13 @@
+---
+title: Remove support for `--depth` option to `npm update`
+number: 19
+status: implemented
+created: null
+accepted_at: null
+implemented_at: null
+withdrawn_at: null
+implementation: null
+---
 # Remove support for `--depth` option to `npm update`
 
 ## Summary

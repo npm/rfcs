@@ -1,0 +1,132 @@
+name: RFC ratify
+
+# Fires when a PR with a new accepted/0000-*.md file is merged into main.
+# Computes the next RFC number, assigns it, fills front-matter, renames the
+# file, regenerates INDEX.md, and opens a bot PR with the result.
+#
+# Reads only from main (the merged content) — never executes PR-author code
+# with elevated permissions. Concurrency group serializes runs so two RFCs
+# merged close together don't collide on numbers.
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - accepted/0000-*.md
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: rfc-ratify
+  cancel-in-progress: false
+
+jobs:
+  ratify:
+    name: Ratify newly-added 0000-*.md files
+    if: github.repository_owner == 'npm'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - name: Setup Git user
+        run: |
+          git config --global user.email "npm-cli+bot@github.com"
+          git config --global user.name "npm CLI robot"
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24.x
+          cache: npm
+      - name: Install dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Find newly-added accepted/0000-*.md files
+        id: added
+        run: |
+          added=$(git diff --name-only --diff-filter=A HEAD^ HEAD -- 'accepted/0000-*.md' || true)
+          {
+            echo "files<<EOF"
+            echo "$added"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+          if [ -z "$added" ]; then
+            echo "No newly-added accepted/0000-*.md files in this push."
+          else
+            echo "Found:"
+            echo "$added"
+          fi
+      - name: Compute reserved numbers (from open bot ratify branches)
+        if: steps.added.outputs.files != ''
+        id: reserved
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # Any open bot PR named bot/rfc-ratify-NNNN-* already claims that number.
+          reserved=$(gh pr list \
+            --state open \
+            --search 'head:bot/rfc-ratify-' \
+            --json headRefName \
+            --jq '.[].headRefName' \
+            | grep -oE 'rfc-ratify-[0-9]+' \
+            | grep -oE '[0-9]+' \
+            | paste -sd, - || true)
+          echo "list=$reserved" >> "$GITHUB_OUTPUT"
+          echo "Reserved numbers from open bot PRs: ${reserved:-(none)}"
+      - name: Ratify each new file
+        if: steps.added.outputs.files != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          FILES: ${{ steps.added.outputs.files }}
+          RESERVED: ${{ steps.reserved.outputs.list }}
+        run: |
+          set -euo pipefail
+          # Accumulate reserved numbers across files in this run (avoid two
+          # new files in the same push both grabbing the same next number).
+          run_reserved="$RESERVED"
+          # Make sure main is the basis for every new branch.
+          base_sha=$(git rev-parse HEAD)
+          while IFS= read -r file; do
+            [ -z "$file" ] && continue
+            git checkout -- .
+            git checkout "$base_sha" -- .
+            args=(--file="$file")
+            if [ -n "$run_reserved" ]; then
+              args+=("--reserved=$run_reserved")
+            fi
+            output=$(node bin/rfc-ratify.js "${args[@]}")
+            echo "$output"
+            summary=$(echo "$output" | grep '^rfc-ratify: result ' | tail -1)
+            number=$(echo "$summary" | sed -nE 's/.*number=([0-9]+).*/\1/p')
+            new_rel=$(echo "$summary" | sed -nE 's/.*path=([^ ]+).*/\1/p')
+            slug=$(basename "$new_rel" .md | sed 's/^[0-9]*-//')
+            branch="bot/rfc-ratify-${number}-${slug}"
+            git checkout -b "$branch"
+            git add -A
+            git commit -m "rfc: ratify #${number} (${slug})"
+            git push --set-upstream origin "$branch"
+            gh pr create \
+              --base main \
+              --head "$branch" \
+              --title "rfc: ratify #${number} (${slug})" \
+              --body "Bot-generated follow-up to the merge of \`${file}\`.
+
+Assigns RFC number **${number}**, renames the file to \`${new_rel}\`, fills in front-matter (\`status\`, \`accepted_at\`, \`created\`), and regenerates \`INDEX.md\`.
+
+Front-matter was synthesized from the file's \`# Title\` heading. Edit the front-matter or the title in this PR if you need different values, then merge."
+            # Accumulate this number into the reserved list so the next iteration skips it.
+            if [ -z "$run_reserved" ]; then
+              run_reserved="$number"
+            else
+              run_reserved="${run_reserved},${number}"
+            fi
+            # Reset back to main for the next iteration.
+            git checkout main
+            git reset --hard "$base_sha"
+          done <<< "$FILES"

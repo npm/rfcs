@@ -1,3 +1,13 @@
+---
+title: Don't change EUID/perms when running as root
+number: 12
+status: implemented
+created: null
+accepted_at: null
+implemented_at: null
+withdrawn_at: null
+implementation: null
+---
 # Don't change EUID/perms when running as root
 
 ## Summary

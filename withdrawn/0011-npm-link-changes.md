@@ -1,3 +1,13 @@
+---
+title: Refreshing the `npm link` command
+number: 11
+status: withdrawn
+created: null
+accepted_at: null
+implemented_at: null
+withdrawn_at: null
+implementation: null
+---
 # Withdrawal Amendment
 
 - The particular implementation this RFC was based on no longer exists, links are handled differently now that `npm install` is handled by [Arborist](https://github.com/npm/arborist/).

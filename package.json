@@ -14,7 +14,10 @@
     "posttest": "npm run lint",
     "eslint": "eslint \"**/*.{js,cjs,ts,mjs,jsx,tsx}\"",
     "test:node20": "node --test test",
-    "test:cover": "node --test --experimental-test-coverage --test-timeout=3000 --test-coverage-lines=100 --test-coverage-functions=100 --test-coverage-branches=100 './test/**/*.js'"
+    "test:cover": "node --test --experimental-test-coverage --test-timeout=3000 --test-coverage-lines=100 --test-coverage-functions=100 --test-coverage-branches=100 './test/**/*.js'",
+    "rfc:validate": "node bin/rfc-validate.js",
+    "rfc:index": "node bin/rfc-index.js",
+    "rfc:backfill": "node bin/rfc-backfill.js"
   },
   "repository": {
     "type": "git",
@@ -43,7 +46,8 @@
       "accepted/",
       "implemented/",
       "meetings/",
-      "withdrawn/"
+      "withdrawn/",
+      "/INDEX.md"
     ],
     "rootRepo": {
       "add": {
@@ -52,10 +56,12 @@
       }
     },
     "testRunner": "node:test",
-    "latestCiVersion": 24
+    "latestCiVersion": 24,
+    "lockfile": true
   },
   "devDependencies": {
     "@npmcli/eslint-config": "^7.0.0",
-    "@npmcli/template-oss": "4.30.0"
+    "@npmcli/template-oss": "4.30.0",
+    "yaml": "^2.9.0"
   }
 }

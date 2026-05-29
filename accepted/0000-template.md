@@ -1,3 +1,14 @@
+---
+title: A human-readable title for this RFC
+number: null
+status: proposed
+created: null
+accepted_at: null
+implemented_at: null
+withdrawn_at: null
+implementation: null
+---
+
 # {{TITLE: a human-readable title for this RFC!}}
 
 ## Summary

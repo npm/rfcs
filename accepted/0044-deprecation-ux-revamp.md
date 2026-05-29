@@ -1,3 +1,13 @@
+---
+title: Deprecated packages UX revamp
+number: 44
+status: accepted
+created: null
+accepted_at: null
+implemented_at: null
+withdrawn_at: null
+implementation: null
+---
 # Deprecated packages UX revamp
 
 ## Summary

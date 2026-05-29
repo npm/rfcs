@@ -1,3 +1,13 @@
+---
+title: Improve command suggestions
+number: 34
+status: implemented
+created: null
+accepted_at: null
+implemented_at: null
+withdrawn_at: null
+implementation: null
+---
 # Improve command suggestions
 
 ## Summary

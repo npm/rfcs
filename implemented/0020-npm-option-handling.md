@@ -1,3 +1,13 @@
+---
+title: Handling of npm config options in the CLI and dep stack
+number: 20
+status: implemented
+created: null
+accepted_at: null
+implemented_at: null
+withdrawn_at: null
+implementation: null
+---
 # Handling of npm config options in the CLI and dep stack
 
 NB: this is an internal RFC related to the code structure and patterns of

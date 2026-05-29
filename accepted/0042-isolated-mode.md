@@ -1,3 +1,13 @@
+---
+title: Isolated mode
+number: 42
+status: accepted
+created: null
+accepted_at: null
+implemented_at: null
+withdrawn_at: null
+implementation: null
+---
 # Isolated mode
 
 ## Summary

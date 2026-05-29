@@ -1,3 +1,13 @@
+---
+title: Changelog
+number: 2
+status: withdrawn
+created: null
+accepted_at: null
+implemented_at: null
+withdrawn_at: null
+implementation: null
+---
 # Withdrawal Amendment
 
 - Managing changelog is considered outside of the scope of the **npm cli**

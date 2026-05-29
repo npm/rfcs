@@ -1,3 +1,13 @@
+---
+title: Publish confirmation prompt
+number: 28
+status: accepted
+created: null
+accepted_at: null
+implemented_at: null
+withdrawn_at: null
+implementation: null
+---
 # Publish confirmation prompt
 
 ## Summary

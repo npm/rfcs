@@ -1,3 +1,13 @@
+---
+title: Throw forbidden error when package is blocked by security policy
+number: 15
+status: implemented
+created: null
+accepted_at: null
+implemented_at: null
+withdrawn_at: null
+implementation: null
+---
 # Throw forbidden error when package is blocked by security policy
 
 ## Summary

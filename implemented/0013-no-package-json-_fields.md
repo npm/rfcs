@@ -1,3 +1,13 @@
+---
+title: Do Not Put Meta Information In `_`-Prefixed `package.json` Fields
+number: 13
+status: implemented
+created: null
+accepted_at: null
+implemented_at: null
+withdrawn_at: null
+implementation: null
+---
 # Do Not Put Meta Information In `_`-Prefixed `package.json` Fields
 
 ## Summary

@@ -1,3 +1,13 @@
+---
+title: Powershell for Installed Binaries
+number: 32
+status: implemented
+created: null
+accepted_at: null
+implemented_at: null
+withdrawn_at: null
+implementation: null
+---
 # Powershell for Installed Binaries
 
 AKA Terminate Terminate Batch Job
