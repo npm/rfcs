@@ -1,13 +1,22 @@
 ---
 title: Shallow update support for `npm update`
 number: 6
-status: accepted
+status: withdrawn
 created: null
 accepted_at: null
 implemented_at: null
-withdrawn_at: null
+withdrawn_at: 2026-05-29
 implementation: null
 ---
+# Withdrawal Amendment
+
+<!-- Provide as much detail as possible as to why the originally drafted
+proposal no longer should be considered for implementation. -->
+
+## Relevant Resources
+
+<!-- Optional: link relevant discussions, meeting notes, or follow-up RFCs. -->
+
 # Shallow update support for `npm update`
 
 ## Summary

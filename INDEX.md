@@ -4,7 +4,7 @@
 
 Generated 2026-05-29. See [README.md](./README.md) for the RFC process.
 
-## Accepted (8)
+## Accepted (7)
 
 | # | Title | Created | Accepted | Implemented | Withdrawn | Implementation |
 | - | ----- | ------- | -------- | ----------- | --------- | -------------- |
@@ -15,7 +15,6 @@ Generated 2026-05-29. See [README.md](./README.md) for the RFC process.
 | [0035](./accepted/0035-registry-spec.md) | The `registry:` Dependency Specifier | — | — | — | — | — |
 | [0028](./accepted/0028-publish-prompt.md) | Publish confirmation prompt | — | — | — | — | — |
 | [0007](./accepted/0007-publish-without-tag.md) | Publish older versions without a tag | — | — | — | — | — |
-| [0006](./accepted/0006-shallow-updates.md) | Shallow update support for `npm update` | — | — | — | — | — |
 
 ## Implemented (37)
 
@@ -59,12 +58,13 @@ Generated 2026-05-29. See [README.md](./README.md) for the RFC process.
 | [0003](./implemented/0003-run-suggestions.md) | Run Suggestions | — | — | — | — | — |
 | [0001](./implemented/0001-package-aliases.md) | Package Aliases | — | — | — | — | — |
 
-## Withdrawn (5)
+## Withdrawn (6)
 
 | # | Title | Created | Accepted | Implemented | Withdrawn | Implementation |
 | - | ----- | ------- | -------- | ----------- | --------- | -------------- |
 | [0011](./withdrawn/0011-npm-link-changes.md) | Refreshing the `npm link` command | — | — | — | — | — |
 | [0009](./withdrawn/0009-package-overrides.md) | Implement a package override option | — | — | — | — | — |
 | [0008](./withdrawn/0008-no-caret-prerelease-installs.md) | No Caret Ranges for Prerelease Installs | — | — | — | — | — |
+| [0006](./withdrawn/0006-shallow-updates.md) | Shallow update support for `npm update` | — | — | — | 2026-05-29 | — |
 | [0004](./withdrawn/0004-npm-audit-xml-report.md) | Creating a npm audit xml report | — | — | — | — | — |
 | [0002](./withdrawn/0002-changelog.md) | Changelog | — | — | — | — | — |
