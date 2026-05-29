@@ -4,18 +4,17 @@
 
 Generated 2026-05-29. See [README.md](./README.md) for the RFC process.
 
-## Accepted (6)
+## Accepted (5)
 
 | # | Title | Created | Accepted | Implemented | Withdrawn | Implementation |
 | - | ----- | ------- | -------- | ----------- | --------- | -------------- |
 | [0047](./accepted/0047-npm-diff-ignore-cr-at-eol.md) | npm diff ignore CR at EOL | — | — | — | — | — |
 | [0044](./accepted/0044-deprecation-ux-revamp.md) | Deprecated packages UX revamp | — | — | — | — | — |
-| [0042](./accepted/0042-isolated-mode.md) | Isolated mode | — | — | — | — | — |
 | [0037](./accepted/0037-audit-overrides.md) | npm audit fix can apply overrides | — | — | — | — | — |
 | [0035](./accepted/0035-registry-spec.md) | The `registry:` Dependency Specifier | — | — | — | — | — |
 | [0028](./accepted/0028-publish-prompt.md) | Publish confirmation prompt | — | — | — | — | — |
 
-## Implemented (38)
+## Implemented (39)
 
 | # | Title | Created | Accepted | Implemented | Withdrawn | Implementation |
 | - | ----- | ------- | -------- | ----------- | --------- | -------------- |
@@ -27,6 +26,7 @@ Generated 2026-05-29. See [README.md](./README.md) for the RFC process.
 | [0046](./implemented/0046-add-types-metadata-to-package-json.md) | Add Types Metadata to the Registry [Packument](https://github.com/npm/registry/blob/master/docs/REGISTRY-API.md#package-endpoints) | — | — | — | — | — |
 | [0045](./implemented/0045-workspaces-auto-cwd-context.md) | npm workspaces: auto switch context based on cwd | — | — | — | — | — |
 | [0043](./implemented/0043-lockfile-version-config.md) | Add `lockfile-version` Config Flag | — | — | — | — | — |
+| [0042](./implemented/0042-isolated-mode.md) | Isolated mode | — | — | 2026-05-29 | — | [link](<https://github.com/npm/cli/issues/6078>) |
 | [0039](./implemented/0039-npm-pkg.md) | npm pkg | — | — | — | — | — |
 | [0038](./implemented/0038-workspaces-run-cmds.md) | npm Workspaces: Running commands | — | — | 2026-05-29 | — | [link](<https://github.com/npm/cli/pull/2864>) |
 | [0036](./implemented/0036-overrides.md) | Dependency resolution overrides | — | — | 2026-05-29 | — | [link](<https://github.com/npm/arborist/pull/354>) |
