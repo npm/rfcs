@@ -25,13 +25,13 @@ jobs:
         shell: bash
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Setup Git User
         run: |
           git config --global user.email "npm-cli+bot@github.com"
           git config --global user.name "npm CLI robot"
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         id: node
         with:
           node-version: 24.x
@@ -70,19 +70,20 @@ jobs:
         shell: ${{ matrix.platform.shell }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
       - name: Setup Git User
         run: |
           git config --global user.email "npm-cli+bot@github.com"
           git config --global user.name "npm CLI robot"
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         id: node
         with:
           node-version: ${{ matrix.node-version }}
           check-latest: contains(matrix.node-version, '.x')
           cache: npm
       - name: Install Latest npm
+        if: ${{ !startsWith(matrix.node-version, '22.') }}
         uses: ./.github/actions/install-latest-npm
         with:
           node: ${{ steps.node.outputs.node-version }}
@@ -91,9 +92,6 @@ jobs:
       - name: Test (with coverage on Node >= 24)
         if: ${{ startsWith(matrix.node-version, '24') }}
         run: npm run test:cover --ignore-scripts
-      - name: Test (on Node 20 with globbing workaround)
-        if: ${{ startsWith(matrix.node-version, '20') }}
-        run: npm run test:node20 --ignore-scripts
-      - name: Test
-        if: ${{ !startsWith(matrix.node-version, '24') && !startsWith(matrix.node-version, '20') }}
+      - name: Test (without coverage on Node < 24)
+        if: ${{ !startsWith(matrix.node-version, '24') }}
         run: npm test --ignore-scripts
