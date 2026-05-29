@@ -59,10 +59,7 @@ jobs:
             os: ubuntu-latest
             shell: bash
         node-version:
-          - 20.17.0
-          - 20.x
-          - 22.9.0
-          - 22.x
+          - 24.0.0
           - 24.x
     runs-on: ${{ matrix.platform.os }}
     defaults:
