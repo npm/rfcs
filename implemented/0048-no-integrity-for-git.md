@@ -1,12 +1,12 @@
 ---
 title: Stop storing `integrity` for git dependencies
 number: 48
-status: accepted
+status: implemented
 created: null
 accepted_at: null
-implemented_at: null
+implemented_at: 2026-05-29
 withdrawn_at: null
-implementation: null
+implementation: https://github.com/npm/cli/pull/4468
 ---
 # Stop storing `integrity` for git dependencies
 
