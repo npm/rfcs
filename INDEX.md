@@ -4,7 +4,7 @@
 
 Generated 2026-05-29. See [README.md](./README.md) for the RFC process.
 
-## Accepted (11)
+## Accepted (9)
 
 | # | Title | Created | Accepted | Implemented | Withdrawn | Implementation |
 | - | ----- | ------- | -------- | ----------- | --------- | -------------- |
@@ -12,14 +12,13 @@ Generated 2026-05-29. See [README.md](./README.md) for the RFC process.
 | [0047](./accepted/0047-npm-diff-ignore-cr-at-eol.md) | npm diff ignore CR at EOL | — | — | — | — | — |
 | [0044](./accepted/0044-deprecation-ux-revamp.md) | Deprecated packages UX revamp | — | — | — | — | — |
 | [0042](./accepted/0042-isolated-mode.md) | Isolated mode | — | — | — | — | — |
-| [0038](./accepted/0038-workspaces-run-cmds.md) | npm Workspaces: Running commands | — | — | — | — | — |
 | [0037](./accepted/0037-audit-overrides.md) | npm audit fix can apply overrides | — | — | — | — | — |
 | [0035](./accepted/0035-registry-spec.md) | The `registry:` Dependency Specifier | — | — | — | — | — |
 | [0028](./accepted/0028-publish-prompt.md) | Publish confirmation prompt | — | — | — | — | — |
 | [0007](./accepted/0007-publish-without-tag.md) | Publish older versions without a tag | — | — | — | — | — |
 | [0006](./accepted/0006-shallow-updates.md) | Shallow update support for `npm update` | — | — | — | — | — |
 
-## Implemented (34)
+## Implemented (36)
 
 | # | Title | Created | Accepted | Implemented | Withdrawn | Implementation |
 | - | ----- | ------- | -------- | ----------- | --------- | -------------- |
@@ -31,6 +30,7 @@ Generated 2026-05-29. See [README.md](./README.md) for the RFC process.
 | [0045](./implemented/0045-workspaces-auto-cwd-context.md) | npm workspaces: auto switch context based on cwd | — | — | — | — | — |
 | [0043](./implemented/0043-lockfile-version-config.md) | Add `lockfile-version` Config Flag | — | — | — | — | — |
 | [0039](./implemented/0039-npm-pkg.md) | npm pkg | — | — | — | — | — |
+| [0038](./implemented/0038-workspaces-run-cmds.md) | npm Workspaces: Running commands | — | — | 2026-05-29 | — | [link](<https://github.com/npm/cli/pull/2864>) |
 | [0036](./implemented/0036-overrides.md) | Dependency resolution overrides | — | — | 2026-05-29 | — | [link](<https://github.com/npm/arborist/pull/354>) |
 | [0034](./implemented/0034-improve-command-suggestions.md) | Improve command suggestions | — | — | — | — | — |
 | [0033](./implemented/0033-npm-diff.md) | npm diff | — | — | — | — | — |
