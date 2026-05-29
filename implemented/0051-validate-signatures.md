@@ -1,12 +1,12 @@
 ---
 title: Improve npm signature verification
 number: 51
-status: accepted
+status: implemented
 created: 2026-05-29
 accepted_at: 2026-05-29
-implemented_at: null
+implemented_at: 2026-05-29
 withdrawn_at: null
-implementation: null
+implementation: https://github.com/npm/cli/pull/4827
 ---
 # Improve npm signature verification
 
