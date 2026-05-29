@@ -4,7 +4,7 @@
 
 Generated 2026-05-29. See [README.md](./README.md) for the RFC process.
 
-## Accepted (7)
+## Accepted (6)
 
 | # | Title | Created | Accepted | Implemented | Withdrawn | Implementation |
 | - | ----- | ------- | -------- | ----------- | --------- | -------------- |
@@ -14,9 +14,8 @@ Generated 2026-05-29. See [README.md](./README.md) for the RFC process.
 | [0037](./accepted/0037-audit-overrides.md) | npm audit fix can apply overrides | — | — | — | — | — |
 | [0035](./accepted/0035-registry-spec.md) | The `registry:` Dependency Specifier | — | — | — | — | — |
 | [0028](./accepted/0028-publish-prompt.md) | Publish confirmation prompt | — | — | — | — | — |
-| [0007](./accepted/0007-publish-without-tag.md) | Publish older versions without a tag | — | — | — | — | — |
 
-## Implemented (37)
+## Implemented (38)
 
 | # | Title | Created | Accepted | Implemented | Withdrawn | Implementation |
 | - | ----- | ------- | -------- | ----------- | --------- | -------------- |
@@ -54,6 +53,7 @@ Generated 2026-05-29. See [README.md](./README.md) for the RFC process.
 | [0013](./implemented/0013-no-package-json-_fields.md) | Do Not Put Meta Information In `_`-Prefixed `package.json` Fields | — | — | — | — | — |
 | [0012](./implemented/0012-running-as-root.md) | Don't change EUID/perms when running as root | — | — | — | — | — |
 | [0010](./implemented/0010-monorepo-subdirectory-declaration.md) | Monorepo subdirectory declaration | — | — | — | — | — |
+| [0007](./implemented/0007-publish-without-tag.md) | Publish older versions without a tag | — | — | 2026-05-29 | — | [link](<https://github.com/npm/cli/pull/7939>) |
 | [0005](./implemented/0005-update-package-json.md) | Change how `npm update` edits `package.json` | — | — | — | — | — |
 | [0003](./implemented/0003-run-suggestions.md) | Run Suggestions | — | — | — | — | — |
 | [0001](./implemented/0001-package-aliases.md) | Package Aliases | — | — | — | — | — |
