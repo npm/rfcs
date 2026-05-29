@@ -1,12 +1,12 @@
 ---
 title: Location Config Parameter
 number: 50
-status: accepted
+status: implemented
 created: null
 accepted_at: null
-implemented_at: null
+implemented_at: 2026-05-29
 withdrawn_at: null
-implementation: null
+implementation: https://github.com/npm/cli/commit/98905ae3759165cd6d6f6306f31acc6a2baa4cde
 ---
 ## Summary
 
