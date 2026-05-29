@@ -1,12 +1,12 @@
 ---
 title: Registry-scoped keyfile / certfile credential options
 number: 52
-status: accepted
+status: implemented
 created: 2026-05-29
 accepted_at: 2026-05-29
-implemented_at: null
+implemented_at: 2026-05-29
 withdrawn_at: null
-implementation: null
+implementation: https://github.com/npm/cli/pull/5160
 ---
 # Registry-scoped keyfile / certfile credential options
 
