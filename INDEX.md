@@ -4,7 +4,7 @@
 
 Generated 2026-05-29. See [README.md](./README.md) for the RFC process.
 
-## Accepted (12)
+## Accepted (11)
 
 | # | Title | Created | Accepted | Implemented | Withdrawn | Implementation |
 | - | ----- | ------- | -------- | ----------- | --------- | -------------- |
@@ -15,13 +15,12 @@ Generated 2026-05-29. See [README.md](./README.md) for the RFC process.
 | [0042](./accepted/0042-isolated-mode.md) | Isolated mode | — | — | — | — | — |
 | [0038](./accepted/0038-workspaces-run-cmds.md) | npm Workspaces: Running commands | — | — | — | — | — |
 | [0037](./accepted/0037-audit-overrides.md) | npm audit fix can apply overrides | — | — | — | — | — |
-| [0036](./accepted/0036-overrides.md) | Dependency resolution overrides | — | — | — | — | — |
 | [0035](./accepted/0035-registry-spec.md) | The `registry:` Dependency Specifier | — | — | — | — | — |
 | [0028](./accepted/0028-publish-prompt.md) | Publish confirmation prompt | — | — | — | — | — |
 | [0007](./accepted/0007-publish-without-tag.md) | Publish older versions without a tag | — | — | — | — | — |
 | [0006](./accepted/0006-shallow-updates.md) | Shallow update support for `npm update` | — | — | — | — | — |
 
-## Implemented (33)
+## Implemented (34)
 
 | # | Title | Created | Accepted | Implemented | Withdrawn | Implementation |
 | - | ----- | ------- | -------- | ----------- | --------- | -------------- |
@@ -32,6 +31,7 @@ Generated 2026-05-29. See [README.md](./README.md) for the RFC process.
 | [0045](./implemented/0045-workspaces-auto-cwd-context.md) | npm workspaces: auto switch context based on cwd | — | — | — | — | — |
 | [0043](./implemented/0043-lockfile-version-config.md) | Add `lockfile-version` Config Flag | — | — | — | — | — |
 | [0039](./implemented/0039-npm-pkg.md) | npm pkg | — | — | — | — | — |
+| [0036](./implemented/0036-overrides.md) | Dependency resolution overrides | — | — | 2026-05-29 | — | [link](<https://github.com/npm/arborist/pull/354>) |
 | [0034](./implemented/0034-improve-command-suggestions.md) | Improve command suggestions | — | — | — | — | — |
 | [0033](./implemented/0033-npm-diff.md) | npm diff | — | — | — | — | — |
 | [0032](./implemented/0032-powershell-bins.md) | Powershell for Installed Binaries | — | — | — | — | — |
