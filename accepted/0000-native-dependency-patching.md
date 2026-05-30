@@ -236,6 +236,8 @@ The path stored in `patchedDependencies` is the literal relative path including 
 
 This bumps `lockfileVersion` from `3` to `4` ([`workspaces/arborist/lib/shrinkwrap.js`](https://github.com/npm/cli/blob/latest/workspaces/arborist/lib/shrinkwrap.js) defines the current default and the parse path supports forward-version detection). The bump is the load-bearing safety mechanism: an older npm reading a v4 lockfile with any `patched` record **must error and abort the install**. A warn-only fallback is explicitly rejected — it would let an older CLI silently install unpatched code from a project that declares patches, which is exactly the regression this RFC is built to prevent. A v4 lockfile with **no** `patched` records anywhere remains safe to install under older clients; the abort only kicks in when a patch is present.
 
+A pinned lower `lockfile-version` (e.g. 3) cannot be honored when patches are present, since patches require version 4 for the older-client abort gate. npm writes version 4 and warns that the lockfile was upgraded; it neither errors nor silently honors the pin.
+
 > Note: this RFC deliberately does **not** rely on a per-package `engines.npm` floor. npm CLI today validates `engines.node` at startup ([`lib/cli/validate-engines.js`](https://github.com/npm/cli/blob/latest/lib/cli/validate-engines.js)) but does not enforce `engines.npm` at install time, so a manifest floor would be advisory at best and would not stop an older CLI from proceeding. Lockfile-version gating in arborist's shrinkwrap read path is the only mechanism that actually fails closed.
 
 When a patch file's contents change, its `sha512` changes, and the lockfile must be regenerated — `npm ci` refuses to proceed if the recorded hash and the on-disk hash diverge. This eliminates the "patches drifted silently in CI" failure mode that plagues `patch-package` users.
@@ -284,7 +286,7 @@ The default for every patch-related failure is **hard error, abort the install**
 Two **CLI-only** flags exist to cover legitimate one-off cases:
 
 - `npm install --allow-unused-patches`: temporarily install a tree in which a registered patch matched nothing (e.g. mid-upgrade where a pinned version no longer exists). Does not silence apply-failures.
-- `npm install --ignore-patch-failures`: temporarily install a tree even if a patch fails to apply, with a loud warning per failure. Intended for incident response (e.g. roll back a regression while re-authoring a patch).
+- `npm install --ignore-patch-failures`: temporarily install a tree even if a patch fails to apply, with a loud warning per failure. Intended for incident response (e.g. roll back a regression while re-authoring a patch). Under `install-strategy=linked`, `--ignore-patch-failures` cannot be honored for a package: the content-addressed side-store cannot hold unpatched contents at a patched key without later installs silently trusting it, so a failed patch is a hard error regardless of the flag. The flag applies to hoisted/nested/shallow, which re-extract and re-attempt the patch each install.
 
 Neither flag is honoured from `.npmrc`, environment variables, or `engines`. They must be passed on every invocation that needs them. The intent is to make a relaxed posture impossible to set as project-default policy: a CI environment that wants laxness has to write the flag into the install command itself, where it is visible in code review.
 
@@ -298,11 +300,13 @@ Patches target a registry tarball as their "original", so the diff has a stable 
 | -------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `npm:` (registry alias)    | Supported. The aliased registry tuple is used as the baseline; the selector is keyed on the alias name.                                                                                                                     |
 | `file:` (local tarball)    | Rejected by `npm patch add` with a clear error. The user already controls the source; edit it directly.                                                                                                                     |
-| `link:` / workspace member | Rejected. Workspace members are project source code, not vendored dependencies — edit the source.                                                                                                                           |
+| `file:` directory / workspace member | Rejected. Local directories and workspace members are project source code — edit the source. (npm has no `link:` protocol; pnpm/yarn-style `link:` specs are rejected at install with `EUNSUPPORTEDPROTOCOL`.)                |
 | `git:` / `github:`         | Rejected in the initial RFC. The "original" would be a specific commit, which is reproducible, but the workflow is significantly more complex (shallow clones, submodules, build steps) and is deferred to a follow-up RFC. |
 | `http(s):` tarball         | Rejected. No integrity guarantee equivalent to registry tarballs; see future work.                                                                                                                                          |
 
 Rejection means: `npm patch add <pkg>` exits non-zero with a message explaining why, pointing at the source-edit alternative. An entry in `patchedDependencies` whose resolved type is one of the rejected categories above is also a hard error at install time.
+
+Implementation note: registry-vs-non-registry is decided from the resolved dependency's incoming edge specs (those `npm-package-arg` classifies as non-registry: `file:`, `git:`, `http(s):`), not a per-node heuristic. Edgeless nodes (content-addressed `.store` entries under `install-strategy=linked`, extraneous installs) carry no non-registry edge and stay patchable; `npm:` registry aliases stay patchable.
 
 ### `optionalDependencies`, `peerDependencies`, deprecated packages
 
