@@ -2,7 +2,7 @@
 
 ## Summary
 
-Add first-class, install-time patching of installed dependencies to the npm CLI, on parity with `pnpm patch`, `yarn patch`, and `bun patch`. This RFC proposes a new `npm patch` command with four subcommands (`add`, `commit`, `ls`, `rm`), a new top-level `patchedDependencies` field in `package.json`, an additive change to `package-lock.json` that records a hash of every applied patch, and an apply pipeline integrated into Arborist's reify step so that patches apply uniformly across every supported `install-strategy` (`hoisted`, `nested`, `shallow`, and `linked`).
+Add first-class, install-time patching of installed dependencies to the npm CLI, on parity with `pnpm patch`, `yarn patch`, and `bun patch`. This RFC proposes a new `npm patch` command with subcommands `add`, `commit`, `update`, `ls`, and `rm`, a new top-level `patchedDependencies` field in `package.json`, an additive change to `package-lock.json` that records a hash of every applied patch, and an apply pipeline integrated into Arborist's reify step so that patches apply uniformly across every supported `install-strategy` (`hoisted`, `nested`, `shallow`, and `linked`).
 
 ## Motivation
 
@@ -61,7 +61,7 @@ All operations live under `npm patch <subcommand>`, matching the mixed-register 
 
 The bare form `npm patch <pkg>` is a shorthand for `npm patch add <pkg>` because that is the most common entry point. `npm patch` with no arguments prints help (it does **not** list patches — use `npm patch ls`). This follows npm CLI precedent: `npm pkg`, `npm cache`, and `npm team` all print help when invoked with no subcommand.
 
-**Disambiguation.** The bare form `npm patch <arg>` is parsed as follows: if `<arg>` is exactly one of `add`, `commit`, `ls`, or `rm`, it is treated as a subcommand; otherwise it is treated as a package selector and routed to `npm patch add <arg>`. A package literally named `add` (or any other subcommand name) must be referenced via the explicit form `npm patch add add`. This mirrors the existing rule that `npm install install` is how you would install a hypothetical package called `install`.
+**Disambiguation.** The bare form `npm patch <arg>` is parsed as follows: if `<arg>` is exactly one of `add`, `commit`, `update`, `ls`, or `rm`, it is treated as a subcommand; otherwise it is treated as a package selector and routed to `npm patch add <arg>`. A package literally named `add` (or any other subcommand name) must be referenced via the explicit form `npm patch add add`. This mirrors the existing rule that `npm install install` is how you would install a hypothetical package called `install`.
 
 **Help.** `npm patch --help` and `npm help patch` both render the full subcommand list and flags. Per-subcommand help (`npm patch add --help`, etc.) is also provided.
 
@@ -110,6 +110,51 @@ Flags:
 
 - `--patches-dir <dir>`: override the destination directory for this invocation.
 - `--keep-edit-dir`: do not remove the edit directory after committing.
+
+#### `npm patch update <pkg>[@<old-version>] [--to <new-version>]`
+
+Rebases an existing patch onto a new version of a package. The intended workflow is: bump the dependency, run `npm patch update`. Single command for the happy path; same `npm patch commit` finalisation for the conflict path.
+
+**Selector resolution.** The command must identify exactly one existing patch entry and exactly one target version, with no implicit fallback.
+
+1. **Existing entry.** If `<pkg>@<old-version>` is supplied, look up that exact key in `patchedDependencies`. Otherwise look up entries whose key resolves to `<pkg>`: if there is exactly one, use it; if there are zero, exit non-zero with "no patch to update"; if there are several (e.g. multiple pinned versions, or a range plus an exact entry), list them and require an explicit `<pkg>@<old-version>` to disambiguate. If the project has multiple lockfile nodes for `<pkg>` and the chosen selector is a range or name-only form, *all* matching nodes are considered when reasoning about staleness and lockfile updates below; `update` errors if any required node is missing from the lockfile.
+2. **Target version.** If `--to <new-version>` is supplied, use that. Otherwise read the resolved version of `<pkg>` from `package-lock.json`. The lockfile is considered "stale" if it cannot be read, fails the `lockfileVersion`-and-integrity self-checks `npm ci` runs today, or — depending on the form of the chosen selector — fails one of the following decidable checks against the lockfile alone:
+   - **Exact `<old-version>`**: no lockfile node for `<pkg>` is at exactly that version.
+   - **Range `<old-version>`**: no lockfile node for `<pkg>` satisfies the range.
+   - **Name-only `<old-version>`**: no lockfile node for `<pkg>` exists at all.
+
+   In any stale case, `update` exits non-zero with "lockfile is stale or missing — pass `--to <new-version>` or run `npm install` first". If old version equals new version, exit non-zero with "nothing to update".
+
+`update` operates on `package.json` and `package-lock.json` only. It does **not** require `node_modules` to exist, nor a successful prior `npm install`. This is intentional: the most common time a user reaches for `update` is right after a failed install whose patch step rejected fuzz>0 drift, and forcing them to recover the install before they can rebase the patch would be backwards.
+
+**Rebase.**
+
+3. Extract a clean copy of the new version's tarball into a temporary edit directory (same temp-dir conventions as `npm patch add`).
+4. Attempt a 3-way `git apply --3way` of the existing `.patch` file into the edit directory.
+
+**Clean apply.**
+
+5. Re-diff the edit directory against the new tarball; write the result to a new patch file under the new selector (`<patches-dir>/<name>@<new-version>.patch` by default).
+6. Selector handling — four cases, checked in order. The early single-entry disambiguation in step 1 guarantees these cases are mutually exclusive at evaluation time (e.g. "old selector exact" and "old patch file shared" cannot both fire on the same iteration, because the user has already picked one entry):
+   - **An entry for `<pkg>@<new-version>` already exists** (separate from the old entry, e.g. a previously-added exact pin or a range that includes the new version): exit non-zero with "an entry already exists for `<pkg>@<new-version>`; use `npm patch rm` first or rebase manually". `update` never silently overrides an existing selector.
+   - **Old selector was an exact `<pkg>@<old-version>`**: rename the `patchedDependencies` key from `<pkg>@<old-version>` to `<pkg>@<new-version>`. Delete the old patch file *only if* no other selector still references it (existing shared-reference rule).
+   - **Old selector was a range or name-only**: **add** a new exact `<pkg>@<new-version>` entry pointing at the new patch file; **leave the old range/name-only entry intact**. Any other resolved nodes still matching the range keep their existing patch — `update` never silently mutates patches for nodes the user did not name. The new exact entry has higher selector priority (per the *Selector forms and match priority* rules) and wins for the new version.
+   - **Old patch file is shared by multiple selectors**: never mutate the shared file in place. `update` always writes a new file under the new selector; the shared-reference rule then deletes the old file only if the old selector was the last reference.
+7. Update `package-lock.json`: walk every node in the lockfile (direct, transitive, hoisted, side-store) and apply the matching rule once. Write a new `patched.{path,integrity}` record for every node that resolves to the new selector after the rewrite; remove the `patched` record from every node that previously matched the renamed-or-deleted selector and no longer matches any remaining `patchedDependencies` entry. Nodes that still match a surviving range or name-only entry keep their existing record unchanged. Nodes whose resolved version matches neither the old nor the new selector are not touched at all.
+
+**Conflict.**
+
+8. Leave the edit directory on disk with `<<<<<<<` / `>>>>>>>` conflict markers, print the path, and instruct the user to resolve and re-run `npm patch commit <edit-dir>`. The user-facing finalisation flow is identical to a fresh patch — no new "resolve" command.
+
+**Atomicity.** Manifest, patch file, and lockfile updates are performed as a single transaction. Each output is staged as a temp file on the same filesystem as its final destination (so the final `rename(2)` is atomic on POSIX), fsync'd, then renamed into place in a fixed order: new patch file → updated `package.json` → updated `package-lock.json`. If any temp write, fsync, or rename fails, `update` removes every temp file it created and exits non-zero; no committed `patchedDependencies` entry, patch file, or lockfile record reflects the partial state. An interrupted `npm patch update` (SIGINT, crash, kill) similarly leaves the project in its pre-update state, because nothing committed beyond renames is partial. There is no transient configuration that the lockfile-version gate (see *Lockfile*) would later misinterpret as drift.
+
+`update` does **not** touch `node_modules`. The on-disk dependency tree continues to reflect the previous install until the next `npm install` reifies the updated manifest and lockfile. **A successful `npm patch update` does not change the running application's behaviour**: the patched code only takes effect after the next install. CI pipelines that rely on the patched version must run `npm install` (or `npm ci`) between `npm patch update` and the build/test step. This is intentional: `update` is a metadata-and-patch-file operation, install is what materialises trees, and conflating the two would make `update` impossible to run from a failed-install state (the very state it is designed to recover from).
+
+Flags:
+
+- `--to <version>`: target version. Overrides lockfile / manifest discovery; required whenever the lockfile is missing or stale (see *Target version*).
+- `--patches-dir <dir>`: override the destination directory for the rewritten patch.
+- `--keep-edit-dir`: do not remove the edit directory after successful commit.
 
 #### `npm patch ls`
 
@@ -341,7 +386,7 @@ my-app@1.0.0
 
 | Surface          | New                                                                                                        |
 | ---------------- | ---------------------------------------------------------------------------------------------------------- |
-| Commands         | `npm patch add`, `npm patch commit`, `npm patch ls`, `npm patch rm` (plus `npm patch <pkg>` shorthand for `npm patch add <pkg>`) |
+| Commands         | `npm patch add`, `npm patch commit`, `npm patch update`, `npm patch ls`, `npm patch rm` (plus `npm patch <pkg>` shorthand for `npm patch add <pkg>`) |
 | Manifest fields  | `patchedDependencies` (auto-stripped by `npm publish` / `npm pack`)                                        |
 | Lockfile fields  | `patched.path`, `patched.integrity`                                                                        |
 | Lockfile version | bumped to `4`; older clients **error** on v4 lockfiles containing patches                                  |
@@ -409,7 +454,7 @@ This is elegant in yarn's locator-driven model. For `package-lock.json`'s nested
 Affected repositories and packages. All implementation now lives under the `npm/cli` monorepo and a small set of supporting `npm/*` packages. The previously-separate `npm/arborist` repository was archived and its code moved to `npm/cli/workspaces/arborist`.
 
 - **[`npm/cli`](https://github.com/npm/cli)** — top-level CLI:
-  - new `npm patch` command with subcommands `add`, `commit`, `ls`, `rm`
+  - new `npm patch` command with subcommands `add`, `commit`, `update`, `ls`, `rm`
   - new config (`patches-dir`) and CLI-only flags (`--allow-unused-patches`, `--ignore-patch-failures`)
   - `npm ls` / `npm audit` annotations
   - `npm/cli/workspaces/arborist` (formerly the `npm/arborist` repo): read `patchedDependencies` during build-ideal-tree; attach patch records to nodes during reify; apply patches to extracted trees; honour the side-store layout under `install-strategy=linked`
@@ -425,6 +470,7 @@ Tests:
 
 - Round-trip: `npm patch add` → edit → `npm patch commit` → `npm install` → patched files present.
 - Shorthand routing: `npm patch <pkg>` is equivalent to `npm patch add <pkg>`; subcommand-name shadowing (`npm patch add` is the subcommand, `npm patch add add` reaches a package literally named `add`).
+- Rebase via `npm patch update`: (a) exact-selector update renames the key and deletes the old patch file (subject to shared-reference rule); (b) range/name-only selector forks into a new exact `<pkg>@<new>` entry and leaves the original entry intact — surviving nodes still matching the range keep their existing patch; (c) shared patch file is never mutated in place — a new file is written, old file is deleted only when no remaining selector references it; (d) collision — an existing `<pkg>@<new>` entry causes `update` to exit non-zero instead of silently overriding it; (e) conflict path leaves conflict markers in the edit dir for `npm patch commit`; (f) atomicity — interrupted `update` (kill mid-run) leaves project in pre-update state; mid-write failures (simulate fsync/rename failure) leave no committed records and remove all temp files; (g) `update` does not touch `node_modules` — successful `update` does not change the running app until the next `npm install` reifies; (h) recovery from failed install — `update` succeeds without `node_modules` and without a successful prior install, including from the post-fuzz-drift install-aborted state; (i) "nothing to update" exits non-zero when old version equals new; (j) stale-lockfile detection per selector form: exact / range / name-only each have the right decidable check against the lockfile, all stale cases produce the same actionable error; (k) bare `<pkg>` works when exactly one entry resolves; multiple entries require `<pkg>@<old-version>`; (l) `--to <new-version>` overrides lockfile/manifest discovery; (m) range/name-only selector with multiple matching lockfile nodes — `update` processes all of them and errors if any is missing.
 - Each `install-strategy` value: `hoisted`, `nested`, `shallow`, `linked`. The `linked` test must verify that (a) an unrelated project sharing the global cache does **not** see the patched copy and (b) two consumers in the same project sharing `(packageIntegrity, patchIntegrity)` dedupe to one side-store entry.
 - Workspaces: patch declared at root applies to a transitive dep used only by a workspace member; patch declared in a workspace member's manifest **errors**.
 - `npm ci` with a tampered patch file → fails with hash mismatch.
@@ -438,7 +484,7 @@ Tests:
 
 Implementation rollout. The entire feature ships **atomically in a single npm release** — no part of it is allowed to lag behind the others, because every "almost finished" intermediate state is a vector for the silent-skip and silent-leak failure modes this RFC exists to prevent. The atomic deliverable is:
 
-- CLI commands: `npm patch add`, `npm patch commit`, `npm patch ls`, `npm patch rm` (plus the bare `npm patch <pkg>` shorthand for `add`).
+- CLI commands: `npm patch add`, `npm patch commit`, `npm patch update`, `npm patch ls`, `npm patch rm` (plus the bare `npm patch <pkg>` shorthand for `add`).
 - Manifest field: `patchedDependencies` (root-only; hard error in workspace members).
 - Lockfile schema: `patched.{path,integrity}` per node, `lockfileVersion: 4`, with `npm ci` enforcing hash match and older clients erroring on v4 lockfiles that contain patch records.
 - Apply pipeline for **all four** supported `install-strategy` values — `hoisted`, `nested`, `shallow`, and `linked` — at the same seam in arborist's reify step. `linked` uses the content-addressed side-store key `(packageIntegrity, patchIntegrity)` described in [`linked` install-strategy: side-store](#linked-install-strategy-side-store) and is treated as a first-class target, not a follow-up.
