@@ -191,6 +191,10 @@ Implementations MUST NOT match keys against:
 
 All four are attacker-controllable through manifest confusion or alias installs. The lockfile's `resolved` field, set by the resolver from the registry response or the user's git/tarball/file spec, is the only field set independently of the tarball.
 
+#### `npm rebuild <name>` follows the same rule
+
+The `<name>` argument to `npm rebuild` also selects nodes by resolved identity, not by folder name or self-reported `package.json#name`. `npm rebuild bcrypt` rebuilds the registry-resolved `bcrypt` and never a bundled `node_modules/bcrypt` folder that some other package shipped under that name. Bundled nodes are excluded from rebuild for the reasons given in [Bundled dependencies](#bundled-dependencies).
+
 #### Forward compatibility with a query selector grammar
 
 The key syntax above is forward-compatible with npm's existing [dependency selectors](https://docs.npmjs.com/cli/v11/using-npm/dependency-selectors) (`npm query`). Today, only package-specs are accepted as keys. If a future arborist version exposes a trustworthy queryable identity (see Unresolved Questions), the same key position could accept full selector syntax (`":root > .prod"`, `":type(git)"`, etc.) alongside today's bare-name and `name@spec` keys. The bare-name keys would then read as sugar over a name-equality selector against the identity field.
@@ -319,7 +323,11 @@ If a package in `optionalDependencies` has install scripts that are blocked, it 
 
 ### Bundled dependencies
 
-Bundled dependencies are packages shipped inside a parent package's tarball. The lockfile marks them with `inBundle: true`, but they have no independent `resolved` URL since they were never fetched on their own. Bundled deps with install scripts are treated as unreviewed and blocked with a warning. Allowlisting them is deferred to a follow-up RFC: matching by `name@version` from the bundled tarball would reintroduce manifest confusion, and a safe parent-qualified syntax needs its own design.
+Bundled dependencies are packages shipped inside a parent package's tarball. The lockfile marks them with `inBundle: true`, but they have no independent `resolved` URL because they were never fetched on their own.
+
+Install scripts of bundled dependencies never run. They are not counted as pending or unreviewed, so they do not trip `strict-allow-scripts`, and they cannot be added to `allowScripts`. This matches pnpm, which also ignores scripts of bundled dependencies.
+
+A package that needs a bundled dependency's install script to run must forward it as one of its own lifecycle scripts. That forwarded script is then subject to the same `allowScripts` policy as any other dependency's, matched by the parent package's resolved identity. The folder names inside the parent's bundled `node_modules` are never used for matching, so a bundled folder that calls itself `bcrypt` cannot borrow the real `bcrypt`'s approval.
 
 ## Rationale and Alternatives
 
