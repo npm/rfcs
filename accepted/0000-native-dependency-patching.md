@@ -91,7 +91,7 @@ Flags:
 
 Finalises a patch.
 
-1. Diffs `<edit-dir>` against the original tarball contents (using the same extraction performed by `npm patch add`).
+1. Diffs `<edit-dir>` against the original tarball contents (using the same extraction performed by `npm patch add`). `package.json` is **excluded** from the diff: `patch-package` does this because version bumps make patches non-portable, and additionally — because Arborist resolves the pre-patch manifest before the patch is applied during reify — a patched `package.json` would change resolution-affecting fields (`dependencies`, `bin`, `scripts`, `exports`) on disk without those changes being honored (silent partial application). If an edit touches only `package.json`, `commit` warns that nothing was captured.
 2. Writes a unified diff to `<patches-dir>/<name>@<version>.patch` (default `./patches/`, configurable — see below).
 3. Adds an entry to `patchedDependencies` in the project's root `package.json`:
 
@@ -538,7 +538,7 @@ The 2020 proposal, [npm/rfcs#94 ("Allow customizing packages on install")](https
 1. **Patches directory path**. `patches/` matches `patch-package`, pnpm, and bun. Is there an objection to occupying that name at the project root? Alternative: `.npm/patches/`.
 2. **Interaction with `overrides`**. Patches apply to the **resolved** version after override resolution. If `overrides` swaps `foo@1` → `foo@2`, a `patchedDependencies["foo@1"]` entry becomes unused and errors under default settings — which seems correct, but confirms that overrides + patches require coordinated edits. Is the "patch the resolved version" rule the right composition order in every case, or should range selectors be evaluated against the pre-override identity?
 3. **`npm audit fix` + patches**. If a patch is the only thing keeping a transitive dep secure, should `npm audit fix` refuse to upgrade away from the patched version, or upgrade and require the user to re-author the patch? Strawman: refuse, with `--force` to upgrade.
-4. **Exclude `package.json` from the diff by default?** `patch-package` does this because version bumps make patches non-portable. Carry the default forward, with `--include-package-json` to override.
+4. **Exclude `package.json` from the diff by default?** **Resolved: yes, unconditionally in v1.** Beyond `patch-package`'s portability rationale, Arborist resolves the pre-patch manifest, so a patched `package.json` would apply to disk without affecting resolution (silent partial application). v1 therefore excludes `package.json` with no `--include-package-json` override; a mere diff-include flag would not fix the silent-application problem. Honoring manifest patches would require applying them before ideal-tree resolution and is left to future work.
 5. **Globs in selectors?** e.g. `"@types/*": "patches/types-fix.patch"`. Useful for monorepos with many similar deps; potential footgun for typo-driven over-application. Strawman: not in v1.
 6. **Stacking patches**. Should multiple patches be applicable to a single resolved node (selector value as an array)? Out of scope for v1 but additive if needed later.
 7. **Git dependencies**. Deferred. A future RFC could add patching for `git:` deps with commit-pinned baselines.
