@@ -111,22 +111,25 @@ When a selector matches a package manifest, npm applies the extension to a per-i
 For each supported object field:
 
 1. If the field is missing from the package manifest, npm creates it.
-2. For `dependencies`, `optionalDependencies`, and `peerDependencies`, npm shallow-merges entries by dependency name.
-3. If the package already declares the same dependency or peer name in the same field, the extension value replaces the package's value in memory.
-4. For `peerDependenciesMeta`, npm merges by peer name and then shallow-merges each peer metadata object, so an extension can add `optional: true` without replacing unrelated metadata keys for that peer.
+2. For `dependencies` and `optionalDependencies`, npm adds entries by dependency name only when that package name is not already declared in either normal dependency field.
+3. If a package already declares a package name in `dependencies` or `optionalDependencies`, an extension that provides that name in either normal dependency field is an error. Users should use `overrides` for normal dependency version changes.
+4. For `peerDependencies`, npm shallow-merges entries by peer name, and the extension value replaces the package's peer range in memory when that peer name already exists.
+5. For `peerDependenciesMeta`, npm merges by peer name and then shallow-merges each peer metadata object, so an extension can add `optional: true` without replacing unrelated metadata keys for that peer.
 
-After extension application, npm validates and normalizes the manifest using the same rules it uses for published package manifests. An extension must not create a new duplicate package name across `dependencies` and `optionalDependencies`, and it must not try to move a package name between those two fields. If the package already declares `bar` in `optionalDependencies`, then an extension may replace `optionalDependencies.bar` but may not add `dependencies.bar`; if the package already declares `bar` in `dependencies`, then an extension may replace `dependencies.bar` but may not add `optionalDependencies.bar`. This keeps v1 from implicitly converting optional dependencies into required dependencies or required dependencies into optional dependencies without an explicit deletion feature.
+After extension application, npm validates and normalizes the manifest using the same rules it uses for published package manifests. An extension must not create a new duplicate package name across `dependencies` and `optionalDependencies`, and it must not try to move a package name between those two fields. If the package already declares `bar` in `optionalDependencies`, then an extension may not provide either `dependencies.bar` or `optionalDependencies.bar`; if the package already declares `bar` in `dependencies`, then an extension may not provide either `optionalDependencies.bar` or `dependencies.bar`. This keeps v1 from implicitly converting optional dependencies into required dependencies or required dependencies into optional dependencies without an explicit deletion feature, while leaving normal dependency version changes to `overrides`.
 
-`peerDependencies` may overlap with `dependencies` or `optionalDependencies`, because packages commonly provide a fallback implementation while also declaring a peer contract. An extension may add or correct a `peerDependencies` entry for a package that already lists the same name in `dependencies` or `optionalDependencies`, and it may add or correct a `dependencies` or `optionalDependencies` entry for a package that already lists the same name in `peerDependencies`.
+`peerDependencies` may overlap with `dependencies` or `optionalDependencies`, because packages commonly provide a fallback implementation while also declaring a peer contract. An extension may add or correct a `peerDependencies` entry for a package that already lists the same name in `dependencies` or `optionalDependencies`, and it may add a `dependencies` or `optionalDependencies` entry for a package that already lists the same name in `peerDependencies` when that name is not already declared in either normal dependency field.
 
 Every `peerDependenciesMeta` entry present after extension application must correspond to a `peerDependencies` entry present after extension application. An extension may add `peerDependenciesMeta.<name>.optional` only if the package already declares `peerDependencies.<name>` or the same extension also adds `peerDependencies.<name>`. Orphaned `peerDependenciesMeta` entries are an error in v1.
 
-This permits both of the common manifest-repair cases:
+This permits the common manifest-repair cases that are in scope for v1:
 
-- add a missing dependency edge
-- correct a dependency or peer range that is known to be wrong
+- add a missing `dependencies` or `optionalDependencies` edge
+- add a missing peer dependency edge
+- correct a peer dependency range that is known to be wrong
+- add or correct peer dependency metadata
 
-Deletion is not supported in v1. A `null`, `false`, or `"-"` value is an error. Removing dependencies or install behavior has different security and compatibility consequences and should be handled by `overrides`, lifecycle-script policy, native patching, or a follow-up RFC.
+Deletion is not supported in v1. A `null`, `false`, or `"-"` value is an error. Changing normal dependency selection should be handled by `overrides`; removing dependencies or changing install behavior has different security and compatibility consequences and should be handled by lifecycle-script policy, native patching, or a follow-up RFC.
 
 ### Root-only behavior
 
@@ -210,13 +213,27 @@ The preferred v1 shape is to store only the canonical extension hash on the root
 }
 ```
 
-The canonical hash input is the normalized root `packageExtensions` object from `package.json`. The normalized form should be key-order independent and should ignore insignificant JSON formatting. The root manifest remains authoritative for the extension rules; the lockfile hash proves that the locked graph was generated from the same canonical rule set. The install should reject multiple selectors that match the same candidate package before writing lockfile state. Package entries continue to store their normal effective `dependencies`, `optionalDependencies`, `peerDependencies`, and `peerDependenciesMeta` fields after extension application.
+The canonical hash input is the root `packageExtensions` field after `package.json` parsing and extension-schema validation, not the lockfile's effective dependency metadata or per-entry provenance.
+
+The canonicalization rules are:
+
+- If the root manifest does not contain `packageExtensions`, npm records no extension hash and no applied-extension provenance, and `npm ci` fails when the lockfile records either one.
+- If the root manifest contains `packageExtensions`, including `{}`, npm hashes the canonical form of that object.
+- Unsupported fields, invalid value types, invalid selectors, and selector conflicts are rejected before npm writes lockfile state.
+- Object keys are sorted lexicographically at every object level before serialization.
+- Selector strings, package names, field names, metadata keys, specifier strings, and metadata values are preserved exactly after JSON parsing.
+- npm must not normalize semver ranges, registry specs, whitespace inside string values, or boolean metadata values for the hash.
+- Serialization uses deterministic JSON with no insignificant whitespace.
+- The digest is written using npm's existing lockfile digest encoding, with `sha512` as the expected v1 algorithm unless npm standardizes another lockfile hash format before implementation.
+- The hash covers only the canonical root extension rules, while package entries store effective dependency metadata and minimal provenance separately.
+
+The root manifest remains authoritative for the extension rules; the lockfile hash proves that the locked graph was generated from the same canonical rule set. The install should reject multiple selectors that match the same candidate package before writing lockfile state. Package entries continue to store their normal effective `dependencies`, `optionalDependencies`, `peerDependencies`, and `peerDependenciesMeta` fields after extension application.
 
 The required behavior is:
 
 - `npm install` updates `package-lock.json` when `packageExtensions` changes.
-- `npm ci` fails if the root `packageExtensions` field is present but the lockfile does not contain extension state.
-- `npm ci` fails if the lockfile contains non-empty extension state but the root `packageExtensions` field is absent.
+- `npm ci` fails if the root `packageExtensions` field is present but the lockfile does not contain a matching extension hash.
+- `npm ci` fails if the lockfile contains an extension hash or applied-extension provenance but the root `packageExtensions` field is absent.
 - `npm ci` fails if the root `packageExtensions` state does not match the canonical state represented in the lockfile.
 - `npm ci` fails if any package identity recorded in the lockfile matches more than one root selector.
 - `npm ci` fails if a lockfile package entry records extension provenance that no longer corresponds to exactly one selector in the canonical root extension state.
@@ -345,6 +362,8 @@ The primary implementation work is in `npm/cli`, especially Arborist.
   - Avoid mutating shared pacote, packument, manifest, registry metadata, or cache objects in place.
   - Skip workspace package manifests as extension targets and warn when a selector would match a workspace member.
   - Normalize cross-field dependency metadata after extension application using the same rules as normal package manifests.
+  - Reject `dependencies` and `optionalDependencies` extension entries that attempt to provide a name already declared in either normal dependency field.
+  - Allow `peerDependencies` extension entries to replace an existing peer range before peer resolution.
   - Reject extensions that create or attempt to move duplicate names across `dependencies` and `optionalDependencies`.
   - Reject `peerDependenciesMeta` entries that do not correspond to a `peerDependencies` entry after extension application.
   - Preserve extended manifest data in the ideal tree, effective dependency metadata in the lockfile, and minimal extension provenance for affected lockfile entries.
@@ -383,9 +402,14 @@ Required test coverage:
   - Add `peerDependenciesMeta.<peer>.optional`.
   - Verify Arborist's peer resolution sees the extended metadata.
 
-- Existing dependency correction:
-  - A package declares `bar: "^1"` and the extension changes it to `^2`.
-  - The resulting lockfile resolves from the corrected edge.
+- Normal dependency repair:
+  - A package missing `dependencies.bar` can receive an extension-created `bar` edge.
+  - An extension that attempts to replace existing `dependencies.bar` or `optionalDependencies.bar` fails with a clear error.
+  - Normal dependency version changes are handled by `overrides`, not `packageExtensions`.
+
+- Peer dependency correction:
+  - A package declares `peerDependencies.bar: "^1"` and the extension changes it to `^2`.
+  - Arborist's peer resolution and the resulting lockfile use the corrected peer contract.
 
 - `overrides` composition:
   - Extension adds `bar: "^1"`.
@@ -414,9 +438,11 @@ Required test coverage:
   - Two installs using the same cached manifest metadata do not observe each other's package extensions.
 
 - Merge behavior:
-  - `dependencies`, `optionalDependencies`, and `peerDependencies` merge by dependency name.
+  - `dependencies` and `optionalDependencies` add missing names only.
+  - Extensions that provide a name already declared in `dependencies` or `optionalDependencies` fail.
+  - `peerDependencies` merges by peer name.
+  - Extension values replace existing peer ranges in `peerDependencies`.
   - `peerDependenciesMeta` merges by peer name and then by metadata key.
-  - Extension values replace existing values in the same field.
   - Extensions that create duplicate names across `dependencies` and `optionalDependencies` fail.
   - Extensions that try to move a name between `dependencies` and `optionalDependencies` fail.
   - Extensions may create or preserve overlap between `peerDependencies` and `dependencies` or `optionalDependencies`.
@@ -426,8 +452,11 @@ Required test coverage:
 - Lockfile determinism:
   - `npm install` records a canonical extension hash, effective dependency metadata, and minimal provenance.
   - `npm install` records minimal provenance for affected package entries without duplicating the full extension object on every affected entry.
+  - Key order and insignificant JSON formatting changes do not change the canonical extension hash.
+  - Selector, package name, field name, metadata key, specifier string, or metadata value changes do change the canonical extension hash.
+  - Unsupported fields, invalid value types, invalid selectors, and selector conflicts fail before npm writes extension lockfile state.
   - `npm ci` succeeds with matching extension state.
-  - `npm ci` fails when the root manifest has `packageExtensions` but the lockfile lacks extension state.
+  - `npm ci` fails when the root manifest has `packageExtensions` but the lockfile lacks a matching extension hash.
   - `npm ci` fails after the root `packageExtensions` entry changes without updating the lockfile.
   - `npm ci` fails after a lockfile package entry records extension provenance that no longer corresponds to exactly one canonical root extension rule.
   - `npm ci` validates extension hash, selector conflicts, and provenance before trusting locked effective dependency metadata.
@@ -516,14 +545,12 @@ The [Make Install Scripts Opt-In RFC](https://github.com/npm/rfcs/pull/868) prop
 
 1. **Lockfile placement and versioning.** Should the canonical root extension hash live on `packages[""]` or in a top-level lockfile section? Does this require a lockfile version bump, or is an additive field enough?
 
-2. **Overwrite semantics.** This RFC allows extension values to replace existing dependency and peer ranges. Should v1 instead be add-only, with range correction left entirely to `overrides`?
+2. **Deletion.** Should v1 support removing dependency entries with a sentinel such as `"-"`? This would match some package-manager prior art, but it also increases the risk of deleting dependencies that are needed at runtime.
 
-3. **Deletion.** Should v1 support removing dependency entries with a sentinel such as `"-"`? This would match some package-manager prior art, but it also increases the risk of deleting dependencies that are needed at runtime.
+3. **Where should the field live?** `package.json` is consistent with npm's current lack of a workspace config file. If npm later introduces an `npm-workspace.yaml` or similar file, `packageExtensions` may be a good candidate for migration.
 
-4. **Where should the field live?** `package.json` is consistent with npm's current lack of a workspace config file. If npm later introduces an `npm-workspace.yaml` or similar file, `packageExtensions` may be a good candidate for migration.
+4. **Should npm provide management commands?** A future command such as `npm package-extensions ls` or `npm explain --extensions` could identify extension rules that no longer match any package, rules made redundant by upstream fixes, or extension-created edges.
 
-5. **Should npm provide management commands?** A future command such as `npm package-extensions ls` or `npm explain --extensions` could identify extension rules that no longer match any package, rules made redundant by upstream fixes, or extension-created edges.
+5. **Shared ecosystem database.** Should npm participate in a shared package-extension database, similar to `@yarnpkg/extensions`, or should all extensions remain project-local?
 
-6. **Shared ecosystem database.** Should npm participate in a shared package-extension database, similar to `@yarnpkg/extensions`, or should all extensions remain project-local?
-
-7. **Imperative hooks.** If the declarative field is not sufficient, should npm add `.npmfile.mjs` / `.npmfile.cjs` with a `readPackage` hook? If so, how should hook output be represented in the lockfile, and what restrictions are needed to keep `npm ci` deterministic?
+6. **Imperative hooks.** If the declarative field is not sufficient, should npm add `.npmfile.mjs` / `.npmfile.cjs` with a `readPackage` hook? If so, how should hook output be represented in the lockfile, and what restrictions are needed to keep `npm ci` deterministic?
