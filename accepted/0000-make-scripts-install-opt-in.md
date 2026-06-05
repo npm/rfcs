@@ -330,7 +330,9 @@ In a workspace (monorepo) context:
 
 ### Optional dependencies
 
-If a package in `optionalDependencies` has install scripts that are blocked, it is treated as a failed optional dependency installation. This is consistent with existing behavior where optional dependencies that fail to build are silently skipped.
+If a package in `optionalDependencies` has install scripts that are not allowed, npm still installs the package and skips only its scripts, exactly as it would for a regular dependency. The package is not treated as a failed optional dependency. Packages that use install scripts to optimize themselves but still function without them keep working when listed in `optionalDependencies`.
+
+The existing failed optional dependency behavior is unchanged. It applies when a script that is allowed to run exits non-zero, or when the package fails to extract. In those cases npm drops the optional dependency from the tree, the same as it does now. A script that the `allowScripts` policy skips never runs, so it cannot trigger that path.
 
 ### Bundled dependencies
 
