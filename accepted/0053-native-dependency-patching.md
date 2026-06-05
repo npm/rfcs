@@ -1,3 +1,13 @@
+---
+title: Native Dependency Patching
+number: 53
+status: accepted
+created: 2026-06-05
+accepted_at: 2026-06-05
+implemented_at: null
+withdrawn_at: null
+implementation: null
+---
 # Native Dependency Patching
 
 ## Summary
