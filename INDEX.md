@@ -2,12 +2,13 @@
 
 # RFC index
 
-Generated 2026-05-29. See [README.md](./README.md) for the RFC process.
+Generated 2026-06-05. See [README.md](./README.md) for the RFC process.
 
-## Accepted (5)
+## Accepted (6)
 
 | # | Title | Created | Accepted | Implemented | Withdrawn | Implementation |
 | - | ----- | ------- | -------- | ----------- | --------- | -------------- |
+| [0053](./accepted/0053-native-dependency-patching.md) | Native Dependency Patching | 2026-06-05 | 2026-06-05 | — | — | — |
 | [0047](./accepted/0047-npm-diff-ignore-cr-at-eol.md) | npm diff ignore CR at EOL | — | — | — | — | — |
 | [0044](./accepted/0044-deprecation-ux-revamp.md) | Deprecated packages UX revamp | — | — | — | — | — |
 | [0037](./accepted/0037-audit-overrides.md) | npm audit fix can apply overrides | — | — | — | — | — |
