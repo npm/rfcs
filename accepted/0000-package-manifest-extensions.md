@@ -279,19 +279,19 @@ Adding or narrowing a `peerDependencies` entry can also make Arborist report an 
 
 ### Publish behavior
 
-`packageExtensions` is consumer-side project policy. Published packages may include the field, but npm will not apply it when the package is installed as a dependency.
+`packageExtensions` is application-side project policy. npm only applies it from the project root, and npm does not apply it when a package containing the field is installed as a dependency.
 
-If a package is being published and contains `packageExtensions` while not being marked `"private": true`, npm should print a warning:
+If a non-private package is being published and contains `packageExtensions`, npm should fail the publish:
 
 ```text
-packageExtensions is only honored at the project root and will not affect consumers of this package.
+packageExtensions is only honored at the project root and must not be published.
 ```
 
-The field does not need to be stripped from the tarball. It is harmless metadata when ignored by consumers, just as dependency `overrides` are root-only.
+This keeps root-owned dependency repair available to applications, private workspaces, and local CI while preventing useless project policy from being added to the registry manifest or the `package.json` inside the published tarball.
 
 Keeping the field in `package.json` is a trade-off. pnpm and Yarn keep package extensions in workspace configuration files, which avoids publishing consumer-only policy, but npm does not currently have an equivalent structured workspace config file for package-manager-owned project policy. A root `package.json` field keeps the feature available to single-package projects and workspaces without introducing a new config file format just for this feature.
 
-If npm later introduces a structured workspace config file, `packageExtensions` could move there or be supported there as an additional location. Until then, root-only semantics and the publish warning make the package.json placement explicit.
+If npm later wants published packages to carry their own dependency-manifest repair policy, that policy should live somewhere other than `package.json`. If npm later introduces a structured workspace config file, `packageExtensions` could move there or be supported there as an additional location.
 
 ## Rationale and Alternatives
 
@@ -376,7 +376,7 @@ The primary implementation work is in `npm/cli`, especially Arborist.
   - Add install-time validation for root-only usage and warnings for ignored non-root workspace fields.
   - Add `npm ci` validation for canonical extension hash state, selector conflicts against locked package identities, and stale extension provenance.
   - Surface extension provenance in `npm ls` and `npm explain`.
-  - Warn on publish when a non-private package contains `packageExtensions`.
+  - Fail `npm publish` for non-private packages that contain `packageExtensions`.
 
 - **`npm/cli/workspaces/package-json`**
   - Add schema/read-write awareness of the field.
@@ -466,8 +466,9 @@ Required test coverage:
   - `npm explain` identifies extension-created edges.
   - `npm ls --json` exposes extension metadata for affected nodes or edges.
 
-- Publish warning:
-  - `npm publish --dry-run` on a non-private package with `packageExtensions` emits a warning explaining root-only behavior.
+- Publish behavior:
+  - `npm publish --dry-run` on a non-private package with `packageExtensions` fails with an error explaining root-only behavior.
+  - Private packages and unpublished local projects can use `packageExtensions` for local installs and CI.
 
 - Lifecycle, peer, and bundled dependency behavior:
   - Extension-added dependency edges are subject to the same lifecycle-script policy as normal dependency edges.
