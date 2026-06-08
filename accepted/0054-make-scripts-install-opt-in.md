@@ -1,14 +1,13 @@
 ---
 title: Make install scripts opt-in
-number: null
-status: proposed
-created: null
-accepted_at: null
+number: 54
+status: accepted
+created: 2026-06-08
+accepted_at: 2026-06-08
 implemented_at: null
 withdrawn_at: null
 implementation: null
 ---
-
 # Make install scripts opt-in
 
 ## Summary
