@@ -2,24 +2,24 @@
 
 # RFC index
 
-Generated 2026-06-08. See [README.md](./README.md) for the RFC process.
+Generated 2026-06-18. See [README.md](./README.md) for the RFC process.
 
-## Accepted (7)
+## Accepted (6)
 
 | # | Title | Created | Accepted | Implemented | Withdrawn | Implementation |
 | - | ----- | ------- | -------- | ----------- | --------- | -------------- |
 | [0054](./accepted/0054-make-scripts-install-opt-in.md) | Make install scripts opt-in | 2026-06-08 | 2026-06-08 | — | — | — |
-| [0053](./accepted/0053-native-dependency-patching.md) | Native Dependency Patching | 2026-06-05 | 2026-06-05 | — | — | — |
 | [0047](./accepted/0047-npm-diff-ignore-cr-at-eol.md) | npm diff ignore CR at EOL | — | — | — | — | — |
 | [0044](./accepted/0044-deprecation-ux-revamp.md) | Deprecated packages UX revamp | — | — | — | — | — |
 | [0037](./accepted/0037-audit-overrides.md) | npm audit fix can apply overrides | — | — | — | — | — |
 | [0035](./accepted/0035-registry-spec.md) | The `registry:` Dependency Specifier | — | — | — | — | — |
 | [0028](./accepted/0028-publish-prompt.md) | Publish confirmation prompt | — | — | — | — | — |
 
-## Implemented (39)
+## Implemented (40)
 
 | # | Title | Created | Accepted | Implemented | Withdrawn | Implementation |
 | - | ----- | ------- | -------- | ----------- | --------- | -------------- |
+| [0053](./implemented/0053-native-dependency-patching.md) | Native Dependency Patching | 2026-06-05 | 2026-06-05 | 2026-06-18 | — | [link](<https://github.com/npm/cli/pull/9439>) |
 | [0052](./implemented/0052-registry-scoped-keyfile-and-certfile.md) | Registry-scoped keyfile / certfile credential options | 2026-05-29 | 2026-05-29 | 2026-05-29 | — | [link](<https://github.com/npm/cli/pull/5160>) |
 | [0051](./implemented/0051-validate-signatures.md) | Improve npm signature verification | 2026-05-29 | 2026-05-29 | 2026-05-29 | — | [link](<https://github.com/npm/cli/pull/4827>) |
 | [0050](./implemented/0050-location-config-parameter.md) | Location Config Parameter | — | — | 2026-05-29 | — | [link](<https://github.com/npm/cli/commit/98905ae3759165cd6d6f6306f31acc6a2baa4cde>) |
