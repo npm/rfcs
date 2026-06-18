@@ -1,3 +1,13 @@
+---
+title: Package Manifest Extensions
+number: 55
+status: accepted
+created: 2026-06-18
+accepted_at: 2026-06-18
+implemented_at: null
+withdrawn_at: null
+implementation: null
+---
 # Package Manifest Extensions
 
 ## Summary

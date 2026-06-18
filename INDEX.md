@@ -4,10 +4,11 @@
 
 Generated 2026-06-18. See [README.md](./README.md) for the RFC process.
 
-## Accepted (6)
+## Accepted (7)
 
 | # | Title | Created | Accepted | Implemented | Withdrawn | Implementation |
 | - | ----- | ------- | -------- | ----------- | --------- | -------------- |
+| [0055](./accepted/0055-package-manifest-extensions.md) | Package Manifest Extensions | 2026-06-18 | 2026-06-18 | — | — | — |
 | [0054](./accepted/0054-make-scripts-install-opt-in.md) | Make install scripts opt-in | 2026-06-08 | 2026-06-08 | — | — | — |
 | [0047](./accepted/0047-npm-diff-ignore-cr-at-eol.md) | npm diff ignore CR at EOL | — | — | — | — | — |
 | [0044](./accepted/0044-deprecation-ux-revamp.md) | Deprecated packages UX revamp | — | — | — | — | — |
