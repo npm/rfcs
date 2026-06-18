@@ -1,12 +1,12 @@
 ---
 title: Native Dependency Patching
 number: 53
-status: accepted
+status: implemented
 created: 2026-06-05
 accepted_at: 2026-06-05
-implemented_at: null
+implemented_at: 2026-06-18
 withdrawn_at: null
-implementation: null
+implementation: https://github.com/npm/cli/pull/9439
 ---
 # Native Dependency Patching
 
