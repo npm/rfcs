@@ -1,12 +1,12 @@
 ---
 title: Package Manifest Extensions
 number: 55
-status: accepted
+status: implemented
 created: 2026-06-18
 accepted_at: 2026-06-18
-implemented_at: null
+implemented_at: 2026-06-18
 withdrawn_at: null
-implementation: null
+implementation: https://github.com/npm/cli/pull/9496
 ---
 # Package Manifest Extensions
 

@@ -4,11 +4,10 @@
 
 Generated 2026-06-18. See [README.md](./README.md) for the RFC process.
 
-## Accepted (7)
+## Accepted (6)
 
 | # | Title | Created | Accepted | Implemented | Withdrawn | Implementation |
 | - | ----- | ------- | -------- | ----------- | --------- | -------------- |
-| [0055](./accepted/0055-package-manifest-extensions.md) | Package Manifest Extensions | 2026-06-18 | 2026-06-18 | — | — | — |
 | [0054](./accepted/0054-make-scripts-install-opt-in.md) | Make install scripts opt-in | 2026-06-08 | 2026-06-08 | — | — | — |
 | [0047](./accepted/0047-npm-diff-ignore-cr-at-eol.md) | npm diff ignore CR at EOL | — | — | — | — | — |
 | [0044](./accepted/0044-deprecation-ux-revamp.md) | Deprecated packages UX revamp | — | — | — | — | — |
@@ -16,10 +15,11 @@ Generated 2026-06-18. See [README.md](./README.md) for the RFC process.
 | [0035](./accepted/0035-registry-spec.md) | The `registry:` Dependency Specifier | — | — | — | — | — |
 | [0028](./accepted/0028-publish-prompt.md) | Publish confirmation prompt | — | — | — | — | — |
 
-## Implemented (40)
+## Implemented (41)
 
 | # | Title | Created | Accepted | Implemented | Withdrawn | Implementation |
 | - | ----- | ------- | -------- | ----------- | --------- | -------------- |
+| [0055](./implemented/0055-package-manifest-extensions.md) | Package Manifest Extensions | 2026-06-18 | 2026-06-18 | 2026-06-18 | — | [link](<https://github.com/npm/cli/pull/9496>) |
 | [0053](./implemented/0053-native-dependency-patching.md) | Native Dependency Patching | 2026-06-05 | 2026-06-05 | 2026-06-18 | — | [link](<https://github.com/npm/cli/pull/9439>) |
 | [0052](./implemented/0052-registry-scoped-keyfile-and-certfile.md) | Registry-scoped keyfile / certfile credential options | 2026-05-29 | 2026-05-29 | 2026-05-29 | — | [link](<https://github.com/npm/cli/pull/5160>) |
 | [0051](./implemented/0051-validate-signatures.md) | Improve npm signature verification | 2026-05-29 | 2026-05-29 | 2026-05-29 | — | [link](<https://github.com/npm/cli/pull/4827>) |
