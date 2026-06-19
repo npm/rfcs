@@ -127,7 +127,7 @@ npm should not provide registry, fetch, lockfile mutation, or package extraction
 
 ### Extension timing
 
-npm should call `transformManifest` after it reads or fetches a non-workspace dependency manifest and before Arborist reads that manifest's outgoing dependency and peer edges. The extension point operates on in-memory manifest metadata. npm should call `transformManifest` at most once per unique resolved package identity during a single ideal-tree build and cache the effective manifest for that build. This identity-keyed cache is new implementation work for imperative extension output, separate from any existing raw-manifest cache keyed by the requested spec. The cache key should identify the resolved package instance rather than the incoming edge, so the same resolved package is not repeatedly transformed for every dependent that reaches it. The key should use the package integrity when available. When integrity is unavailable, the key should use the resolved URL or source identity plus the manifest name and version. These rules apply to any non-root, non-workspace dependency manifest that Arborist reads for ideal-tree construction, including registry packages, git dependencies, remote tarball dependencies, and local file, directory, or symlinked dependency manifests. The source-identity fallback exists for those cases where integrity may be unavailable or insufficient to identify the manifest before transformation. npm must call `transformManifest` with a deeply isolated copy of the normalized manifest and must not mutate pacote's cached manifest object or any nested object reachable from it.
+npm should call `transformManifest` after it reads or fetches a non-workspace dependency manifest and before Arborist reads that manifest's outgoing dependency and peer edges. The extension point operates on in-memory manifest metadata. npm should call `transformManifest` at most once per unique resolved package identity during a single ideal-tree build and cache the effective manifest for that build. This identity-keyed cache is new implementation work for imperative extension output, separate from any existing raw-manifest cache keyed by the requested spec. The cache key should identify the resolved package instance rather than the incoming edge, so the same resolved package is not repeatedly transformed for every dependent that reaches it. The key should use the package integrity when available. When integrity is unavailable, the key should use the resolved URL or source identity plus the manifest name and version. These rules apply to any non-root, non-workspace dependency manifest that Arborist reads for ideal-tree construction, including registry packages, git dependencies, remote tarball dependencies, and local file, directory, or symlinked dependency manifests. The source-identity fallback exists for those cases where integrity may be unavailable or insufficient to identify the manifest before transformation. Supporting local directory and symlinked dependency manifests requires new wiring for Arborist paths that create `Link` nodes rather than fetched package nodes. npm must call `transformManifest` with a deeply isolated copy of the normalized manifest and must not mutate pacote's cached manifest object or any nested object reachable from it.
 
 When npm reuses a transformed manifest result, it should pass consumers a deeply isolated copy rather than a shared mutable object. The package tarball and the installed `node_modules/<package>/package.json` file are not rewritten by this feature. The extension point is not called for the root project package. The extension point is not called for workspace package manifests, because workspace package manifests are source-controlled project files that should be edited directly. The extension point is not called for installed dependency `.npm-extension` files. This keeps the authority model the same as `packageExtensions`: only the root project can change the dependency graph that npm resolves.
 
@@ -202,6 +202,8 @@ For example:
 `npmExtensionApplied` should include `extensionPoint: "transformManifest"` plus one key for each changed allowlisted field. Each changed field key should contain a sorted array of dependency names affected in that field. The sorted order is a deterministic lockfile requirement for this feature, even if existing `packageExtensions` provenance preserves insertion order. The hash should be computed from an exact prefix and the bytes of the selected extension file after npm has selected the file to load. For `.mjs`, npm should hash `utf8("npm-extension:v1:mjs\n")` followed by the raw file bytes. For `.cjs`, npm should hash `utf8("npm-extension:v1:cjs\n")` followed by the raw file bytes. If there is no `.npm-extension`, npm records no `npmExtensionHash` and no `npmExtensionApplied` provenance. `npm ci` should not execute `transformManifest` when it can reify the locked graph from matching lockfile state. If the root `.npm-extension` is present but the lockfile lacks matching extension state, `npm ci` must fail.
 
 If the lockfile contains extension state but the root `.npm-extension` is absent, `npm ci` must fail. If the root `.npm-extension` content changes, `npm install` must treat the locked dependency graph as stale and re-resolve using the new extension output. If the root `.npm-extension` content changes, `npm ci` must fail until the lockfile is regenerated. Package entries should continue to store their effective `dependencies`, `optionalDependencies`, `peerDependencies`, and `peerDependenciesMeta` after extension application. Package entries affected by `transformManifest` should store minimal provenance rather than a copy of the extension output. npm should compare the dependency and peer metadata before and after the extension point to decide whether `npmExtensionApplied` is needed for a package entry and which dependency names it should list.
+
+The `npm ci` path should verify the selected extension file hash before importing any extension module. When the hash and lockfile extension state match, `npm ci` should reify from the locked effective dependency metadata. If the implementation still constructs an ideal tree internally for `npm ci`, that path must run in a mode that trusts matching locked extension metadata and disables `transformManifest` execution. If npm cannot prove the lockfile extension state matches the selected extension file before such a build, `npm ci` must fail rather than execute `.npm-extension`.
 
 Names recorded in `npmExtensionApplied` are affected dependency names, not only names for edges that still exist after transformation. For a created or changed edge, the affected name appears in the effective dependency field stored on the same package entry. For a deleted edge, the affected name appears in `npmExtensionApplied` but is absent from the effective dependency field, and that absence must not be treated as stale lockfile metadata.
 
@@ -307,7 +309,7 @@ Native dependency patching is appropriate when the package contents or the insta
 
 The implementation should build on the `packageExtensions` phase added to `npm/cli` and Arborist in https://github.com/npm/cli/pull/9496. The current implementation already has a phase that repairs manifest metadata before dependency and peer edges are created. The `transformManifest` extension point should operate in that same phase, before `packageExtensions` is applied.
 
-Some behavior in this RFC is intentionally new rather than inherited from `packageExtensions`. npm needs an identity-keyed effective-manifest cache for `transformManifest` output, a deeply isolated manifest copy for user JavaScript, a `npm ci` path that verifies extension state without executing the extension function, and source-aware config validation for `extension-file`.
+Some behavior in this RFC is intentionally new rather than inherited from `packageExtensions`. npm needs an identity-keyed effective-manifest cache for `transformManifest` output, a deeply isolated manifest copy for user JavaScript before any user code runs, support for Arborist paths that create `Link` nodes for local dependency sources, linked-install actual-tree handling that preserves extension-created edges and provenance, a `npm ci` path that verifies extension state without executing the extension function, and source-aware config validation for `extension-file`.
 
 ### Affected packages
 
@@ -320,6 +322,7 @@ Some behavior in this RFC is intentionally new rather than inherited from `packa
   - Reject extension-point return values that are not manifest objects, including promises.
   - Skip root and workspace package manifests as extension targets.
   - Run `transformManifest` for non-root, non-workspace dependency manifests regardless of whether they came from the registry, git, a remote tarball, a local file, a local directory, or a symlinked dependency source.
+  - Add transform support for local dependency sources that currently create `Link` nodes rather than fetched package nodes.
   - Ignore `.npm-extension` files from installed dependencies.
   - Check workspace directories for `.npm-extension.mjs` or `.npm-extension.cjs` and warn when non-root workspace packages contain one.
   - Validate the extension-point return value before dependency edges are read.
@@ -330,6 +333,7 @@ Some behavior in this RFC is intentionally new rather than inherited from `packa
   - Apply peer-related `transformManifest` changes before virtual package / peer-set identity is calculated for linked installs.
   - Record the root extension hash and affected package provenance in the lockfile.
   - Re-run `transformManifest` across candidate manifests when the selected extension file changes instead of using the selector-based selective re-resolution model from `packageExtensions`.
+  - Preserve extension-created edges and provenance when loading the linked actual tree, following the `packageExtensions` actual-tree fix in https://github.com/npm/cli/issues/9568 and https://github.com/npm/cli/pull/9569.
   - Ensure extension-influenced edges participate in peer resolution, deduplication, auditing, lifecycle-script policy, and all install strategies.
   - Surface extension provenance through edge and node explanation data.
 
@@ -403,6 +407,7 @@ Required test coverage:
   - `npm ci` succeeds when the extension hash and lockfile state match.
   - `npm ci` does not execute `transformManifest` when the extension hash and lockfile state match.
   - `npm ci` accepts deletion provenance when the extension hash and lockfile state match.
+  - `npm ci` fails before importing `.npm-extension` when the selected extension file hash does not match the lockfile.
   - `npm ci` fails when the extension file changes without updating the lockfile.
   - `npm ci` fails when the extension file is absent but extension state is present in the lockfile.
   - `npm ci` fails when the extension file is present but extension state is absent from the lockfile.
@@ -411,6 +416,7 @@ Required test coverage:
 
 - Install strategies:
   - A missing dependency repaired by `transformManifest` installs under `install-strategy=hoisted`, `nested`, `shallow`, and `linked`.
+  - A dependency repaired by `transformManifest` remains visible to actual-tree commands under `install-strategy=linked`.
   - Peer dependency and `peerDependenciesMeta` changes from `transformManifest` are applied before linked-install peer-set identity is calculated.
   - The extension context does not expose the selected `install-strategy`.
 
