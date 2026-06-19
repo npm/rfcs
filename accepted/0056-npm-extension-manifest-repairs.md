@@ -1,3 +1,13 @@
+---
+title: npm Extension for Manifest Repairs
+number: 56
+status: accepted
+created: 2026-06-19
+accepted_at: 2026-06-19
+implemented_at: null
+withdrawn_at: null
+implementation: null
+---
 # npm Extension for Manifest Repairs
 
 ## Summary
