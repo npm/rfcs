@@ -1,12 +1,12 @@
 ---
 title: npm Extension for Manifest Repairs
 number: 56
-status: accepted
+status: implemented
 created: 2026-06-19
 accepted_at: 2026-06-19
-implemented_at: null
+implemented_at: 2026-06-22
 withdrawn_at: null
-implementation: null
+implementation: https://github.com/npm/cli/pull/9586
 ---
 # npm Extension for Manifest Repairs
 
