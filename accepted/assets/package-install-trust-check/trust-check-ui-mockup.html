@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Install trust check — mcp-trustcard</title>
+  <style>
+    :root {
+      --bg: #f6f8fa;
+      --card: #ffffff;
+      --text: #1f2328;
+      --muted: #656d76;
+      --border: #d0d7de;
+      --brand: #1a3c6c;
+      --brand-2: #3a8c4a;
+      --danger: #cf222e;
+      --radius: 12px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 24px;
+    }
+    .page {
+      width: 100%;
+      max-width: 480px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: 0 8px 24px rgba(31, 35, 40, 0.08);
+      overflow: hidden;
+    }
+    .header {
+      padding: 32px 32px 0;
+      text-align: center;
+    }
+    .logo {
+      width: 96px;
+      height: 96px;
+      margin: 0 auto 16px;
+    }
+    .logo img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+    h1 {
+      font-size: 22px;
+      margin: 0 0 6px;
+      line-height: 1.3;
+    }
+    .subtitle {
+      color: var(--muted);
+      font-size: 15px;
+      margin: 0;
+    }
+    .body {
+      padding: 24px 32px 32px;
+    }
+    .package-card {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px;
+      margin-bottom: 20px;
+      background: #fafafa;
+    }
+    .package-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      background: #e8f0fe;
+      display: grid;
+      place-items: center;
+      font-weight: 700;
+      color: var(--brand);
+      flex-shrink: 0;
+    }
+    .package-meta {
+      min-width: 0;
+    }
+    .package-name {
+      font-weight: 600;
+      font-size: 15px;
+      margin: 0 0 2px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .package-version {
+      color: var(--muted);
+      font-size: 13px;
+      margin: 0;
+    }
+    .publisher {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--brand-2);
+      font-size: 13px;
+      font-weight: 600;
+      margin-top: 8px;
+    }
+    .publisher svg, .publisher .badge {
+      width: 16px;
+      height: 16px;
+    }
+    .notice {
+      background: #fff8c5;
+      border: 1px solid #e7d87a;
+      border-radius: 8px;
+      padding: 12px;
+      font-size: 14px;
+      margin-bottom: 20px;
+    }
+    .notice strong { color: #744210; }
+    .human-check {
+      text-align: center;
+      padding: 20px;
+      border: 2px dashed var(--border);
+      border-radius: 10px;
+      margin-bottom: 16px;
+    }
+    .human-check p {
+      margin: 0 0 12px;
+      font-size: 14px;
+      color: var(--muted);
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      width: 100%;
+      padding: 12px;
+      border: 0;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .btn-primary {
+      background: var(--brand);
+      color: #fff;
+    }
+    .btn-primary:hover { background: #142f56; }
+    .btn-ghost {
+      background: transparent;
+      color: var(--muted);
+      margin-top: 10px;
+    }
+    .footer {
+      text-align: center;
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 18px;
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="header">
+      <div class="logo">
+        <img src="trustcard-logo.png" alt="trustcard" />
+      </div>
+      <h1>Confirm this install</h1>
+      <p class="subtitle">mcp-trustcard requires a one-time, hardware-bound proof of humanity before this package can be downloaded.</p>
+    </div>
+
+    <div class="body">
+      <div class="package-card">
+        <div class="package-icon">T</div>
+        <div class="package-meta">
+          <p class="package-name">mcp-trustcard</p>
+          <p class="package-version">v3.1.0 · published 2026-08-18</p>
+          <div class="publisher">
+            <span>Provenance verified</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="notice">
+        <strong>Why am I seeing this?</strong><br />
+        This publisher has enabled install trust check. CI, agents, and known automation skip this step automatically through the zero-config heuristic pass (IP/ASN, User-Agent, and the echoed <code>X-NPM-Trust-Check-Challenge</code> header).
+      </div>
+
+      <div class="human-check">
+        <p>Prove you are human. This uses a WebAuthn / platform authenticator such as Touch ID, Windows Hello, or a security key. Puzzle or image challenges are not used here — LLM computer-use agents can solve them.</p>
+        <button class="btn btn-primary" type="button">Verify with passkey / Touch ID / Windows Hello</button>
+        <br />
+        <button class="btn btn-ghost" type="button">Email a one-time link</button>
+        <p class="fallback-note" style="margin:10px 0 0; font-size:12px; color:var(--muted);">Two clicks: request the email, then click the single “Verify this install” button inside it.</p>
+      </div>
+
+      <p class="footer">
+        The registry will issue a short-lived trust check token once verified. No new personal data is collected beyond your existing npm session.
+      </p>
+    </div>
+  </div>
+</body>
+</html>
