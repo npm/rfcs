@@ -13,27 +13,23 @@ implementation: null
 
 ## Summary
 
-This RFC proposes an opt-in, registry-side mechanism that lets an npm publisher
-classify every tarball fetch for a package as either legitimate automation,
-a verified human, or unwanted traffic. The registry's tarball endpoint becomes
-a per-package policy proxy with three lanes:
+This RFC adds an opt-in, per-package trust gate at the registry tarball endpoint.
+Publishers choose one of four modes via `publishConfig.trustCheck`:
 
-1. **CI and legitimate automation** receive a **zero-config heuristic automation
-   pass**. The registry uses passive signals (IP/ASN reputation, User-Agent and
-   TLS fingerprint, and an echoed challenge header) to recognize automation and
-   serve the tarball immediately. No tokens, browser, CAPTCHA, or manual setup is
-   required.
-2. **Human-driven installs** are directed through a **hardware-bound proof of
-   humanity** using WebAuthn / platform biometric authenticators (Touch ID,
-   Windows Hello, hardware security keys). No visual or cognitive CAPTCHA is
-   offered.
-3. **Known scrapers, abuse networks, and obvious non-human traffic** are
-   classified as `spam_user` (returned externally as `blocked`) and receive a
-   403 `TRUST_CHECK_BLOCKED` response. They are not offered a challenge, fallback,
-   or CAPTCHA.
+| Mode | Behavior |
+|------|----------|
+| `none` (default) | No change — tarballs served freely |
+| `audit` | Log every fetch with a trust classification; never block |
+| `require` | Accept **heuristic automation** (zero-config CI pass) **or** **hardware-bound human** (WebAuthn / biometric) tokens |
+| `require-human` | Accept **only** hardware-bound human tokens; CI must use explicit `automation`/`service` tokens or OIDC trusted publishing |
 
-The design only affects packages that explicitly opt in through
-`publishConfig.trustCheck`.
+**Three traffic lanes, zero CAPTCHA:**
+
+1. **Heuristic automation pass** — CI and headless runners get a frictionless tarball. The registry classifies requests using passive signals (known CI ASN/IP ranges, User-Agent/TLS fingerprints, an echoed `X-NPM-Trust-Check-Challenge` nonce). No tokens, no browser, no setup.
+2. **Hardware-bound human check** — Residential IPs, unknown clients, and ambiguous traffic hit a `428 Precondition Required`. The npm CLI triggers a native OS biometric prompt (Touch ID, Windows Hello, security key) via WebAuthn with `userVerification=required`. The signature is bound to `npmjs.com` and the package name; a remote LLM in a cloud sandbox cannot touch the enclave.
+3. **Hard `spam_user` block** — Known scrapers, TOR exits, open proxies, exploit tooling, and repeat abusers get `403 TRUST_CHECK_BLOCKED` immediately. No challenge, no fallback, no CAPTCHA.
+
+Every fetch (allowed or blocked) emits a standardized `install-trust-check` event with a `tokenKind` (`heuristic-automation`, `unattended`, `human`, `automation`, `service`, or `spam_user`), giving publishers real visibility into human vs automated adoption — something per-package CI tokens never delivered.
 
 ## Motivation
 
