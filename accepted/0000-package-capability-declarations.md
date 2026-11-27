@@ -21,7 +21,7 @@ Package managers can show the declaration and how it changed between versions. S
 
 ### The problem
 
-Security tools that analyse npm packages before installation find capabilities in code. A package downloads a file, starts a program, or reads an environment variable. What a security tool cannot see is whether the package author meant the package to do that. Today the only hint a security tool has is the package's history. A capability that was already present in previous published versions is probably part of what the package does, and one that appears suddenly in a new version deserves a look. A package that downloads its platform binary from GitHub in a `postinstall` script looks, to static analysis, much like a hijacked release that downloads a payload from an attacker's server. Every security tool therefore has two poor choices. It can report the capability and raise false alarms on legitimate packages, or it can stay silent and miss the attack.
+Security tools that analyse npm packages before installation find capabilities in code, the kinds of access to the system described in the Summary. A package downloads a file, starts a program, or reads an environment variable. None of these is harmful in itself. What a security tool cannot see is whether the package author meant the package to do that. Today the only hint a security tool has is the package's history. A capability that was already present in previous published versions is probably part of what the package does, and one that appears suddenly in a new version deserves a look. A package that downloads its platform binary from GitHub in a `postinstall` script looks, to static analysis, much like a hijacked release that downloads a payload from an attacker's server. Every security tool therefore has two poor choices. It can report the capability and raise false alarms on legitimate packages, or it can stay silent and miss the attack.
 
 False alarms are not only an inconvenience. When a security tool flags many legitimate packages, developers learn to dismiss its findings, and a real attack is dismissed with the rest. To avoid this, developers raise thresholds, stop failing builds, or add allowlists, and a package on an allowlist is what an attacker most wants to hijack. The authors of security tools face the same pressure from the other side. To keep false alarms low they drop or narrow rules, and attacks that look like legitimate behaviour pass unreported. Because malicious versions are rare compared with all the versions developers install, even a low false-alarm rate means most alerts are false.
 
@@ -166,7 +166,7 @@ Security tools should keep sensitive behaviour visible whether or not it is decl
 
 ### Working with install-script approval (RFC #54)
 
-npm RFC #54, accepted in June 2026, blocks dependency install scripts by default. This covers `preinstall`, `install`, `postinstall` and automatic `node-gyp` builds. The developer allows scripts for chosen packages in an `allowScripts` field in their own project's `package.json`, and an `npm approve-scripts` command helps build that list. RFC #54 describes `allowScripts` as "a consumer-side policy, not a publisher declaration". This RFC supplies the publisher side.
+npm RFC #54, accepted in June 2026, blocks dependency install scripts by default, and npm enforces it from version 12. This covers `preinstall`, `install`, `postinstall` and automatic `node-gyp` builds. The developer allows scripts for chosen packages in an `allowScripts` field in their own project's `package.json`, and an `npm approve-scripts` command helps build that list. RFC #54 describes `allowScripts` as "a consumer-side policy, not a publisher declaration". This RFC supplies the publisher side.
 
 The two fit together at the moment a developer decides. Today the developer sees that a package wants to run an install script, but not what the script does. With declarations, npm can show what each script declares next to the request.
 
@@ -186,7 +186,7 @@ $ npm install
 Run npm approve-scripts to review.
 ```
 
-Declarations also cover a case that approval alone does not. In RFC #54 an entry with only a package name allows the scripts of every version of that package, including versions published later. If such a package is hijacked, the new version's install script runs without a new approval. A change in its install declaration is the visible signal at that point.
+Declarations also cover a case that approval alone does not. `npm approve-scripts` pins an approval to the version the developer reviewed, but an entry with only a package name, written by hand or with `--no-allow-scripts-pin`, allows the scripts of every version of that package, including versions published later. If such a package is hijacked, the new version's install script runs without a new approval. A change in its install declaration is the visible signal at that point.
 
 ```
 example-image-tool  2.4.0 -> 2.4.1   (scripts allowed for all versions)
@@ -259,7 +259,7 @@ An example implementation that reads the field is in TreeCustodian, on the branc
 
 ## Prior Art
 
-- npm RFC #54 (PR #868), "Make install scripts opt-in", accepted 8 June 2026. Blocks dependency install scripts by default and lets the developer allow them per package. It also notes manifest confusion, the registry not checking its copy of `package.json` against the tarball.
+- npm RFC #54 (PR #868), "Make install scripts opt-in", accepted 8 June 2026 and enforced from npm 12. Blocks dependency install scripts by default and lets the developer allow them per package. It also notes manifest confusion, the registry not checking its copy of `package.json` against the tarball.
 - npm PR #297, "RFC: permissions", opened December 2020 and not accepted. An earlier proposal on permissions for module loading.
 - Node.js Permission Model. Process-wide controls over the file system, child processes, workers and other resources.
 - Install-script controls in other package managers, such as pnpm's list of dependencies allowed to build, Bun's `trustedDependencies` and Deno's opt-in for npm lifecycle scripts. These decide whether scripts run, not what a package declares it does.
